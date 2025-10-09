@@ -35,9 +35,9 @@ export class WelcomePage implements OnInit, OnDestroy {
         clearInterval(this.timer);
         setTimeout(() => {
           this.navCtrl.navigateRoot('/login');
-        }, 1200);
+        }, 600);
       }
-    }, 2500); // cada 2.5 segundos cambia
+    }, 900); 
   }
 
   ngOnDestroy() {

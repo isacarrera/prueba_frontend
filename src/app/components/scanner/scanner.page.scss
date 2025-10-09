@@ -1,254 +1,127 @@
-body {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    margin: 0;
-    padding: 0;
-    position: fixed;
-    width: 100%;
-    max-width: 100%;
-    height: 100%;
-    max-height: 100%;
-    background: transparent !important;
-    transform: translateZ(0);
-    text-rendering: optimizeLegibility;
-    overflow: hidden;
-    touch-action: manipulation;
-    -webkit-user-drag: none;
-    -ms-content-zooming: none;
-    word-wrap: break-word;
-    overscroll-behavior-y: none;
-    -webkit-text-size-adjust: none;
-    text-size-adjust: none;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@500&display=swap');
+
+body, ion-content {
+  background: radial-gradient(circle at center, #02060a 0%, #000 100%) !important;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
 }
 
+/* Contenedor del escáner */
 .scanner-container {
   position: relative;
   width: 100%;
-  height: 70vh;
-  background: transparent !important;
-  overflow: hidden;
-}
-.scanner-active {
-  ion-app,
-  ion-content {
-    --background: transparent !important;
-    background: transparent !important;
-  }
-}
-.scan-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
 }
 
+/* Marco de escaneo */
 .scan-frame {
   position: relative;
   width: 280px;
   height: 280px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(0, 191, 255, 0.5);
   border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 191, 255, 0.3);
+  overflow: hidden;
+  animation: framePulse 2.2s infinite alternate ease-in-out;
 }
 
+@keyframes framePulse {
+  0% { box-shadow: 0 0 15px rgba(0, 191, 255, 0.2); }
+  100% { box-shadow: 0 0 40px rgba(0, 191, 255, 0.6); }
+}
+
+/* Esquinas brillantes */
 .scan-corner {
   position: absolute;
-  width: 24px;
-  height: 24px;
-  border-color: #4CAF50;
+  width: 26px;
+  height: 26px;
+  border-color: #00bfff;
   border-style: solid;
-  z-index: 10;
+  filter: drop-shadow(0 0 6px #00bfff);
 }
 
-.top-left {
-  top: 0;
-  left: 0;
-  border-width: 4px 0 0 4px;
-}
+.top-left { top:0; left:0; border-width:3px 0 0 3px; }
+.top-right { top:0; right:0; border-width:3px 3px 0 0; }
+.bottom-left { bottom:0; left:0; border-width:0 0 3px 3px; }
+.bottom-right { bottom:0; right:0; border-width:0 3px 3px 0; }
 
-.top-right {
-  top: 0;
-  right: 0;
-  border-width: 4px 4px 0 0;
-}
-
-.bottom-left {
-  bottom: 0;
-  left: 0;
-  border-width: 0 0 4px 4px;
-}
-
-.bottom-right {
-  bottom: 0;
-  right: 0;
-  border-width: 0 4px 4px 0;
-}
-
+/* Línea de escaneo */
 .scan-line {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(to right, transparent, #4CAF50, transparent);
-  animation: scan 2s infinite linear;
+  background: linear-gradient(90deg, transparent, #00bfff, #00e5ff, transparent);
+  box-shadow: 0 0 15px #00e5ff, 0 0 30px rgba(0, 229, 255, 0.5);
+  animation: scan 2.5s infinite ease-in-out;
+  opacity: 0.9;
 }
 
 @keyframes scan {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(274px); }
+  0% { transform: translateY(0); opacity: 0.9; }
+  50% { opacity: 1; }
+  100% { transform: translateY(277px); opacity: 0.9; }
 }
 
-.scan-instructions {
+/* Modal temporal "Apunta al QR" */
+.scan-instructions-modal {
   position: absolute;
-  bottom: -60px;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  padding: 16px 24px;
+  border-radius: 12px;
+  text-align: center;
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: white;
-  text-align: center;
-  
-  ion-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
-    color: #4CAF50;
-  }
-  
-  p {
-    margin: 0;
-    font-size: 14px;
-    opacity: 0.8;
-  }
+  z-index: 10;
+  animation: fadeInOut 4s forwards;
 }
 
+.scan-instructions-modal ion-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  color: #00bfff;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* Código escaneado */
 .code-display {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  animation: slideUp 0.3s ease-out;
-
-  .code-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    
-    ion-icon {
-      margin-right: 8px;
-      font-size: 20px;
-    }
-    
-    h3 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: #2e7d32;
-    }
-  }
-
-  .code-text {
-    margin: 0;
-    font-family: 'Courier New', monospace;
-    font-size: 18px;
-    font-weight: bold;
-    color: #1976d2;
-    background: #e3f2fd;
-    padding: 8px 12px;
-    border-radius: 6px;
-    text-align: center;
-    word-break: break-all;
-  }
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 51, 102, 0.3);
+  backdrop-filter: blur(12px) saturate(160%);
+  border-radius: 10px;
+  padding: 18px 24px;
+  width: 80%;
+  max-width: 340px;
+  text-align: center;
+  z-index: 5;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.scanner-page {
-  --background: transparent !important;
-  background: transparent !important;
-  --ion-background-color: transparent !important;
-  overflow: hidden !important;
-
-  // Asegurar que el contenedor de la cámara tenga altura y no esté oculto
-  .scanner-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: #000; /* Fondo negro para la cámara */
-    overflow: hidden;
-    z-index: 1;
-  }
-
-  // Overlay de escaneo
-  .scan-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  // Código escaneado
-  .code-display {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-    animation: slideUp 0.3s ease-out;
-  }
-}
-
- ion-content {
-    --background: transparent !important;
-    background: transparent !important;
-    --ion-background-color: transparent !important;
-  }
-  .scanner-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: transparent !important;
-    overflow: hidden;
-    z-index: 1;
-    border: 2px solid red;
-  }
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.code-display .code-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 17px;
+  font-weight: bold;
+  color: #00e5ff;
+  background: rgba(0, 191, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  word-break: break-all;
 }

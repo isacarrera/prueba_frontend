@@ -12,6 +12,7 @@ import {
   chatbubbleEllipsesOutline,
   documentTextOutline,
   homeOutline,
+  informationCircleOutline,
   qrCodeOutline,
   ellipsisHorizontalCircleOutline,
   personAddOutline,
@@ -73,6 +74,7 @@ export class InicioOperativoPage implements OnInit {
       documentTextOutline,
       homeOutline,
       qrCodeOutline,
+      informationCircleOutline,
       ellipsisHorizontalCircleOutline,
       personAddOutline,
       arrowBackOutline,
@@ -136,13 +138,25 @@ export class InicioOperativoPage implements OnInit {
   closeInviteModal() {
     this.isInviteOpen = false;
   }
+  
+// Estado para mostrar/ocultar modal de instrucciones
+isInstructionsOpen = false;
 
-  openObservacionesModal() {
-    this.isObservacionesOpen = true;
-  }
-  closeObservacionesModal() {
-    this.isObservacionesOpen = false;
-  }
+// Métodos para abrir y cerrar el modal
+openInstructionsModal() {
+  this.isInstructionsOpen = true;
+}
+
+closeInstructionsModal() {
+  this.isInstructionsOpen = false;
+}
+openObservacionesModal() {
+  this.isObservacionesOpen = true;
+}
+
+closeObservacionesModal() {
+  this.isObservacionesOpen = false;
+}
 
   openExitModal() {
     this.isExitOpen = true;
@@ -165,24 +179,26 @@ export class InicioOperativoPage implements OnInit {
     this.isExportOpen = false;
   }
 
-  // === Finalizar inventario ===
-  async guardarObservacion() {
-    const inventaryId = this.inventaryService.getInventaryId();
-    if (!inventaryId) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No hay un inventario activo para finalizar.',
-        buttons: ['OK'],
-      });
-      await alert.present();
-      this.closeObservacionesModal();
-      return;
-    }
-    await this.finalizarInventario();
-  }
+// === Guardar observación ===
+async guardarObservacion() {
+  // Permitir texto vacío, pero mostrar confirmación igual
+  console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
+  this.closeObservacionesModal();
 
+  const alert = await this.alertController.create({
+    header: '✅ Observación guardada',
+    message: this.observacionTexto.trim()
+      ? 'Tu observación ha sido guardada correctamente.'
+      : 'No escribiste ninguna observación, pero fue guardada como vacía.',
+    buttons: ['OK'],
+  });
+  await alert.present();
+}
+
+// === Finalizar inventario ===
 async finalizarInventario() {
   const inventaryId = this.inventaryService.getInventaryId();
+
   if (!inventaryId) {
     const alert = await this.alertController.create({
       header: 'Error',
@@ -190,47 +206,44 @@ async finalizarInventario() {
       buttons: ['OK']
     });
     await alert.present();
-    this.closeObservacionesModal();
     return;
   }
 
-  // ✅ Observación opcional: solo enviar si no está vacía
-  const observations = this.observacionTexto.trim() ;
+  // ✅ Observación opcional (puede venir vacía si no escribió nada)
+  const observations = this.observacionTexto?.trim() || '';
 
   const request: FinishRequestDto = {
     inventaryId: inventaryId,
-    observations: observations 
+    observations
   };
 
   try {
     await this.inventaryService.finish(request).toPromise();
-    
+
     // ✅ Éxito
     this.inventaryService.setInventaryId(0);
-    this.observacionTexto = '';
-    this.closeObservacionesModal();
-    
+    this.observacionTexto = ''; // limpiar
+    this.closeConfirmModal();   // cerrar solo el modal de confirmación
+
     const alert = await this.alertController.create({
       header: '✅ Éxito',
       message: 'Inventario finalizado correctamente.',
       buttons: ['OK']
     });
     await alert.present();
-    
+
+    alert.onDidDismiss().then(() => {
+      this.router.navigate(['/login']);
+    });
   } catch (error: any) {
     console.error('Error al finalizar inventario:', error);
-    
-    // ✅ Manejo de errores específicos
+
     let errorMessage = 'No se pudo finalizar el inventario.';
-    
-    if (error?.error?.message) {
-      errorMessage = error.error.message;
-    } else if (error?.status === 400) {
-      errorMessage = 'Datos inválidos. Verifica la información.';
-    } else if (error?.status === 404) {
-      errorMessage = 'Inventario no encontrado.';
-    }
-    
+
+    if (error?.error?.message) errorMessage = error.error.message;
+    else if (error?.status === 400) errorMessage = 'Datos inválidos. Verifica la información.';
+    else if (error?.status === 404) errorMessage = 'Inventario no encontrado.';
+
     const alert = await this.alertController.create({
       header: 'Error',
       message: errorMessage,
@@ -239,6 +252,7 @@ async finalizarInventario() {
     await alert.present();
   }
 }
+
   // === Iniciar inventario (con observaciones iniciales opcionales) ===
   async iniciarInventario() {
     const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
@@ -280,7 +294,7 @@ async finalizarInventario() {
               next: (res) => {
                 this.inventaryService.setInventaryId(res.inventaryId);
                 console.log('Inventario iniciado con ID:', res.inventaryId);
-                this.router.navigate(['/scanner']); // 👈 va directo al scanner
+                 this.router.navigate(['/scanner', zonaId]);
               },
               error: async (err) => {
                 const errorAlert = await this.alertController.create({

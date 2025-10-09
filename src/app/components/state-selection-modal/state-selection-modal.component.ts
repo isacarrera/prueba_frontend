@@ -49,7 +49,7 @@ export class StateSelectionModalComponent {
           feedbackMessage = '✅ Item escaneado correctamente.';
           break;
         case 'WrongZone':
-          feedbackMessage = '⚠️ Item no pertenece a esta zona.';
+          feedbackMessage = '⚠ Item no pertenece a esta zona.';
           break;
         case 'NotFound':
           feedbackMessage = '❌ Item no encontrado en el sistema.';
@@ -58,7 +58,7 @@ export class StateSelectionModalComponent {
           feedbackMessage = '🔁 Item ya escaneado anteriormente.';
           break;
         default:
-          feedbackMessage = 'ℹ️ Operación completada.';
+          feedbackMessage = 'ℹ Operación completada.';
       }
 
       // Mostrar feedback

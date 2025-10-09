@@ -1,64 +1,126 @@
+.verification-page {
+  --background: #0a0f1f;
+  color: #e5e7eb;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+}
+
+/* ---------- ICONO Y TÍTULO ---------- */
+.icon-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px auto 20px;
+  background: radial-gradient(circle at top, #1e3a8a, #3b82f600);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+}
+
+.icon-circle img {
+  width: 70px;
+  height: 70px;
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8));
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 54px;
+  background: linear-gradient(to right, #60a5fa, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .header {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  justify-content: flex-start;
 
-  ion-button {
-    margin-right: 8px;
+  border-radius: 14px;
+  padding: 14px 2px;
+
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
   }
 
-  h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
+  .back-btn-inline {
+    --color: #fff;
     margin: 0;
   }
 }
 
-.summary-card {
-  margin-bottom: 20px;
-  background-color: #e8f5e9;
-}
-
-.issue-card {
-  margin-bottom: 20px;
-
-  &.issue-missing {
-    --background: #ffebee; // Rojo muy claro
-  }
-
-  &.issue-unexpected {
-    --background: #fff8e1; // Amarillo muy claro
-  }
-
-  &.issue-mismatch {
-    --background: #e3f2fd; // Azul muy claro
-  }
-}
-
-.item-issue {
-  padding: 12px 0;
-
-  .reason {
-    color: #d32f2f;
-    font-weight: 500;
-    margin: 4px 0;
-  }
-
-  .suggestion {
-    color: #1976d2;
-    margin: 4px 0;
-  }
-}
-
-ion-textarea {
-  --background: #f9f9f9;
-  --padding-start: 8px;
-  --padding-end: 8px;
-}
-
-.actions {
-  margin-top: 16px;
+/* ---------- SECCIONES ---------- */
+.section {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  text-align: left;
+}
+
+/* ---------- TARJETAS ---------- */
+ion-card {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 4px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+ion-card-title {
+  color: #60a5fa;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ---------- TIPOS ---------- */
+.issue-card.missing { border-left: 4px solid #ef4444; }
+.issue-card.unexpected { border-left: 4px solid #facc15; }
+.issue-card.mismatch { border-left: 4px solid #3b82f6; }
+
+.item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 10px 0;
+
+  h3 { color: #fff; font-weight: 600; }
+  .reason { color: #f87171; }
+  .suggestion { color: #60a5fa; }
+}
+
+/* ---------- TEXTAREA ---------- */
+ion-textarea {
+  --background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  color: #fff;
+}
+
+/* ---------- BOTONES ---------- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+ion-button {
+  --border-radius: 10px;
+  font-weight: 600;
+  text-transform: none;
+
+  &[color="danger"] {
+    --background: linear-gradient(135deg, #dc2626, #ef4444);
+  }
+
+  &[color="success"] {
+    --background: linear-gradient(135deg, #2563eb, #3b82f6);
+  }
 }

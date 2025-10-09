@@ -1,36 +1,45 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Estado del item: {{ code }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">
-        <ion-icon name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content class="ion-padding">
-  <ion-radio-group [(ngModel)]="selectedStateId">
-    <ion-item
-      *ngFor="let state of stateItems"
-      [class.selected]="selectedStateId === state.id"
-    >
-      <ion-radio [value]="state.id" slot="start"></ion-radio>
-      <ion-label>
-        <h4>{{ state.name }}</h4>
-        <p>{{ state.description }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-radio-group>
+  <div class="center-wrapper">
+    <div class="modal-wrapper">
+      <header class="modal-header">
+        <h2>Estado del ítem</h2>
+        <span class="item-code">{{ code }}</span>
+        <button class="close-button" (click)="dismiss()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </header>
 
-  <ion-button
-    expand="block"
-    color="success"
-    (click)="confirm()"
-    [disabled]="!selectedStateId"
-    class="ion-margin-top"
-  >
-    <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
-    Confirmar Estado
-  </ion-button>
+      <!-- 🔹 Lista de estados tipo "selección", sin circulitos -->
+      <ion-list class="state-list">
+        <ion-item
+          *ngFor="let state of stateItems"
+          class="state-item"
+          [class.selected]="selectedStateId === state.id"
+          (click)="selectedStateId = state.id"
+        >
+          <ion-label>
+            <h3>{{ state.name }}</h3>
+            <p>{{ state.description }}</p>
+          </ion-label>
+          <ion-icon
+            *ngIf="selectedStateId === state.id"
+            name="checkmark-outline"
+            color="success"
+            slot="end"
+          ></ion-icon>
+        </ion-item>
+      </ion-list>
+
+      <ion-button
+        expand="block"
+        color="primary"
+        class="confirm-button"
+        (click)="confirm()"
+        [disabled]="!selectedStateId"
+      >
+        <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+        Confirmar Estado
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

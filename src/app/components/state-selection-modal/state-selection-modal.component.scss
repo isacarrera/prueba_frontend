@@ -1,20 +1,121 @@
-/* state-selection-modal.component.scss */
-:host {
-  --background: transparent;
-}
-
 ion-content {
-  --background: rgba(0, 0, 0, 0.6); // semi-transparente
+  --background: #0f172a;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.modal-container {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+/* Contenedor principal centrado */
+.center-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Modal más pequeño y ovalado */
+.modal-wrapper {
+  background: #1e293b;
+  border-radius: 30px; /* más ovalado */
+  padding: 12px 18px;
+  width: 95%;
+  max-width: 300px; /* 🔹 mucho más pequeño */
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+  color: #f8fafc;
+  animation: fadeIn 0.4s ease;
+}
+
+/* Header compacto */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.modal-header h2 {
+  font-size: 0.9rem;
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.item-code {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-left: auto;
+  margin-right: 6px;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-size: 1rem;
+}
+
+/* Lista de estados más pequeña */
+.state-list {
+  margin: 6px 0;
+  background: transparent;
+}
+
+.state-item {
+  --background: transparent !important; /* ✅ Esto borra el color negro */
+  background: transparent !important;
+  border: 1px solid #334155;
+  border-radius: 22px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+ion-item::part(native) {
+  background: transparent !important;
+}
+
+
+.state-item:hover {
+  background: #2b3b55;
+  transform: scale(1.01);
+}
+
+.state-item.selected {
+  border-color: #38bdf8;
+  background: #16233a;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+}
+
+.state-item h3 {
+  font-size: 0.85rem;
+  margin: 0;
+  color: #f1f5f9;
+}
+
+.state-item p {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Botón pequeño y redondeado */
+.confirm-button {
+  margin-top: 6px;
+  font-weight: 600;
+  --border-radius: 18px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  font-size: 0.8rem;
+  height: 32px;
+  line-height: 1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

@@ -17,6 +17,7 @@ import { StateSelectionModalComponent } from '../state-selection-modal/state-sel
 })
 export class ScannerPage implements OnInit, OnDestroy {
   scannedCode: string | null = null;
+  showInstructions = true;
   constructor(
     private router: Router,
     private inventoryService: InventoryService,
@@ -48,6 +49,7 @@ export class ScannerPage implements OnInit, OnDestroy {
 
     // Inicia escaneo
     this.startScanning();
+     setTimeout(() => this.showInstructions = false, 2000);
   }
 
   ngOnDestroy() {
@@ -73,8 +75,9 @@ export class ScannerPage implements OnInit, OnDestroy {
   private async handleScanResult(cleanCode: string) {
     this.scannedCode = cleanCode;
     await new Promise((r) => setTimeout(r, 800));
+      this.scannedCode = null;
     await this.openStateSelectionModal(cleanCode);
-    this.scannedCode = null;
+    
   }
 
   private async openStateSelectionModal(code: string) {

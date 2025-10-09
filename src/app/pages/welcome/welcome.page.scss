@@ -7,6 +7,14 @@ ion-content {
   overflow: hidden;
   position: relative;
 }
+ion-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent 70%);
+  z-index: 2;
+  pointer-events: none;
+}
 
 /* Fondo */
 .background {
@@ -45,12 +53,16 @@ ion-content {
   width: min(55vw, 360px);
   max-width: 420px;
   animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+  transition: filter 0.3s ease;
 }
 
 .final-logo {
   width: clamp(80px, 15vw, 140px);
   height: auto;
   animation: float 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+  transition: filter 0.3s ease;
 }
 
 .hola-container {
@@ -58,7 +70,11 @@ ion-content {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  animation: fadeInUp 1s ease forwards;
+  animation: fadeInScale 1s ease forwards;
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .hola-text {
@@ -70,11 +86,6 @@ ion-content {
   margin: 0;
 }
 
-/* Animaciones */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
