@@ -1,39 +1,38 @@
-<ion-content class="custom-bg" [fullscreen]="true">
+<ion-content class="zones-content" [fullscreen]="true">
   <div class="wrap">
     <ion-button class="back-button" fill="clear" (click)="goBack()">
       <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
     </ion-button>
 
-    <!-- Círculo con icono -->
-    <div class="icon-circle">
-      <img src="../../../assets/images/heroicons_map-pin.png" alt="Ubicación" />
+    <div class="icon-header">
+      <div class="icon-circle">
+        <img src="../../../assets/images/heroicons_map-pin.png" alt="Ubicación" />
+      </div>
+      <h1 class="title">Zonas Operativas</h1>
     </div>
 
-    <h1 class="title">Zonas Operativas</h1>
-
-    <!-- Barra de búsqueda -->
     <ion-searchbar
-      placeholder="Buscar..."
+      placeholder="Buscar zona..."
       [(ngModel)]="searchTerm"
-      debounce="300">
+      debounce="300"
+      class="custom-search">
     </ion-searchbar>
 
-    <!-- Lista de tarjetas de zonas -->
-    <div 
-      class="card-zona" 
-      *ngFor="let zona of filteredZonas()" 
-      (click)="goToOperativo(zona.id)">
-      
-      <div class="card-info">
-        <span class="label">{{ zona.name }}</span>
-        <span class="badge-disponible">Zona Disponible</span>
-      </div>
+    <div class="zones-grid">
+      <div 
+        class="card-zona" 
+        *ngFor="let zona of filteredZonas()" 
+        (click)="goToOperativo(zona.id)">
+        
+        <div class="card-info">
+          <span class="label">{{ zona.name }}</span>
+          <span class="badge-disponible">Zona Disponible</span>
+        </div>
 
-      <!-- Icono fijo -->
-      <div class="icon-circle-big">
-        <ion-icon name="lock-closed-outline"></ion-icon>
+        <div class="icon-circle-big">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+        </div>
       </div>
-
     </div>
   </div>
 </ion-content>

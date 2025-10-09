@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NavController } from '@ionic/angular';
-import { IonContent } from "@ionic/angular/standalone";
+import { NavController, IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-welcome',
@@ -11,36 +10,24 @@ import { IonContent } from "@ionic/angular/standalone";
   imports: [CommonModule, IonContent],
 })
 export class WelcomePage implements OnInit, OnDestroy {
-  currentScreen = 0;
+  showWelcome = false;
   timer: any;
 
-  welcomeScreens = [
-    { logo: 'assets/images/Logo3.png', background: 'assets/images/Frame_Test.png' },
-    { logo: 'assets/images/Logo2.png', background: 'assets/images/Frame_Test.png' },
-    { logo: 'assets/images/Logo3.png', background: 'assets/images/Frame_Test.png' },
-    { logo: 'assets/images/Logo.png', background: 'assets/images/Rectangle_Gradient.png' },
-  ];
+  background = 'assets/images/Frame_Test.png';
+  logo = 'assets/images/Logo.png'; 
 
   constructor(private navCtrl: NavController) {}
 
   ngOnInit() {
-    this.startSequence();
-  }
-
-  startSequence() {
-    this.timer = setInterval(() => {
-      if (this.currentScreen < this.welcomeScreens.length - 1) {
-        this.currentScreen++;
-      } else {
-        clearInterval(this.timer);
-        setTimeout(() => {
-          this.navCtrl.navigateRoot('/login');
-        }, 600);
-      }
-    }, 900); 
+    this.timer = setTimeout(() => {
+      this.showWelcome = true;   
+      setTimeout(() => {
+        this.navCtrl.navigateRoot('/login');
+      }, 1500);
+    }, 1200);
   }
 
   ngOnDestroy() {
-    if (this.timer) clearInterval(this.timer);
+    if (this.timer) clearTimeout(this.timer);
   }
 }

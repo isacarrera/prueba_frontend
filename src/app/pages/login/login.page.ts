@@ -8,18 +8,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule],
 })
 export class LoginPage {
-
   constructor(private router: Router) {}
 
   goToOperativo() {
-  this.router.navigate(['/operativo']);
-}
+    this.router.navigate(['/operativo']);
+  }
 
-goToVerificador() {
-  this.router.navigate(['/verificador']);
-}
-
+  goToVerificador() {
+    this.router.navigate(['/verificador']);
+  }
 }

@@ -1,4 +1,4 @@
 export const environment = {
-  apiURL : 'http://172.30.3.163:7051/',
+  apiURL : 'http://10.3.234.237:7051/',
   
 };

@@ -19,7 +19,10 @@ body, ion-content {
 
 /* Marco de escaneo */
 .scan-frame {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 280px;
   height: 280px;
   border: 2px solid rgba(0, 191, 255, 0.5);
@@ -68,15 +71,14 @@ body, ion-content {
   100% { transform: translateY(277px); opacity: 0.9; }
 }
 
-/* Modal temporal "Apunta al QR" */
 .scan-instructions-modal {
   position: absolute;
-  top: 20%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
-  padding: 16px 24px;
-  border-radius: 12px;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  padding: 18px 26px;
+  border-radius: 14px;
   text-align: center;
   color: #fff;
   display: flex;
@@ -84,21 +86,30 @@ body, ion-content {
   align-items: center;
   z-index: 10;
   animation: fadeInOut 4s forwards;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
+}
+.scan-instructions-modal ion-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+  color: #00bfff;
+}
+@keyframes framePulse {
+  0% { box-shadow: 0 0 15px rgba(0, 191, 255, 0.2); }
+  100% { box-shadow: 0 0 40px rgba(0, 191, 255, 0.6); }
 }
 
-.scan-instructions-modal ion-icon {
-  font-size: 36px;
-  margin-bottom: 8px;
-  color: #00bfff;
+@keyframes scan {
+  0% { transform: translateY(0); opacity: 0.9; }
+  50% { opacity: 1; }
+  100% { transform: translateY(277px); opacity: 0.9; }
 }
 
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translate(-50%, -20px); }
-  10% { opacity: 1; transform: translate(-50%, 0); }
-  80% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -20px); }
+  0% { opacity: 0; transform: translate(-50%, -60%); }
+  10% { opacity: 1; transform: translate(-50%, -50%); }
+  80% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -60%); }
 }
-
 /* Código escaneado */
 .code-display {
   position: absolute;

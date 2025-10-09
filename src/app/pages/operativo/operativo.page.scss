@@ -3,112 +3,118 @@
 }
 
 .operativo-content::part(background) {
-  background: url('../../../assets/images/Inicio_Sesion_OP.png') no-repeat center/cover;
+  background:
+    radial-gradient(circle at top center, rgba(20, 40, 100, 0.85) 0%, rgba(5, 10, 30, 1) 100%),
+    url('../../../assets/images/Inicio_Sesion_OP.png') no-repeat center/cover;
+  background-blend-mode: overlay;
 }
 
+/* Layout general */
 .wrap {
   min-height: calc(100dvh - var(--keyboard-offset, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   padding: 20px;
-  padding-top: clamp(12px, 9dvh, 96px);
+  padding-top: clamp(60px, 12dvh, 140px);
+  animation: fadeIn 0.8s ease-out forwards;
 }
-
 .back-button {
   position: absolute;
-  top: max(16px, env(safe-area-inset-top)); /* respeta notch */
+  top: max(24px, env(safe-area-inset-top));
   left: 16px;
   z-index: 1000;
-
   --border-radius: 50%;
-  --background: rgba(10, 15, 44, 0.55);
+  --background: rgba(15, 25, 60, 0.55);
   --color: #fff;
-
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-
-  backdrop-filter: blur(2px);
+  width: 44px;
+  height: 44px;
 }
 
-
-
-
+.back-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 14px rgba(0, 136, 255, 0.5);
+}
 .icon-container {
-  background-color: #0a0f2c;
-  border-radius: 999px;
-  padding: 14px;
-  border: 2px solid #0044ff;
+  background: rgba(10, 15, 44, 0.6);
+  border-radius: 50%;
+  padding: 20px;
+  border: 2px solid rgba(0, 136, 255, 0.75);
   display: grid;
   place-items: center;
-  margin-bottom: 12px;
-
-  img {
-    width: 82px;
-    height: 82px;
-    object-fit: contain;
-    filter: drop-shadow(0 6px 20px rgba(0, 136, 255, .4));
-  }
+  margin-bottom: 24px;
+  box-shadow:
+    inset 0 0 18px rgba(0, 136, 255, 0.15),
+    0 0 30px rgba(0, 136, 255, 0.25);
+  animation: float 3.2s ease-in-out infinite;
 }
 
+.icon-container img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px rgba(0, 136, 255, 0.45));
+}
+
+/* Título */
 .title {
-  font-size: 24px;
-  color: #fff;
+  font-size: clamp(28px, 6vw, 36px);
+  color: #ffffff;
   font-weight: 700;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
   text-align: center;
+  text-shadow:
+    0 0 10px rgba(0, 136, 255, 0.4),
+    0 0 20px rgba(0, 136, 255, 0.2);
+  letter-spacing: 0.8px;
+  animation: slideDown 0.9s ease-out;
 }
 
+/* Inputs */
 .input-container {
   width: 100%;
-  max-width: 280px;
-  margin-bottom: 16px;
-
-  .custom-input {
-    --padding-start: 10px;
-    --inner-padding-end: 10px;
-    --min-height: 56px;
-    --background: rgba(17, 23, 56, 0.72);
-    --inner-border-width: 0;
-    border: 2px solid #0044ff;
-    border-radius: 14px;
-    backdrop-filter: blur(2px);
-
-    ion-icon {
-      font-size: 20px;
-      color: #8ec8ff;
-      margin-right: 10px;
-    }
-
-    ion-select,
-    ion-input {
-      color: #fff;
-      font-size: 16px;
-    }
-  }
+  max-width: 300px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.8s ease forwards;
 }
 
-.input-icon-circle {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 2px solid #0044ff;
-  background: rgba(10, 15, 44, .65);
-  display: grid;
-  place-items: center;
-  font-size: 18px;
+.custom-input {
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 60px;
+  --background: rgba(17, 23, 56, 0.55);
+  border: 2px solid rgba(0, 136, 255, 0.75);
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 12px rgba(0, 136, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.custom-input:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+}
+
+.custom-input:focus-within {
+  border-color: #60a5fa;
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.35);
+}
+
+.custom-input ion-icon {
+  font-size: 22px;
   color: #8ec8ff;
   margin-right: 10px;
-  box-shadow: inset 0 0 10px rgba(0, 136, 255, .18), 0 0 10px rgba(0, 136, 255, .12);
-
-  &.hash {
-    font-weight: 500;
-    color: #cfe2ff;
-  }
 }
 
+.custom-input ion-select,
+.custom-input ion-input {
+  color: #ffffff;
+  font-size: 16px;
+  letter-spacing: 0.4px;
+}
+
+/* Botón de acceder (sin cambios) */
 .access-button {
   margin-top: 50px;
   width: 100%;
@@ -128,13 +134,38 @@
   }
 }
 
+/* Hint inferior */
 .hint {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #ddd;
-
-  a {
-    color: #4da3ff;
-    font-weight: bold;
-  }
+  margin-top: 28px;
+  font-size: 15px;
+  color: #dddddd;
+  animation: fadeIn 1.3s ease;
 }
+
+.hint a {
+  color: #4da3ff;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.hint a:hover {
+  color: #8ec8ff;
+  text-shadow: 0 0 8px rgba(77, 163, 255, 0.5);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

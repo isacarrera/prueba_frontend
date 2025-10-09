@@ -1,26 +1,14 @@
 <ion-content fullscreen>
-  <!-- Fondo -->
   <div class="background">
-    <img
-      *ngFor="let screen of welcomeScreens; let i = index"
-      [src]="screen.background"
-      class="background-img fade"
-      [class.active]="i === currentScreen"
-    />
+    <img [src]="background" class="background-img active" />
   </div>
-
-  <!-- Contenido -->
   <div class="content">
-    <!-- Logos intermedios -->
-    <img
-      *ngIf="currentScreen < welcomeScreens.length - 1"
-      [src]="welcomeScreens[currentScreen].logo"
-      class="logo fade active"
-    />
+    <div *ngIf="!showWelcome" class="logo-container fade-in">
+      <img [src]="logo" class="logo" />
+    </div>
 
-    <!-- Pantalla final -->
-    <div *ngIf="currentScreen === welcomeScreens.length - 1" class="hola-container">
-      <img [src]="welcomeScreens[currentScreen].logo" class="final-logo" />
+    <div *ngIf="showWelcome" class="hola-container fade-in-scale">
+      <img [src]="logo" class="final-logo" />
       <h1 class="hola-text">Bienvenido</h1>
     </div>
   </div>
