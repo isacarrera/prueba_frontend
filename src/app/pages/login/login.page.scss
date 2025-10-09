@@ -1,0 +1,109 @@
+.login-content {
+  --background: url("../../../assets/images/Forma_Sesion.png") no-repeat center center / cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+.icon-left {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.icon-right {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+/* Logo */
+.logo-container {
+  margin-top: 60px;
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.logo {
+  width: 250px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 40px;
+  font-weight: 700;
+  color: white;
+  margin-top: -20px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.buttons-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  margin-top: 130px;
+  align-items: center;
+  border-color: blue;
+  
+}
+
+.custom-button {
+  position: relative;
+  width: 75%;
+  height: 65px;
+  border: 3px solid #1E4DFF; 
+  border-radius: 15px;
+  background: transparent;
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+
+.custom-button::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  background: #1E4DFF;
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+}
+
+
+
+.custom-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+.custom-button img {
+  width: 22px;
+  height: 22px;
+}
+
+
+.custom-button:active,
+.custom-button:focus {
+  background: #2563eb; 
+  border-color: #2563eb; 
+  color: white;
+  justify-content: center; 
+}
+
+.custom-button:active img.icon-left,
+.custom-button:active span {
+  display: none; 
+}
+
+.custom-button:active img.icon-right {
+  margin: 0 auto; 
+}

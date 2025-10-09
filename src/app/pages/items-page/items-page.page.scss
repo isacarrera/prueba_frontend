@@ -1,0 +1,99 @@
+.custom-bg {
+  --background: #0b0f2c;
+  color: white;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  --background: rgba(10, 15, 44, 0);
+  --color: #fff;
+  border: 2px solid #2563eb;
+  border-radius: 999px;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+}
+
+.icon-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: #0f1535;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 70px auto 20px;
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+}
+
+.icon-circle img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  text-align: center;
+  color: white;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #aaa;
+  margin-bottom: 30px;
+}
+
+.card-list {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card-item {
+  width: 100%;
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6),
+              0 0 15px rgba(59,130,246,0.5);
+}
+
+.card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+.count {
+  font-size: 13px;
+  color: #aaa;
+}
+
+ion-toggle {
+  --handle-background: #3b82f6;
+  --background: rgba(59, 130, 246, 0.3);
+}

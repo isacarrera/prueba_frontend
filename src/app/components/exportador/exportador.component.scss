@@ -1,0 +1,51 @@
+.export-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+
+  ion-button {
+    --border-radius: 12px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 90px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease-in-out;
+
+    ion-icon {
+      margin-right: 6px;
+      font-size: 18px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  ion-button[color="danger"] {
+    --background: #e63946;
+    --background-hover: #d62828;
+  }
+
+  ion-button[color="success"] {
+    --background: #2a9d8f;
+    --background-hover: #21867a;
+  }
+
+  ion-button[color="primary"] {
+    --background: #457b9d;
+    --background-hover: #1d3557;
+  }
+}
+@media (max-width: 400px) {
+  .export-buttons {
+    flex-direction: column;
+    gap: 10px;
+
+    ion-button {
+      width: 100%;
+    }
+  }
+}

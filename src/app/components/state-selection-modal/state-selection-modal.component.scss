@@ -1,0 +1,20 @@
+/* state-selection-modal.component.scss */
+:host {
+  --background: transparent;
+}
+
+ion-content {
+  --background: rgba(0, 0, 0, 0.6); // semi-transparente
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}

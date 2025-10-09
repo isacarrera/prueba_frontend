@@ -1,0 +1,64 @@
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  ion-button {
+    margin-right: 8px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.summary-card {
+  margin-bottom: 20px;
+  background-color: #e8f5e9;
+}
+
+.issue-card {
+  margin-bottom: 20px;
+
+  &.issue-missing {
+    --background: #ffebee; // Rojo muy claro
+  }
+
+  &.issue-unexpected {
+    --background: #fff8e1; // Amarillo muy claro
+  }
+
+  &.issue-mismatch {
+    --background: #e3f2fd; // Azul muy claro
+  }
+}
+
+.item-issue {
+  padding: 12px 0;
+
+  .reason {
+    color: #d32f2f;
+    font-weight: 500;
+    margin: 4px 0;
+  }
+
+  .suggestion {
+    color: #1976d2;
+    margin: 4px 0;
+  }
+}
+
+ion-textarea {
+  --background: #f9f9f9;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

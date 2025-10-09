@@ -1,0 +1,19 @@
+<div class="export-buttons">
+  <!-- Botón PDF -->
+  <ion-button color="danger" fill="solid" shape="round" (click)="exportToPDF()">
+    <ion-icon slot="start" name="document-text-outline"></ion-icon>
+    PDF
+  </ion-button>
+
+  <!-- Botón Excel -->
+  <ion-button color="success" fill="solid" shape="round" (click)="exportToExcel()">
+    <ion-icon slot="start" name="logo-microsoft"></ion-icon>
+    Excel
+  </ion-button>
+
+  <!-- Botón Word -->
+  <ion-button color="primary" fill="solid" shape="round" (click)="exportToWord()">
+    <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+    Word
+  </ion-button>
+</div>

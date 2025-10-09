@@ -1,0 +1,42 @@
+<ion-content [fullscreen]="true" class="operativo-content">
+  <div class="wrap">
+
+    <!-- Botón de regreso -->
+    <ion-button class="back-button" fill="clear" (click)="goBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+
+    <!-- Icono central -->
+    <div class="icon-container">
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Icono Verificador"/>
+    </div>
+
+    <!-- Título -->
+    <h1 class="title">Verificador</h1>
+
+    <!-- Input Usuario -->
+    <div class="input-container">
+      <ion-item lines="none" class="custom-input">
+        <ion-icon name="person-outline" slot="start" class="input-icon-circle"></ion-icon>
+        <ion-input [(ngModel)]="usuario" placeholder="Usuario" class="input-text"></ion-input>
+      </ion-item>
+    </div>
+
+    <!-- Input Contraseña -->
+    <div class="input-container">
+      <ion-item lines="none" class="custom-input">
+        <ion-icon name="key-outline" slot="start" class="input-icon-circle"></ion-icon>
+        <ion-input [(ngModel)]="contrasena" type="password" placeholder="Contraseña" class="input-text"></ion-input>
+      </ion-item>
+    </div>
+
+    <!-- Botón Acceder -->
+    <ion-button class="access-button" (click)="acceder()">Acceder</ion-button>
+
+    <!-- Hint -->
+    <p class="hint">
+      ¿Olvidaste tu <a (click)="recuperar()">contraseña?</a>
+    </p>
+
+  </div>
+</ion-content>

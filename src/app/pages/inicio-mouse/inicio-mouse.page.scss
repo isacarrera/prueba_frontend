@@ -1,0 +1,109 @@
+.custom-bg {
+  --background: #0b0f2c;
+  color: white;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+/* Botón atrás */
+.back-button {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  --background: rgba(10, 15, 44, 0);
+  --color: #fff;
+  border: 2px solid #2563eb;
+  border-radius: 999px;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+}
+
+/* Icono superior estilo Figma */
+.icon-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: #0f1535;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 70px auto 20px;
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+}
+.icon-circle img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+/* Título */
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  text-align: center;
+  color: white;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #aaa;
+  margin-bottom: 30px;
+}
+
+/* Card estilo Figma */
+.device-card {
+  width: 100%;
+  max-width: 360px;
+  background: #111631;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: inset 4px 0 #22c55e, /* franja lateral verde */
+              0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.device-left {
+  display: flex;
+  flex-direction: column;
+}
+.device-id {
+  font-weight: bold;
+  font-size: 16px;
+}
+.device-serial {
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* Estado estilo pill */
+.device-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status {
+  background: #1e293b;
+  color: #16a34a;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(22, 163, 74, 0.5);
+}
+
+.device-right ion-icon {
+  font-size: 18px;
+  color: white;
+}

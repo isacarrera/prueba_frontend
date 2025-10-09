@@ -1,0 +1,7 @@
+{
+  "name": "Codexy",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

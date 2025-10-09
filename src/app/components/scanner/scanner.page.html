@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelScan()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Escaneo de Items</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleFlash()">
+        <ion-icon name="flash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- 👇 Añade la clase scanner-page aquí -->
+<ion-content class="scanner-page">
+  <!-- Contenedor principal de la cámara -->
+  <div class="scanner-container">
+    <!-- La cámara se mostrará aquí automáticamente por el plugin -->
+    
+    <!-- Overlay guía de escaneo -->
+    <div class="scan-overlay">
+      <div class="scan-frame">
+        <div class="scan-corner top-left"></div>
+        <div class="scan-corner top-right"></div>
+        <div class="scan-corner bottom-left"></div>
+        <div class="scan-corner bottom-right"></div>
+        <div class="scan-line"></div>
+      </div>
+      
+      <div class="scan-instructions">
+        <ion-icon name="qr-code-outline"></ion-icon>
+        <p>Apunta al código QR</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Área de código escaneado (oculta por defecto) -->
+  <div class="code-display" *ngIf="scannedCode">
+    <div class="code-header">
+      <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+      <h3>Código detectado</h3>
+    </div>
+    <div class="code-content">
+      <p class="code-text">{{ scannedCode }}</p>
+    </div>
+  </div>
+</ion-content>

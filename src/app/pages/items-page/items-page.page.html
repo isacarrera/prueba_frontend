@@ -1,0 +1,33 @@
+<ion-content class="custom-bg" [fullscreen]="true">
+  <div class="wrap">
+
+    <ion-button class="back-button" fill="clear" (click)="goBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+
+    <!-- Icono superior -->
+    <div class="icon-circle">
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Categoría" />
+    </div>
+
+    <h1 class="title">{{ categoria?.name }}</h1>
+    <p class="subtitle">Cantidad de ítems: {{ items.length }}</p>
+
+    <!-- Lista de ítems con checkpoint -->
+    <div class="card-list">
+      <div class="card-item" *ngFor="let item of items">
+        <div class="card-left">
+          <span class="label">{{ item.name }}</span>
+          <span class="count">{{ item.description }}</span>
+        </div>
+
+        <!-- Toggle para marcar completado -->
+        <ion-toggle
+          [checked]="item.completado"
+          (ionChange)="toggleItem(item, $event.detail.checked)">
+        </ion-toggle>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

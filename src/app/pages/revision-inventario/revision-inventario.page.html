@@ -1,0 +1,60 @@
+<!-- <ion-content class="custom-bg" [fullscreen]="true">
+  <div class="wrap">
+
+       <ion-button class="back-button" fill="clear" (click)="goBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    
+    <div class="icon-circle">
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Ubicación" />
+    </div>
+      <h1 class="title">Revisión Inventario</h1>
+   
+
+    <div class="card-list">
+     <div class="card-item" *ngFor="let categoria of categorias" (click)="goToItems(categoria)">
+        <div class="card-left">
+          <span class="label">{{ categoria.name }}</span>
+          <span class="count">{{ categoria.items?.length || 0 }} ítems</span>
+        </div>
+
+        <ion-toggle
+          [checked]="categoria.completa"
+          (ionChange)="toggleCompleta(categoria, $event.detail.checked)">
+        </ion-toggle>
+      </div>
+    </div>
+
+  </div>
+</ion-content> -->
+<ion-content class="custom-bg" [fullscreen]="true">
+  <div class="wrap">
+    <ion-button class="back-button" fill="clear" (click)="goBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+
+    <div class="icon-circle">
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Inventarios" />
+    </div>
+    <h1 class="title">Inventarios en Verificación</h1>
+
+    <div class="card-list" *ngIf="!cargando; else loading">
+      <div class="card-item" *ngFor="let inv of inventariosEnVerificacion" (click)="irADetalle(inv)">
+        <div class="card-left">
+          <span class="label">{{ inv.zoneName }}</span>
+          <span class="count">Inventario #{{ inv.inventaryId }}</span>
+          <span class="status">{{ inv.stateZone }}</span>
+        </div>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </div>
+
+      <div *ngIf="inventariosEnVerificacion.length === 0" class="empty-state">
+        No hay inventarios en verificación.
+      </div>
+    </div>
+
+    <ng-template #loading>
+      <ion-spinner class="spinner-center"></ion-spinner>
+    </ng-template>
+  </div>
+</ion-content>

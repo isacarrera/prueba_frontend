@@ -1,0 +1,113 @@
+<ion-content class="ion-padding">
+  <!-- Header -->
+  <div class="header">
+    <ion-button fill="clear" (click)="volver()" size="small">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <h1>Verificación #{{ inventaryId }}</h1>
+  </div>
+
+  <!-- Resumen -->
+  <ion-card *ngIf="comparacion" class="summary-card">
+    <ion-card-content>
+      <ion-text color="medium">
+        <p>{{ comparacion.shortSummary }}</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Ítems faltantes -->
+  <ion-card *ngIf="comparacion?.missingItems?.length" class="issue-card issue-missing">
+    <ion-card-header>
+      <ion-card-title>
+        ❌ Ítems Faltantes ({{ comparacion.missingItems.length }})
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item *ngFor="let item of comparacion.missingItems" lines="none" class="item-issue">
+        <ion-icon name="alert-circle-outline" slot="start" color="danger"></ion-icon>
+        <ion-label>
+          <h3>{{ item.name }}</h3>
+          <p><strong>Código:</strong> {{ item.code }}</p>
+          <p class="reason">{{ item.reason }}</p>
+          <p class="suggestion"><strong>Sugerencia:</strong> {{ item.suggestedAction }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Ítems inesperados -->
+  <ion-card *ngIf="comparacion?.unexpectedItems?.length" class="issue-card issue-unexpected">
+    <ion-card-header>
+      <ion-card-title>
+        ➕ Ítems Inesperados ({{ comparacion.unexpectedItems.length }})
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item *ngFor="let item of comparacion.unexpectedItems" lines="none" class="item-issue">
+        <ion-icon name="add-circle-outline" slot="start" color="warning"></ion-icon>
+        <ion-label>
+          <h3>{{ item.name }}</h3>
+          <p><strong>Código:</strong> {{ item.code }}</p>
+          <p>{{ item.reason || 'Escaneado pero no esperado en esta zona' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Discrepancias de estado -->
+  <ion-card *ngIf="comparacion?.stateMismatches?.length" class="issue-card issue-mismatch">
+    <ion-card-header>
+      <ion-card-title>
+        🔄 Discrepancias de Estado ({{ comparacion.stateMismatches.length }})
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item *ngFor="let item of comparacion.stateMismatches" lines="none" class="item-issue">
+        <ion-icon name="sync-circle-outline" slot="start" color="medium"></ion-icon>
+        <ion-label>
+          <h3>{{ item.name }}</h3>
+          <p><strong>Código:</strong> {{ item.code }}</p>
+          <p>Estado esperado: <strong>{{ item.expectedState }}</strong></p>
+          <p>Estado escaneado: <strong>{{ item.scannedState }}</strong></p>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Observaciones -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>✍️ Observaciones</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-textarea
+        [(ngModel)]="observaciones"
+        placeholder="Escribe observaciones adicionales (opcional)"
+        rows="4"
+        auto-grow="true">
+      </ion-textarea>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Acciones -->
+  <div class="actions">
+    <ion-button
+      expand="block"
+      color="danger"
+      (click)="negarVerificacion()"
+      [disabled]="cargando">
+      <ion-icon name="close-circle-outline"></ion-icon>
+      Negar Verificación
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      color="success"
+      (click)="confirmarCierre()"
+      [disabled]="cargando">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      Confirmar Verificación
+    </ion-button>
+  </div>
+</ion-content>

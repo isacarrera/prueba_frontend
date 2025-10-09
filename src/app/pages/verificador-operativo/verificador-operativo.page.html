@@ -1,0 +1,34 @@
+verificador-operativo
+<ion-content class="custom-bg" [fullscreen]="true">
+  <div class="wrap">
+    <ion-button class="back-button" fill="clear" (click)="goBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+
+    <div class="icon-circle">
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Ubicación" />
+    </div>
+
+    <h1 class="title">Verificar inventario</h1>
+
+    <ion-searchbar
+      placeholder="Buscar..."
+      [(ngModel)]="searchTerm"
+      debounce="300"
+    ></ion-searchbar>
+
+    <div
+      class="card-zona"
+      *ngFor="let zona of filteredZonas()"
+      (click)="goToOperativo(zona.id)"
+    >
+      <div class="card-info">
+        <span class="label">{{ zona.name }}</span>
+        <span class="badge-disponible">No se ha revisado</span>
+      </div>
+      <div class="icon-circle-big">
+        <ion-icon [name]="zona ? 'lock-open-outline' : 'lock-closed-outline'"></ion-icon>
+      </div>
+    </div>
+  </div>
+</ion-content>
