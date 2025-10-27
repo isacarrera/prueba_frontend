@@ -8,14 +8,27 @@
     </div>
     <h1 class="title">{{ categoria?.name }}</h1>
     <p class="subtitle">Cantidad: {{ items.length }}</p>
-    <div class="device-card" *ngFor="let item of items">
+    
+    <!-- ✅ QUITAR el (click) para que no sea interactivo -->
+    <div 
+      class="device-card" 
+      *ngFor="let item of items"
+      [class.scanned]="isScanned(item)">
+      <!-- QUITAR: (click)="markAsScanned(item)" -->
+      
       <div class="device-left">
         <span class="device-id">Nombre: {{ item.name }}</span>
         <span class="device-serial">Descripción: {{ item.description }}</span>
       </div>
 
       <div class="device-right">
-        <span class="status">{{ item.status }}</span>
+        <!-- ✅ Estado de escaneado (solo visual) -->
+        <span 
+          class="status" 
+          [class.escaneado]="isScanned(item)"
+          [class.pendiente]="!isScanned(item)">
+          {{ isScanned(item) ? 'Escaneado' :  'Pendiente' }}
+        </span>
         <ion-icon name="time-outline"></ion-icon>
       </div>
     </div>

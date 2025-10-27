@@ -11,6 +11,29 @@
   position: relative;
 }
 
+/* ✅ Estados de escaneado */
+.status.escaneado {
+  background: #16a34a; /* verde */
+  color: white;
+}
+
+.status.pendiente {
+  background: #f87171; /* rojo */
+  color: white;
+}
+
+/* ✅ Clases para las cards escaneadas */
+.device-card.scanned {
+  box-shadow: inset 4px 0 #16a34a, /* franja lateral verde escaneado */
+              0 6px 20px rgba(0, 0, 0, 0.4);
+  background: #15253d; /* fondo ligeramente diferente para escaneados */
+}
+
+.device-card:not(.scanned) {
+  box-shadow: inset 4px 0 #f87171, /* franja lateral roja pendiente */
+              0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
 /* Botón atrás */
 .back-button {
   position: absolute;
@@ -69,8 +92,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: inset 4px 0 #22c55e, /* franja lateral verde */
-              0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+   cursor: default;
 }
 
 .device-left {
@@ -94,13 +117,13 @@
 }
 
 .status {
-  background: #1e293b;
-  color: #16a34a;
   padding: 4px 12px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
-  border: 1px solid rgba(22, 163, 74, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 80px;
+  text-align: center;
 }
 
 .device-right ion-icon {

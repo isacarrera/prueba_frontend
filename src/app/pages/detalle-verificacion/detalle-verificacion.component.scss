@@ -1,126 +1,594 @@
+// Variables de diseño manteniendo el esquema original
+:root {
+  --primary-blue: #3b82f6;
+  --primary-dark: #1e40af;
+  --primary-light: #60a5fa;
+  --background-dark: #0a0f1f;
+  --background-card: rgba(30, 41, 59, 0.8);
+  --text-primary: #e5e7eb;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --border-radius: 16px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --transition: all 0.3s ease;
+}
+
+// Estilos globales - Manteniendo el fondo original
 .verification-page {
   --background: #0a0f1f;
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  text-align: center;
+  gap: 16px;
+  padding: 16px;
+  padding-bottom: 32px;
+  min-height: 100vh;
 }
 
-/* ---------- ICONO Y TÍTULO ---------- */
-.icon-circle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 40px auto 20px;
-  background: radial-gradient(circle at top, #1e3a8a, #3b82f600);
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
-}
-
-.icon-circle img {
-  width: 70px;
-  height: 70px;
-  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8));
-}
-
-.title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 54px;
-  background: linear-gradient(to right, #60a5fa, #93c5fd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
+// Header mejorado pero manteniendo estilo original
 .header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 0;
 
-  border-radius: 14px;
-  padding: 14px 2px;
-
-
-  h2 {
+  .back-btn {
+    --color: #fff;
+    --background: transparent;
+    --border-radius: 50%;
+    width: 48px;
+    height: 48px;
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
   }
 
-  .back-btn-inline {
-    --color: #fff;
-    margin: 0;
+  .header-content {
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 4px 0 0 0;
+    }
   }
 }
 
-/* ---------- SECCIONES ---------- */
+// Icono principal - Manteniendo el estilo original pero mejorado
+.icon-section {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto;
+
+  .icon-circle {
+    width: 100px;
+    height: 100px;
+    margin: 20px auto;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at top, #1e3a8a, #3b82f600);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    position: relative;
+
+    .icon-inner {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+
+      ion-icon {
+        font-size: 32px;
+        color: var(--primary-light);
+      }
+    }
+  }
+}
+
+// Sección de título - Mejorado pero manteniendo esencia
+.title-section {
+  text-align: center;
+  margin-bottom: 24px;
+
+  .main-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    background: linear-gradient(to right, #60a5fa, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.clean {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success-color);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    &.issues {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning-color);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    &.critical {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger-color);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+  }
+}
+
+// Secciones generales
 .section {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  text-align: left;
 }
 
-/* ---------- TARJETAS ---------- */
-ion-card {
-  background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 14px;
-  padding: 4px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+// Tarjetas - Manteniendo estilo original pero mejorado
+.summary-card, .notes-card {
+  background: var(--background-card);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+
+  .summary-header, .notes-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    ion-icon {
+      font-size: 20px;
+      color: var(--primary-light);
+    }
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+  }
 }
 
-ion-card-title {
-  color: #60a5fa;
-  font-size: 1rem;
-  font-weight: 600;
+// Estadísticas - Mejoradas visualmente
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+
+  .stat-item {
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    &.missing {
+      border-left: 4px solid var(--danger-color);
+      .stat-number { color: var(--danger-color); }
+    }
+
+    &.unexpected {
+      border-left: 4px solid var(--warning-color);
+      .stat-number { color: var(--warning-color); }
+    }
+
+    &.mismatch {
+      border-left: 4px solid var(--primary-blue);
+      .stat-number { color: var(--primary-blue); }
+    }
+  }
 }
 
-/* ---------- TIPOS ---------- */
-.issue-card.missing { border-left: 4px solid #ef4444; }
-.issue-card.unexpected { border-left: 4px solid #facc15; }
-.issue-card.mismatch { border-left: 4px solid #3b82f6; }
+// Secciones de issues - Mejorado visualmente
+.issue-section {
+  margin-bottom: 20px;
 
-.item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 10px 0;
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: 1px;
 
-  h3 { color: #fff; font-weight: 600; }
-  .reason { color: #f87171; }
-  .suggestion { color: #60a5fa; }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      ion-icon {
+        font-size: 20px;
+      }
+
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+      }
+    }
+
+    .count-badge {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    &.missing {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--danger-color);
+      ion-icon { color: var(--danger-color); }
+    }
+
+    &.unexpected {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--warning-color);
+      ion-icon { color: var(--warning-color); }
+    }
+
+    &.mismatch {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid var(--primary-blue);
+      ion-icon { color: var(--primary-blue); }
+    }
+  }
 }
 
-/* ---------- TEXTAREA ---------- */
-ion-textarea {
-  --background: rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  color: #fff;
-}
-
-/* ---------- BOTONES ---------- */
-.actions {
+// Lista de items - Mejorada
+.items-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 10px;
+  gap: 8px;
 }
 
-ion-button {
-  --border-radius: 10px;
-  font-weight: 600;
-  text-transform: none;
+.item-card {
+  background: var(--background-card);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  padding: 16px;
+  border-left: 4px solid;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: var(--transition);
 
-  &[color="danger"] {
-    --background: linear-gradient(135deg, #dc2626, #ef4444);
+  &:hover {
+    transform: translateX(4px);
   }
 
-  &[color="success"] {
-    --background: linear-gradient(135deg, #2563eb, #3b82f6);
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+
+    .item-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .item-code {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
   }
+
+  .item-content {
+    .reason {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0 0 12px 0;
+      line-height: 1.4;
+    }
+
+    .suggestion {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 8px;
+      border-left: 3px solid var(--warning-color);
+      font-size: 0.875rem;
+
+      ion-icon {
+        color: var(--warning-color);
+        font-size: 16px;
+        margin-top: 1px;
+        flex-shrink: 0;
+      }
+
+      span {
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+    }
+
+    .state-comparison {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .state-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+
+        .state-label {
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+        }
+
+        .state-value {
+          font-size: 0.875rem;
+          font-weight: 600;
+          padding: 4px 8px;
+          border-radius: 4px;
+
+          &.expected {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+          }
+
+          &.scanned {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary-blue);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+          }
+        }
+      }
+    }
+  }
+
+  &.missing {
+    border-left-color: var(--danger-color);
+  }
+
+  &.unexpected {
+    border-left-color: var(--warning-color);
+  }
+
+  &.mismatch {
+    border-left-color: var(--primary-blue);
+  }
+}
+
+// Área de observaciones - Mejorada
+.notes-content {
+  .custom-textarea {
+    --background: rgba(255, 255, 255, 0.05);
+    --color: var(--text-primary);
+    --placeholder-color: var(--text-muted);
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 100px;
+  }
+}
+
+// Sección de acciones - Mejorada visualmente
+.actions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+
+  .action-btn {
+    --border-radius: 12px;
+    --padding-top: 18px;
+    --padding-bottom: 18px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    margin: 0;
+    font-size: 0.95rem;
+
+    &.deny {
+      --background: linear-gradient(135deg, var(--danger-color), #dc2626);
+      --box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+      
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      }
+    }
+
+    &.confirm {
+      --background: linear-gradient(135deg, var(--success-color), #059669);
+      --box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+      
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      }
+    }
+  }
+}
+
+// Estado de carga - Mejorado
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+
+  .spinner-container {
+    text-align: center;
+
+    ion-spinner {
+      --color: var(--primary-blue);
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin: 0;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Responsive - Manteniendo mejoras
+@media (min-width: 450px) {
+  .icon-section .icon-circle {
+    width: 120px;
+    height: 120px;
+
+    .icon-inner {
+      width: 80px;
+      height: 80px;
+
+      ion-icon {
+        font-size: 36px;
+      }
+    }
+  }
+
+  .title-section .main-title {
+    font-size: 1.4rem;
+  }
+
+  .stats-grid {
+    gap: 16px;
+
+    .stat-item {
+      padding: 20px 12px;
+
+      .stat-number {
+        font-size: 1.75rem;
+      }
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .verification-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+    padding-bottom: 40px;
+  }
+
+  .header {
+    padding: 16px 0;
+    
+    .header-content h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .actions-section {
+    flex-direction: row;
+    gap: 16px;
+
+    .action-btn {
+      flex: 1;
+    }
+  }
+}
+
+// Animaciones mejoradas
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.item-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.icon-circle {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+// Mejoras de accesibilidad
+@media (prefers-reduced-motion: reduce) {
+  .icon-circle,
+  .item-card,
+  .stat-item {
+    animation: none;
+    transition: none;
+  }
+}
+
+// Estados de focus para accesibilidad
+.action-btn:focus,
+.custom-textarea:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
 }

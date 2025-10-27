@@ -1,23 +1,22 @@
 <ion-content class="custom-bg" [fullscreen]="true">
   <div class="wrap">
 
-    <!-- Header -->
+  <!-- Header -->
     <div class="header">
       <ion-icon name="log-out-outline" class="icon-left" (click)="openExitModal()"></ion-icon>
       <h1 class="title">Inicio</h1>
-      <ion-icon name="cloud-upload-outline" class="icon-right upload-icon" (click)="openExportModal()"></ion-icon>
+      <div class="circle-btn" (click)="openInviteModal()"><ion-icon name="person-circle-outline"></ion-icon>
+      </div>      
     </div>
 
     <!-- Top Actions -->
     <div class="top-actions">
-      <div class="circle-btn" (click)="openInviteModal()">
-        <ion-icon name="person-circle-outline"></ion-icon>
-      </div>
       <ion-button class="confirm-btn" (click)="openConfirmModal()">Confirmar</ion-button>
       <div class="circle-btn" (click)="openObservacionesModal()">
         <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
       </div>
     </div>
+
 
     <!-- Card List -->
     <div class="card-list">

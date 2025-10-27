@@ -1,3 +1,4 @@
+q hago /* Fondo de la página Operativo */
 .operativo-content {
   --background: none;
 }
@@ -9,7 +10,55 @@
   background-blend-mode: overlay;
 }
 
-/* Layout general */
+/* --- Estilos globales para ion-alert (modal del ion-select) --- */
+ion-alert::part(header) {
+  color: #e5edff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-shadow: 0 0 6px rgba(100, 160, 255, 0.4);
+}
+
+ion-alert::part(content) {
+  --background: rgba(18, 25, 58, 0.92);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(120, 170, 255, 0.6);
+  border-radius: 18px;
+  box-shadow: 0 0 30px rgba(100, 160, 255, 0.25);
+  animation: popIn 0.25s ease-out;
+}
+
+ion-alert button.alert-radio-label {
+  color: #d5e6ff;
+  font-size: 16px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+
+ion-alert button.alert-radio-label:hover {
+  background: rgba(80, 140, 255, 0.15);
+  color: #ffffff;
+}
+
+ion-alert button.alert-button {
+  color: #9cc9ff;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: color 0.25s ease;
+}
+
+ion-alert button.alert-button:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(77, 163, 255, 0.6);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Contenido general --- */
 .wrap {
   min-height: calc(100dvh - var(--keyboard-offset, 0px));
   display: flex;
@@ -20,6 +69,7 @@
   padding-top: clamp(60px, 12dvh, 140px);
   animation: fadeIn 0.8s ease-out forwards;
 }
+
 .back-button {
   position: absolute;
   top: max(24px, env(safe-area-inset-top));
@@ -36,6 +86,7 @@
   transform: scale(1.08);
   box-shadow: 0 0 14px rgba(0, 136, 255, 0.5);
 }
+
 .icon-container {
   background: rgba(10, 15, 44, 0.6);
   border-radius: 50%;
@@ -47,7 +98,6 @@
   box-shadow:
     inset 0 0 18px rgba(0, 136, 255, 0.15),
     0 0 30px rgba(0, 136, 255, 0.25);
-  animation: float 3.2s ease-in-out infinite;
 }
 
 .icon-container img {
@@ -57,21 +107,19 @@
   filter: drop-shadow(0 8px 24px rgba(0, 136, 255, 0.45));
 }
 
-/* Título */
 .title {
-  font-size: clamp(28px, 6vw, 36px);
-  color: #ffffff;
-  font-weight: 700;
-  margin-bottom: 60px;
-  text-align: center;
-  text-shadow:
-    0 0 10px rgba(0, 136, 255, 0.4),
-    0 0 20px rgba(0, 136, 255, 0.2);
-  letter-spacing: 0.8px;
-  animation: slideDown 0.9s ease-out;
+  font-size: clamp(30px, 5vw, 38px);
+  background: linear-gradient(120deg, #6cb8ff, #b8e1ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  font-weight: 800;
+  margin-bottom: 48px;
+  letter-spacing: 0.5px;
+  animation: glowTitle 1.2s ease-out;
 }
 
-/* Inputs */
+/* --- Inputs --- */
 .input-container {
   width: 100%;
   max-width: 300px;
@@ -79,16 +127,25 @@
   animation: fadeUp 0.8s ease forwards;
 }
 
+.custom-input::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(100,150,255,0.15), rgba(0,136,255,0.15));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .custom-input {
-  --padding-start: 12px;
-  --inner-padding-end: 12px;
-  --min-height: 60px;
-  --background: rgba(17, 23, 56, 0.55);
-  border: 2px solid rgba(0, 136, 255, 0.75);
-  border-radius: 16px;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 0 12px rgba(0, 136, 255, 0.15);
-  transition: all 0.3s ease;
+  --background: rgba(18, 25, 58, 0.55);
+  border: 1px solid rgba(120, 180, 255, 0.45);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 136, 255, 0.12);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .custom-input:hover {
@@ -97,14 +154,26 @@
 }
 
 .custom-input:focus-within {
-  border-color: #60a5fa;
-  box-shadow: 0 0 20px rgba(96, 165, 250, 0.35);
+  border-color: #6cb8ff;
+  box-shadow: 0 0 20px rgba(100, 180, 255, 0.25);
+}
+
+.custom-input:focus-within::after {
+  opacity: 1;
+  background: linear-gradient(90deg, rgba(90,170,255,0.4), rgba(150,220,255,0.3));
 }
 
 .custom-input ion-icon {
   font-size: 22px;
   color: #8ec8ff;
   margin-right: 10px;
+}
+
+.custom-input ion-select {
+  font-size: 16px;
+  color: #f3f7ff;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 .custom-input ion-select,
@@ -114,27 +183,30 @@
   letter-spacing: 0.4px;
 }
 
-/* Botón de acceder (sin cambios) */
 .access-button {
-  margin-top: 50px;
+  margin-top: 48px;
   width: 100%;
   max-width: 220px;
   height: 52px;
-  --background: transparent;
+  --background: linear-gradient(135deg, rgba(0,136,255,0.25), rgba(0,136,255,0.1));
   --color: #fff;
   text-transform: none;
   font-weight: 700;
-  letter-spacing: .3px;
-
-  &::part(native) {
-    border: 2px solid #2f58ff;
-    border-radius: 14px;
-    width: 100%;
-    height: 100%;
-  }
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
 }
 
-/* Hint inferior */
+.access-button::part(native) {
+  border: 2px solid #2f58ff;
+  border-radius: 14px;
+}
+
+.access-button:hover::part(native) {
+  border-color: #60a5fa;
+  box-shadow: 0 0 18px rgba(96,165,250,0.35);
+}
+
+/* --- Texto inferior --- */
 .hint {
   margin-top: 28px;
   font-size: 15px;
@@ -153,7 +225,7 @@
   text-shadow: 0 0 8px rgba(77, 163, 255, 0.5);
 }
 
-/* Animaciones */
+/* --- Animaciones --- */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -168,4 +240,55 @@
   from { opacity: 0; transform: translateY(-15px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* --- Estilos globales para ion-alert (modal del ion-select) --- */
+ion-alert::part(container) {
+  --background: rgba(18, 25, 58, 0.92);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(120, 170, 255, 0.6);
+  border-radius: 18px;
+  box-shadow: 0 0 30px rgba(100, 160, 255, 0.25);
+  animation: popIn 0.25s ease-out;
+}
 
+ion-alert::part(header) {
+  color: #e5edff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-shadow: 0 0 6px rgba(100, 160, 255, 0.4);
+}
+
+ion-alert::part(message) {
+  color: #d5e6ff;
+  font-size: 16px;
+}
+
+ion-alert button.alert-radio-label {
+  color: #d5e6ff;
+  font-size: 16px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+
+ion-alert button.alert-radio-label:hover {
+  background: rgba(80, 140, 255, 0.15);
+  color: #ffffff;
+}
+
+ion-alert button.alert-button {
+  color: #9cc9ff;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: color 0.25s ease;
+}
+
+ion-alert button.alert-button:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(77, 163, 255, 0.6);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}  

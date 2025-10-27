@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { addIcons } from 'ionicons';
+import { ViewChild } from '@angular/core';
+import { IonTextarea } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
 import {
   arrowBackOutline,
@@ -43,6 +45,7 @@ import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
   imports: [IonicModule, CommonModule, FormsModule, ExportadorComponent],
 })
 export class InicioOperativoPage implements OnInit {
+  @ViewChild('observacionesTextarea') observacionesTextarea!: IonTextarea;
   categorias: any[] = [];
   cargando = true;
   operatingGroupId: number | null = null;
@@ -101,6 +104,7 @@ export class InicioOperativoPage implements OnInit {
         this.cargando = false;
       },
     });
+    
 
     // Obtener operatingGroupId
     if (userId) {

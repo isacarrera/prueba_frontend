@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true" class="operativo-content">
+<ion-content [fullscreen]="true" class="verificador-content">
   <div class="wrap">
 
     <!-- Botón de regreso -->
@@ -8,7 +8,7 @@
 
     <!-- Icono central -->
     <div class="icon-container">
-      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Icono Verificador"/>
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Icono Verificador" />
     </div>
 
     <!-- Título -->
@@ -16,17 +16,17 @@
 
     <!-- Input Usuario -->
     <div class="input-container">
-      <ion-item lines="none" class="custom-input">
-        <ion-icon name="person-outline" slot="start" class="input-icon-circle"></ion-icon>
-        <ion-input [(ngModel)]="usuario" placeholder="Usuario" class="input-text"></ion-input>
+      <ion-item class="custom-input" lines="none">
+        <ion-icon name="person-outline" slot="start" class="input-icon"></ion-icon>
+        <ion-input [(ngModel)]="usuario" placeholder="Usuario"></ion-input>
       </ion-item>
     </div>
 
     <!-- Input Contraseña -->
     <div class="input-container">
-      <ion-item lines="none" class="custom-input">
-        <ion-icon name="key-outline" slot="start" class="input-icon-circle"></ion-icon>
-        <ion-input [(ngModel)]="contrasena" type="password" placeholder="Contraseña" class="input-text"></ion-input>
+      <ion-item class="custom-input" lines="none">
+        <ion-icon name="key-outline" slot="start" class="input-icon"></ion-icon>
+        <ion-input [(ngModel)]="contrasena" type="password" placeholder="Contraseña"></ion-input>
       </ion-item>
     </div>
 

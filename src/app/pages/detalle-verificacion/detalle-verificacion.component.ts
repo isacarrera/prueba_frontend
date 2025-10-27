@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
@@ -6,6 +6,19 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';   
 import { FormsModule } from '@angular/forms';     
 import { InventoryService } from 'src/app/services/inventary.service';
+import { addIcons } from 'ionicons';
+import { 
+  arrowBackOutline,
+  documentTextOutline,
+  warningOutline,
+  helpCircleOutline,
+  swapHorizontalOutline,
+  bulbOutline,
+  createOutline,
+  closeCircleOutline,
+  checkmarkCircleOutline,
+  informationCircleOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-detalle-verificacion',
@@ -18,20 +31,37 @@ import { InventoryService } from 'src/app/services/inventary.service';
     FormsModule     
   ]
 })
-export class DetalleVerificacionPage implements OnInit {
+export class DetalleVerificacionPage implements OnInit, OnDestroy {
   inventaryId!: number;
   comparacion: any = null;
   cargando = true;
   observaciones = '';
+  showIcon = true;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private inventoryService: InventoryService,
     private alertCtrl: AlertController
-  ) {}
+  ) {
+    addIcons({
+      arrowBackOutline,
+      documentTextOutline,
+      warningOutline,
+      helpCircleOutline,
+      swapHorizontalOutline,
+      bulbOutline,
+      createOutline,
+      closeCircleOutline,
+      checkmarkCircleOutline,
+      informationCircleOutline
+    });
+  }
 
   ngOnInit() {
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize.bind(this));
+    
     const idParam = this.route.snapshot.paramMap.get('inventaryId');
     if (!idParam) {
       this.mostrarAlerta('Error', 'ID de inventario no proporcionado.');
@@ -49,9 +79,36 @@ export class DetalleVerificacionPage implements OnInit {
     this.cargarComparacion();
   }
 
+  ngOnDestroy() {
+    window.removeEventListener('resize', this.checkScreenSize.bind(this));
+  }
 
-  volver() {
-    this.router.navigate(['/revision-inventario']);
+  private checkScreenSize() {
+    this.showIcon = window.innerWidth > 400;
+  }
+
+  // Métodos auxiliares para la vista
+  getOverallStatus(): string {
+    if (!this.comparacion) return 'clean';
+    
+    const totalIssues = 
+      (this.comparacion.missingItems?.length || 0) +
+      (this.comparacion.unexpectedItems?.length || 0) +
+      (this.comparacion.stateMismatches?.length || 0);
+
+    if (totalIssues === 0) return 'clean';
+    if (totalIssues <= 2) return 'issues';
+    return 'critical';
+  }
+
+  getStatusText(): string {
+    const status = this.getOverallStatus();
+    switch(status) {
+      case 'clean': return 'Sin problemas';
+      case 'issues': return 'Atención requerida';
+      case 'critical': return 'Problemas críticos';
+      default: return 'En verificación';
+    }
   }
 
   async cargarComparacion() {
@@ -69,15 +126,25 @@ export class DetalleVerificacionPage implements OnInit {
     }
   }
 
+  volver() {
+    this.router.navigate(['/revision-inventario']);
+  }
+
   async negarVerificacion() {
     const alert = await this.alertCtrl.create({
       header: '¿Negar verificación?',
       message: 'Esto indicará que hay problemas graves que requieren revisión.',
+      cssClass: 'custom-alert',
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Cancelar', 
+          role: 'cancel',
+          cssClass: 'alert-cancel'
+        },
         {
           text: 'Negar',
           role: 'destructive',
+          cssClass: 'alert-destructive',
           handler: () => this.enviarCierre(false)
         }
       ]
@@ -87,12 +154,18 @@ export class DetalleVerificacionPage implements OnInit {
 
   async confirmarCierre() {
     const alert = await this.alertCtrl.create({
-      header: '¿Confirmar verificación?',
-      message: '¿Estás seguro que todo está en orden?',
+      header: 'Confirmar Verificación',
+      message: '¿Estás seguro de que todo está en orden y deseas confirmar esta verificación?',
+      cssClass: 'custom-alert',
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Cancelar', 
+          role: 'cancel',
+          cssClass: 'alert-cancel'
+        },
         {
           text: 'Confirmar',
+          cssClass: 'alert-confirm',
           handler: () => this.enviarCierre(true)
         }
       ]
@@ -101,32 +174,37 @@ export class DetalleVerificacionPage implements OnInit {
   }
 
   private async enviarCierre(result: boolean) {
+    this.cargando = true;
+    
     try {
       await firstValueFrom(
         this.inventoryService.confirmarVerificacion(
           this.inventaryId,
           this.observaciones,
-          result // true = confirmar, false = negar
+          result
         )
       );
+      
       const msg = result 
-        ? 'Verificación confirmada correctamente.' 
-        : 'Verificación negada. Se notificará al responsable.';
+        ? '✅ Verificación confirmada correctamente.' 
+        : '⚠️ Verificación negada. Se notificará al responsable.';
       
       await this.mostrarAlerta('Éxito', msg);
       this.volver();
     } catch (err) {
       console.error('Error al enviar verificación:', err);
-      this.mostrarAlerta('Error', 'No se pudo guardar la verificación.');
+      this.mostrarAlerta('Error', '❌ No se pudo guardar la verificación.');
+    } finally {
+      this.cargando = false;
     }
   }
-
 
   private async mostrarAlerta(header: string, message: string) {
     const alert = await this.alertCtrl.create({
       header,
       message,
-      buttons: ['OK']
+      buttons: ['OK'],
+      cssClass: 'custom-alert'
     });
     await alert.present();
   }

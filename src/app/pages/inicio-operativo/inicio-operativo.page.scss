@@ -106,6 +106,7 @@
 .header .title {
   font-size: 24px;
   font-weight: 800;
+  margin-left: 40px;
   color: white;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -136,6 +137,7 @@
 .circle-btn {
   width: 52px;
   height: 52px;
+  margin-left: 24px;
   border-radius: 50%;
   background: linear-gradient(145deg, #1e293b, #111827);
   display: flex;
@@ -160,7 +162,7 @@
   text-transform: uppercase;
   color: white;
   padding: 10px 28px;
-  
+  margin-left: 80px;
   letter-spacing: 1px;
   transition: transform 0.2s ease;
 }
@@ -267,11 +269,13 @@
 
 ion-modal.custom-modal::part(content) {
   --width: 90%;
+   justify-content: center;
+   align-items: center; 
   --height: auto;
   --border-radius: 20px;
   background: transparent;
-  display: block; 
-  overflow-y: auto; 
+  display: flex;
+  overflow: hidden; 
 }
 
 .modal-card {
@@ -325,8 +329,14 @@ width: 80px;
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin: 20px 0;
+  position: fixed;  
+  top: 50%;         
+  left: 50%;       
+  transform: translate(-50%, -50%);
+  z-index: 9999; 
+  margin: 0;  
 }
+
 .code-box span {
   background: rgba(255,255,255,0.1);
   border: 2px solid #2563eb;
@@ -337,6 +347,7 @@ width: 80px;
   color: white;
   box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
 }
+
 .back-btn {
   margin-top: 10px;
   --color: white;
@@ -366,7 +377,7 @@ width: 80px;
 .instructions-list li {
   margin-bottom: 8px;
 }
-
+/* 🔹 Estilos específicos para el textarea de observaciones */
 .observaciones-box {
   width: 100%;
   min-height: 120px;
@@ -378,7 +389,26 @@ width: 80px;
   font-size: 14px;
   margin-bottom: 20px;
   box-shadow: inset 0 0 8px rgba(37, 99, 235, 0.3);
-  resize: vertical; /* 🔹 permite ajustar el alto si es necesario */
+  resize: vertical;
+  
+  /* ✅ Asegurar que el texto sea visible y se pueda escribir */
+  --background: transparent;
+  --color: white;
+  --placeholder-color: #aaa;
+  --placeholder-opacity: 1;
+}
+
+/* ✅ Estilos para el ion-item que contiene el textarea */
+ion-item[lines="none"] {
+  --background: transparent;
+  --inner-border-width: 0;
+  --inner-padding-end: 0;
+}
+
+/* ✅ Asegurar que el textarea tenga el foco correctamente */
+ion-textarea:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
 /* Botón atrás */

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, timeOutline } from 'ionicons/icons';
 import { Router, ActivatedRoute } from '@angular/router';
+import { InventoryService } from 'src/app/services/inventary.service';
 
 @Component({
   selector: 'app-inicio-mouse',
@@ -14,20 +15,21 @@ import { Router, ActivatedRoute } from '@angular/router';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class InicioMousePage implements OnInit {
-
   categoria: any;
   items: any[] = [];
   cargando = true;
   zonaId!: number;
 
-  constructor(private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private router: Router, 
+    private route: ActivatedRoute,
+    private inventoryService: InventoryService // ← Inyectado
+  ) {
     addIcons({ arrowBackOutline, timeOutline });
   }
 
   ngOnInit() {
-    // 👇 obtenemos zonaId desde la ruta
     this.zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
-    // console.log('ZonaId recibido:', this.zonaId);
 
     const nav = this.router.getCurrentNavigation();
     if (nav?.extras.state && nav.extras.state['categoria']) {
@@ -38,6 +40,11 @@ export class InicioMousePage implements OnInit {
     this.cargando = false;
   }
 
+  // ✅ NUEVO: Verificar si un item está escaneado
+  isScanned(item: any): boolean {
+    return this.inventoryService.isItemScanned(item.id);
+  }
+  
   goBack() {
     this.router.navigate(['/inicio-operativo', this.zonaId]);
   }

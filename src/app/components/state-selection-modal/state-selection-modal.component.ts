@@ -42,6 +42,13 @@ export class StateSelectionModalComponent {
         throw new Error('No se recibió respuesta del servidor.');
       }
 
+      // ✅ IMPORTANTE: Marcar el item como escaneado si fue exitoso
+      if (response.isValid && response.itemId && response.status === 'Correct') {
+        // Esto ya debería hacerse automáticamente en el servicio, pero por si acaso:
+        this.inventoryService.addScannedItem(response.itemId);
+        console.log('✅ Item marcado como escaneado:', response.itemId);
+      }
+
       // ✅ Manejo según status
       let feedbackMessage = '';
       switch (response.status) {
@@ -67,17 +74,21 @@ export class StateSelectionModalComponent {
         message: feedbackMessage,
         buttons: ['OK'],
       });
-      await alert.present(); // ✅ Solo una vez
+      await alert.present();
 
       // Cerrar modal con resultado
-      await this.modalCtrl.dismiss({ success: true, response });
+      await this.modalCtrl.dismiss({ 
+        success: true, 
+        response,
+        itemScanned: response.isValid && response.itemId // ✅ Indicar si se escaneó
+      });
     } catch (err) {
       const alert = await this.alertCtrl.create({
         header: 'Error',
         message: 'No se pudo enviar el escaneo. Verifica tu conexión.',
         buttons: ['OK'],
       });
-      await alert.present(); // ✅ Solo una vez
+      await alert.present();
     }
   }
 
