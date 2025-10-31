@@ -45,25 +45,7 @@
 
     <!-- 🔹 Modales -->
 
-    <!-- Modal Exportación -->
-    <ion-modal [isOpen]="isExportOpen" (didDismiss)="closeExportModal()" class="custom-modal">
-      <ng-template>
-        <div class="modal-card">
-          <div class="modal-icon">
-            <ion-icon name="cloud-upload-outline"></ion-icon>
-          </div>
-          <h1 class="modal-title">Exportar Inventario</h1>
-          <p class="modal-subtitle">Selecciona el formato</p>
-          <app-exportador [data]="categorias" fileName="inventario"></app-exportador>
-          <div class="modal-actions">
-            <ion-button fill="clear" (click)="closeExportModal()" class="back-btn">
-              <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
-            </ion-button>
-          </div>
-        </div>
-      </ng-template>
-    </ion-modal>
-
+   
     <!-- Modal Salir -->
     <ion-modal [isOpen]="isExitOpen" (didDismiss)="closeExitModal()" class="custom-modal">
       <ng-template>

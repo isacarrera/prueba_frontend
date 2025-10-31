@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ModalController, ToastController, IonicModule } from '@ionic/angular'; // ✅ Agregar ToastController
+import { AlertController, ModalController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -18,12 +18,10 @@ import { StateSelectionModalComponent } from '../state-selection-modal/state-sel
 export class ScannerPage implements OnInit, OnDestroy {
   scannedCode: string | null = null;
   showInstructions = true;
-  
   constructor(
     private router: Router,
     private inventoryService: InventoryService,
     private alertController: AlertController,
-    private toastController: ToastController, // ✅ Agregar ToastController
     private modalController: ModalController,
     private route: ActivatedRoute
   ) {}
@@ -51,7 +49,7 @@ export class ScannerPage implements OnInit, OnDestroy {
 
     // Inicia escaneo
     this.startScanning();
-    setTimeout(() => this.showInstructions = false, 2000);
+     setTimeout(() => this.showInstructions = false, 2000);
   }
 
   ngOnDestroy() {
@@ -77,8 +75,9 @@ export class ScannerPage implements OnInit, OnDestroy {
   private async handleScanResult(cleanCode: string) {
     this.scannedCode = cleanCode;
     await new Promise((r) => setTimeout(r, 800));
-    this.scannedCode = null;
+      this.scannedCode = null;
     await this.openStateSelectionModal(cleanCode);
+    
   }
 
   private async openStateSelectionModal(code: string) {
@@ -91,45 +90,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     });
 
     await modal.present();
-    
-    // ✅ CAPTURAR LA RESPUESTA DEL MODAL
-    const { data } = await modal.onDidDismiss();
-    
-    if (data?.success) {
-      console.log('✅ Escaneo completado:', data.response?.message);
-      
-      // ✅ El item ya está marcado como escaneado automáticamente en el servicio
-      if (data.response?.isValid && data.response?.itemId) {
-        console.log('📦 Item agregado a la lista de escaneados:', data.response.itemId);
-        
-        // Mostrar mensaje de éxito breve CON TOAST
-        await this.showBriefMessage('✅ Escaneo exitoso', 'success');
-      }
-    } else if (data?.response) {
-      // ❌ Escaneo fallido
-      console.log('❌ Escaneo fallido:', data.response.message);
-      await this.showBriefMessage(`❌ ${data.response.message}`, 'warning');
-    }
-    
-    // El escaneo se reanuda automáticamente por el startScanning() en handleScanResult
-  }
-
-  // ✅ Método para mostrar mensajes breves CON TOAST
-  private async showBriefMessage(message: string, color: 'success' | 'warning' | 'danger' = 'success') {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 2000, // ✅ 2 segundos
-      position: 'top',
-      color: color,
-      buttons: [
-        {
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-    
-    await toast.present();
+    await modal.onDidDismiss();
   }
 
   private async showError(message: string) {

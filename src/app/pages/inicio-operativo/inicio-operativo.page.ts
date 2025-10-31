@@ -42,7 +42,7 @@ import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
   templateUrl: './inicio-operativo.page.html',
   styleUrls: ['./inicio-operativo.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ExportadorComponent],
+  imports: [IonicModule, CommonModule, FormsModule],
 })
 export class InicioOperativoPage implements OnInit {
   @ViewChild('observacionesTextarea') observacionesTextarea!: IonTextarea;

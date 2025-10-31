@@ -18,6 +18,7 @@ export class StateSelectionModalComponent {
 
   selectedStateId: number | null = null;
   stateItems: StateItem[] = STATE_ITEMS;
+  isProcessing = false; // ✅ NUEVO: Evitar múltiples clics
 
   constructor(
     private modalCtrl: ModalController,
@@ -26,7 +27,10 @@ export class StateSelectionModalComponent {
   ) {}
 
   async confirm() {
-    if (!this.selectedStateId) return;
+    // ✅ NUEVO: Prevenir múltiples ejecuciones
+    if (this.isProcessing || !this.selectedStateId) return;
+    
+    this.isProcessing = true; // ✅ NUEVO
 
     const request = {
       inventaryId: this.inventaryId,
@@ -44,7 +48,6 @@ export class StateSelectionModalComponent {
 
       // ✅ IMPORTANTE: Marcar el item como escaneado si fue exitoso
       if (response.isValid && response.itemId && response.status === 'Correct') {
-        // Esto ya debería hacerse automáticamente en el servicio, pero por si acaso:
         this.inventoryService.addScannedItem(response.itemId);
         console.log('✅ Item marcado como escaneado:', response.itemId);
       }
@@ -56,43 +59,68 @@ export class StateSelectionModalComponent {
           feedbackMessage = '✅ Item escaneado correctamente.';
           break;
         case 'WrongZone':
-          feedbackMessage = '⚠ Item no pertenece a esta zona.';
+          feedbackMessage = '❌ Item no pertenece a esta zona.';
           break;
         case 'NotFound':
-          feedbackMessage = '❌ Item no encontrado en el sistema.';
+          feedbackMessage = '🔍 Item no encontrado en el sistema.';
           break;
         case 'Duplicate':
-          feedbackMessage = '🔁 Item ya escaneado anteriormente.';
+          feedbackMessage = '⚠️ Item ya escaneado anteriormente.';
           break;
         default:
-          feedbackMessage = 'ℹ Operación completada.';
+          feedbackMessage = 'ℹ️ Operación completada.';
       }
 
       // Mostrar feedback
       const alert = await this.alertCtrl.create({
         header: 'Resultado',
         message: feedbackMessage,
-        buttons: ['OK'],
+        buttons: [{
+          text: 'OK',
+          handler: () => {
+            // ✅ MODIFICADO: Cerrar modal con canContinue: true
+            this.modalCtrl.dismiss({ 
+              success: true, 
+              response,
+              itemScanned: response.isValid && response.itemId,
+              canContinue: true // ✅ CRÍTICO: Esto permite que el scanner continúe
+            });
+          }
+        }],
       });
+      
       await alert.present();
 
-      // Cerrar modal con resultado
-      await this.modalCtrl.dismiss({ 
-        success: true, 
-        response,
-        itemScanned: response.isValid && response.itemId // ✅ Indicar si se escaneó
-      });
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Error en escaneo:', err);
+      
       const alert = await this.alertCtrl.create({
         header: 'Error',
-        message: 'No se pudo enviar el escaneo. Verifica tu conexión.',
-        buttons: ['OK'],
+        message: '❌ No se pudo enviar el escaneo. Verifica tu conexión.',
+        buttons: [{
+          text: 'OK',
+          handler: () => {
+            // ✅ MODIFICADO: Cerrar modal con canContinue: true incluso en error
+            this.modalCtrl.dismiss({ 
+              success: false, 
+              error: err.message,
+              canContinue: true // ✅ CRÍTICO: Esto permite que el scanner continúe
+            });
+          }
+        }],
       });
       await alert.present();
+    } finally {
+      this.isProcessing = false; // ✅ NUEVO
     }
   }
 
+  // ✅ MODIFICADO: dismiss corregido
   dismiss() {
-    this.modalCtrl.dismiss();
+    this.modalCtrl.dismiss({ 
+      success: false, 
+      dismissed: true,
+      canContinue: true // ✅ CRÍTICO: Esto permite que el scanner continúe
+    });
   }
 }

@@ -1,4 +1,14 @@
 <ion-content class="zones-content" [fullscreen]="true">
+  <!-- Agrega el refresher aquí -->
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Arrastra para recargar"
+      refreshingSpinner="circles"
+      refreshingText="Recargando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <div class="wrap">
     <ion-button class="back-button" fill="clear" (click)="goBack()">
       <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
@@ -18,7 +28,14 @@
       class="custom-search">
     </ion-searchbar>
 
-    <div class="zones-grid">
+    <!-- Estado de carga -->
+    <div *ngIf="cargando" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando zonas...</p>
+    </div>
+
+    <!-- Grid de zonas -->
+    <div class="zones-grid" *ngIf="!cargando">
       <div 
         class="card-zona" 
         *ngFor="let zona of filteredZonas()" 
@@ -33,6 +50,20 @@
           <ion-icon name="lock-closed-outline"></ion-icon>
         </div>
       </div>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!cargando && filteredZonas().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <ion-icon name="map-outline"></ion-icon>
+      </div>
+      <h3>No se encontraron zonas</h3>
+      <p *ngIf="searchTerm">
+        No hay resultados para "{{ searchTerm }}"
+      </p>
+      <p *ngIf="!searchTerm">
+        No hay zonas operativas disponibles.
+      </p>
     </div>
   </div>
 </ion-content>

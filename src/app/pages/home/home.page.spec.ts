@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, RefresherEventDetail } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline, lockClosedOutline, lockOpenOutline } from 'ionicons/icons';
 import { ZonaInventario, ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { IonRefresherCustomEvent } from '@ionic/core';
 
 @Component({
   selector: 'app-home',
@@ -16,6 +17,9 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class HomePage implements OnInit {
+handleRefresh($event: IonRefresherCustomEvent<RefresherEventDetail>) {
+throw new Error('Method not implemented.');
+}
   searchTerm: string = '';
   zonas: ZonaInventario[] = [];
   cargando = true;
