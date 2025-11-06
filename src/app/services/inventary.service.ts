@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators'; // ✅ IMPORTACIÓN NECESARIA
 
@@ -18,10 +18,10 @@ export class InventoryService {
   private baseUrl = environment.apiURL + 'api/Inventory';
   private currentInventaryIdSubject = new BehaviorSubject<number | null>(null);
   public currentInventaryId$ = this.currentInventaryIdSubject.asObservable();
-  
+
   private scannedItems = new Set<number>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   start(
     request: StartInventoryRequestDto
@@ -42,20 +42,20 @@ export class InventoryService {
   }
 
   // ✅ ESCANEAR ITEM - CORREGIDO CON LA ESTRUCTURA REAL
-// En inventory.service.ts - ACTUALIZA el método scan
-// En el método scan del servicio - esto ya debería estar
-scan(scanRequest: ScanRequestDto): Observable<ScanResponseDto> {
-  return this.http.post<ScanResponseDto>(`${this.baseUrl}/scan`, scanRequest)
-    .pipe(
-      tap((response: ScanResponseDto) => {
-        // ✅ Esto marca automáticamente el item cuando el escaneo es exitoso
-        if (response.isValid && response.itemId && response.status === 'Correct') {
-          this.addScannedItem(response.itemId);
-          console.log('✅ Item escaneado automáticamente:', response.itemId);
-        }
-      })
-    );
-}
+  // En inventory.service.ts - ACTUALIZA el método scan
+  // En el método scan del servicio - esto ya debería estar
+  scan(scanRequest: ScanRequestDto): Observable<ScanResponseDto> {
+    return this.http.post<ScanResponseDto>(`${this.baseUrl}/scan`, scanRequest)
+      .pipe(
+        tap((response: ScanResponseDto) => {
+          // ✅ Esto marca automáticamente el item cuando el escaneo es exitoso
+          if (response.isValid && response.itemId && response.status === 'Correct') {
+            this.addScannedItem(response.itemId);
+            console.log('✅ Item escaneado automáticamente:', response.itemId);
+          }
+        })
+      );
+  }
   addScannedItem(itemId: number): void {
     this.scannedItems.add(itemId);
     console.log('📦 Item agregado a escaneados:', itemId, 'Total:', this.scannedItems.size);
@@ -87,11 +87,7 @@ scan(scanRequest: ScanRequestDto): Observable<ScanResponseDto> {
   }
 
   confirmarVerificacion(inventaryId: number, observations: string, result: boolean = true): Observable<any> {
-    const body = {
-      inventaryId,
-      result,
-      observations
-    };
+    const body = { inventaryId, result, observations };
     return this.http.post(`${this.baseUrl}/verify`, body);
   }
 

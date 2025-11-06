@@ -42,7 +42,7 @@
       <div class="card-item" *ngFor="let inv of inventariosEnVerificacion" (click)="irADetalle(inv)">
         <div class="card-left">
           <span class="label">{{ inv.zoneName }}</span>
-          <span class="count">Inventario #{{ inv.inventaryId }}</span>
+          <span class="count">Inventario #{{ inv.date }}</span>
           <span class="status">{{ inv.stateZone }}</span>
         </div>
         <ion-icon name="chevron-forward-outline"></ion-icon>

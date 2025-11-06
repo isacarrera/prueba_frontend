@@ -6,56 +6,81 @@ import { environment } from 'src/environments/environment.prod';
 import { IdleService } from './idle.service';
 import { jwtDecode } from 'jwt-decode';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = environment.apiURL + 'api/Auth';
+  private _storageReady = false;
 
   constructor(
-        private http: HttpClient,
-        public storage: Storage,
-        private idleService: IdleService
-    ) {
-    this.storage.create();
+    private http: HttpClient,
+    private storage: Storage,
+    private idleService: IdleService
+  ) {}
 
-    this.idleService.logout$.subscribe(() => {
-        this.logout();
-    });
-}
-
-  async init() {
-    // Inicializa el motor de Storage
-    this.storage = await this.storage.create();
+  /** Inicializa el motor de almacenamiento */
+  async init(): Promise<void> {
+    if (!this._storageReady) {
+      await this.storage.create();
+      this._storageReady = true;
+      console.log('🗄️ Ionic Storage inicializado correctamente');
+    }
   }
 
- login(username: string, password: string) {
-  return this.http.post<any>(`${this.apiUrl}/Login`, { username, password }).pipe(
+  /** Guarda tokens después del login */
+  login(username: string, password: string) {
+    return this.http.post<any>(`${this.apiUrl}/Login`, { username, password }).pipe(
+      tap(async (res) => {
+        if (res.token && res.refreshToken) {
+          await this.init(); // ⚠️ asegúrate de que esté listo
+          await this.storage.set('access_token', res.token);
+          await this.storage.set('refresh_token', res.refreshToken);
+          // console.log('✅ Tokens guardados en Ionic Storage');
+          this.idleService.startWatching();
+        }
+      })
+    );
+  }
+
+  loginOperativo(documentType: string, documentNumber: string) {
+  return this.http.post<any>(`${this.apiUrl}/LoginOperativo`, {
+    documentType,
+    documentNumber
+  }).pipe(
     tap(async (res) => {
       if (res.token && res.refreshToken) {
+        await this.init(); // ⚙️ aseguramos que el storage esté listo
         await this.storage.set('access_token', res.token);
         await this.storage.set('refresh_token', res.refreshToken);
+        // console.log('✅ Login operativo: tokens guardados');
         this.idleService.startWatching();
       }
     })
   );
 }
-  loginOperativo(documentType: string, documentNumber: string) {
-  return this.http.post<any>(`${this.apiUrl}/LoginOperativo`, {
-      documentType,
-      documentNumber
-    })
-    .pipe(
-      tap(async (res) => {
-        if (res.token && res.refreshToken) {
-          await this.storage.set('access_token', res.token);
-          await this.storage.set('refresh_token', res.refreshToken);
-          this.idleService.startWatching();
-        }
-      })
-    );
- }
- async getUserFromToken() {
+
+  async getAccessToken() {
+    await this.init();
+    const token = await this.storage.get('access_token');
+    console.log('🔐 Token leído de Storage:', token);
+    return token;
+  }
+
+  async getRefreshToken() {
+    await this.init();
+    return await this.storage.get('refresh_token');
+  }
+
+  async logout() {
+    await this.init();
+    await this.storage.remove('access_token');
+    await this.storage.remove('refresh_token');
+    this.idleService.stopWatching();
+  }
+
+  refreshToken(refreshToken: string) {
+    return this.http.post<any>(`${this.apiUrl}/refresh`, { refreshToken });
+  }
+   async getUserFromToken() {
   const token = await this.getAccessToken();
   if (!token) return null;
 
@@ -67,21 +92,4 @@ export class AuthService {
     role: decoded['role']
   };
 }
-  async getAccessToken() {
-    return await this.storage.get('access_token');
-  }
-
-  async getRefreshToken() {
-    return await this.storage.get('refresh_token');
-  }
-
-  async logout() {
-    this.idleService.stopWatching();
-    await this.storage.remove('access_token');
-    await this.storage.remove('refresh_token');
-  }
-  refreshToken(refreshToken: string) {
-  return this.http.post<any>(`${this.apiUrl}/refresh`, { refreshToken });
-}
-
 }

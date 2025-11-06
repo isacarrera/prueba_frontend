@@ -51,9 +51,12 @@ export class RevisionInventarioPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loadInventories();
+    await this.loadInventories(); 
   }
 
+  async ionViewWillEnter() {
+    await this.loadInventories(); 
+  }
   async loadInventories() {
     const user = await this.authService.getUserFromToken();
     const userId = user?.userId;
