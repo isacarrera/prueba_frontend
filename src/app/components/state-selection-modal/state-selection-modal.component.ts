@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ModalController, AlertController, IonicModule } from '@ionic/angular';
+import { ModalController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { STATE_ITEMS, StateItem } from 'src/app/Interfaces/state-item.model';
@@ -18,19 +18,22 @@ export class StateSelectionModalComponent {
 
   selectedStateId: number | null = null;
   stateItems: StateItem[] = STATE_ITEMS;
-  isProcessing = false; // ✅ NUEVO: Evitar múltiples clics
+  isProcessing = false;
+
+  showFeedbackView = false;
+  feedbackMessage = '';
+  feedbackStatus: 'success' | 'error' | 'warning' | 'info' = 'info';
+  private lastResponse: any = null;
 
   constructor(
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController,
     private inventoryService: InventoryService
   ) {}
 
   async confirm() {
-    // ✅ NUEVO: Prevenir múltiples ejecuciones
     if (this.isProcessing || !this.selectedStateId) return;
-    
-    this.isProcessing = true; // ✅ NUEVO
+
+    this.isProcessing = true;
 
     const request = {
       inventaryId: this.inventaryId,
@@ -40,87 +43,67 @@ export class StateSelectionModalComponent {
 
     try {
       const response = await this.inventoryService.scan(request).toPromise();
+      this.lastResponse = response;
 
-      // ✅ Validación explícita
       if (!response) {
         throw new Error('No se recibió respuesta del servidor.');
       }
 
-      // ✅ IMPORTANTE: Marcar el item como escaneado si fue exitoso
       if (response.isValid && response.itemId && response.status === 'Correct') {
         this.inventoryService.addScannedItem(response.itemId);
-        console.log('✅ Item marcado como escaneado:', response.itemId);
       }
 
-      // ✅ Manejo según status
-      let feedbackMessage = '';
       switch (response.status) {
         case 'Correct':
-          feedbackMessage = '✅ Item escaneado correctamente.';
+          this.feedbackMessage = 'Item escaneado correctamente.';
+          this.feedbackStatus = 'success';
           break;
         case 'WrongZone':
-          feedbackMessage = '❌ Item no pertenece a esta zona.';
+          this.feedbackMessage = 'Item no pertenece a esta zona.';
+          this.feedbackStatus = 'error';
           break;
         case 'NotFound':
-          feedbackMessage = '🔍 Item no encontrado en el sistema.';
+          this.feedbackMessage = 'Item no encontrado en el sistema.';
+          this.feedbackStatus = 'error';
           break;
         case 'Duplicate':
-          feedbackMessage = '⚠️ Item ya escaneado anteriormente.';
+          this.feedbackMessage = 'Item ya escaneado anteriormente.';
+          this.feedbackStatus = 'warning';
           break;
         default:
-          feedbackMessage = 'ℹ️ Operación completada.';
+          this.feedbackMessage = 'Operación completada.';
+          this.feedbackStatus = 'info';
       }
 
-      // Mostrar feedback
-      const alert = await this.alertCtrl.create({
-        header: 'Resultado',
-        message: feedbackMessage,
-        buttons: [{
-          text: 'OK',
-          handler: () => {
-            // ✅ MODIFICADO: Cerrar modal con canContinue: true
-            this.modalCtrl.dismiss({ 
-              success: true, 
-              response,
-              itemScanned: response.isValid && response.itemId,
-              canContinue: true // ✅ CRÍTICO: Esto permite que el scanner continúe
-            });
-          }
-        }],
-      });
-      
-      await alert.present();
-
+      this.showFeedbackView = true;
     } catch (err: any) {
-      console.error('Error en escaneo:', err);
-      
-      const alert = await this.alertCtrl.create({
-        header: 'Error',
-        message: '❌ No se pudo enviar el escaneo. Verifica tu conexión.',
-        buttons: [{
-          text: 'OK',
-          handler: () => {
-            // ✅ MODIFICADO: Cerrar modal con canContinue: true incluso en error
-            this.modalCtrl.dismiss({ 
-              success: false, 
-              error: err.message,
-              canContinue: true // ✅ CRÍTICO: Esto permite que el scanner continúe
-            });
-          }
-        }],
-      });
-      await alert.present();
+      this.lastResponse = { error: err.message };
+      this.feedbackMessage = 'No se pudo enviar el escaneo. Verifica tu conexión.';
+      this.feedbackStatus = 'error';
+      this.showFeedbackView = true;
     } finally {
-      this.isProcessing = false; // ✅ NUEVO
+      this.isProcessing = false;
     }
   }
 
-  // ✅ MODIFICADO: dismiss corregido
+  closeModalAndContinue() {
+    const success = this.lastResponse && !this.lastResponse.error;
+    const itemScanned =
+      success && this.lastResponse.isValid && this.lastResponse.itemId;
+
+    this.modalCtrl.dismiss({
+      success: success,
+      response: this.lastResponse,
+      itemScanned: itemScanned,
+      canContinue: true,
+    });
+  }
+
   dismiss() {
-    this.modalCtrl.dismiss({ 
-      success: false, 
+    this.modalCtrl.dismiss({
+      success: false,
       dismissed: true,
-      canContinue: true // ✅ CRÍTICO: Esto permite que el scanner continúe
+      canContinue: true,
     });
   }
 }

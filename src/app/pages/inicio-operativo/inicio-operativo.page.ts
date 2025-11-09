@@ -13,6 +13,7 @@ import {
   personCircleOutline,
   chatbubbleEllipsesOutline,
   documentTextOutline,
+  readerOutline,
   homeOutline,
   informationCircleOutline,
   qrCodeOutline,
@@ -82,6 +83,7 @@ export class InicioOperativoPage implements OnInit {
       personAddOutline,
       arrowBackOutline,
       checkmarkOutline,
+      readerOutline,
       logOutOutline,
       checkmarkDoneOutline,
       closeOutline,
@@ -96,8 +98,15 @@ export class InicioOperativoPage implements OnInit {
     // Cargar categorías
     this.categoryService.getItemsByCategory(zonaId).subscribe({
       next: (data) => {
+        // Asumiendo que 'data' es un array de categorías
+        // y que 'contador' es parte de cada objeto de categoría
         this.categorias = data;
         this.cargando = false;
+        
+        // ✅ 1. LOG PARA VER ESTRUCTURA (AL CARGAR)
+        console.log('----- ESTRUCTURA DE DATOS (AL CARGAR) -----');
+        console.log(JSON.stringify(this.categorias, null, 2));
+        console.log('-------------------------------------------');
       },
       error: (err) => {
         console.error('Error cargando categorías:', err);
@@ -121,7 +130,25 @@ export class InicioOperativoPage implements OnInit {
       console.warn('No se pudo obtener userId del token');
     }
   }
+  async scanItemDescription() {
+    const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
 
+    if (!zonaId) {
+      console.error('No se pudo encontrar la zonaId');
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se pudo identificar la zona actual para escanear.',
+        buttons: ['OK'],
+      });
+      await alert.present();
+      return;
+    }
+    this.router.navigate(['/scanner', zonaId], {
+      state: {
+        scanMode: 'description'
+      }
+    });
+  }
   goToItem(categoria: any) {
     this.router.navigate(
       [
@@ -134,7 +161,7 @@ export class InicioOperativoPage implements OnInit {
       }
     );
   }
-
+  
   // === Modales ===
   openInviteModal() {
     this.isInviteOpen = true;
@@ -185,7 +212,6 @@ closeObservacionesModal() {
 
 // === Guardar observación ===
 async guardarObservacion() {
-  // Permitir texto vacío, pero mostrar confirmación igual
   console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
   this.closeObservacionesModal();
 
@@ -199,8 +225,65 @@ async guardarObservacion() {
   await alert.present();
 }
 
-// === Finalizar inventario ===
+// === Lógica de Finalizar Inventario (REESTRUCTURADA) ===
+
 async finalizarInventario() {
+  
+  console.log('----- FINALIZANDO INVENTARIO -----');
+  // ✅ 2. LOG PARA VER LOS DATOS JUSTO ANTES DE SUMAR
+  console.log('Datos de categorías AHORA MISMO:', JSON.stringify(this.categorias, null, 2));
+
+  // ✅ 3. LOG DENTRO DEL .reduce()
+  const totalEsperado = this.categorias.reduce((sum, cat) => {
+    // ESTE LOG ES EL MÁS IMPORTANTE
+    console.log(`Sumando cat.contador: ${cat.name}, PROPIEDADES:`, cat);
+    return sum + (cat.contador || 0);
+  }, 0);
+  
+  const totalEscaneado = this.inventaryService.getScannedItems().length;
+
+  // ✅ 4. LOG DE COMPARACIÓN
+  console.log('Total Escaneado (Servicio):', totalEscaneado);
+  console.log('Total Esperado (Suma de "cat.contador"):', totalEsperado);
+  console.log('------------------------------------');
+
+  if (totalEscaneado < totalEsperado) {
+    const itemsFaltantes = totalEsperado - totalEscaneado;
+    
+    const alert = await this.alertController.create({
+      header: '⚠️ ¡Atención!',
+      message: `Has escaneado ${totalEscaneado} de ${totalEsperado} ítems.\n\nFaltan ${itemsFaltantes} ítems. ¿Estás seguro de que quieres finalizar?`,
+      cssClass: 'custom-alert',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'alert-button-cancel',
+          handler: () => {
+            console.log('Finalización cancelada por el usuario.');
+            this.closeConfirmModal();
+          }
+        },
+        {
+          text: 'Finalizar de todos modos',
+          cssClass: 'alert-button-danger',
+          handler: () => {
+            console.log('Finalizando de todos modos...');
+            this.procederConFinalizacion(); 
+          }
+        }
+      ]
+    });
+    await alert.present();
+
+  } else {
+    // Si el inventario está completo, proceder normalmente
+    console.log('Inventario completo o igualado (Esto es lo que está pasando). Finalizando...');
+    this.procederConFinalizacion();
+  }
+}
+
+async procederConFinalizacion() {
   const inventaryId = this.inventaryService.getInventaryId();
 
   if (!inventaryId) {
@@ -213,9 +296,7 @@ async finalizarInventario() {
     return;
   }
 
-  // ✅ Observación opcional (puede venir vacía si no escribió nada)
   const observations = this.observacionTexto?.trim() || '';
-
   const request: FinishRequestDto = {
     inventaryId: inventaryId,
     observations
@@ -224,10 +305,9 @@ async finalizarInventario() {
   try {
     await this.inventaryService.finish(request).toPromise();
 
-    // ✅ Éxito
     this.inventaryService.setInventaryId(0);
-    this.observacionTexto = ''; // limpiar
-    this.closeConfirmModal();   // cerrar solo el modal de confirmación
+    this.observacionTexto = ''; 
+    this.closeConfirmModal();   
 
     const alert = await this.alertController.create({
       header: '✅ Éxito',
@@ -257,7 +337,7 @@ async finalizarInventario() {
   }
 }
 
-  // === Iniciar inventario (con observaciones iniciales opcionales) ===
+  // === Iniciar inventario (sin cambios) ===
   async iniciarInventario() {
     const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
     if (!this.operatingGroupId) {
@@ -270,14 +350,12 @@ async finalizarInventario() {
       return;
     }
 
-    // ✅ Si ya hay inventario activo, ir directo al scanner
     const currentInventaryId = this.inventaryService.getInventaryId();
     if (currentInventaryId) {
       this.router.navigate(['/scanner/', zonaId]);
       return;
     }
 
-    // ❓ Solo preguntar si NO hay inventario activo
     const alert = await this.alertController.create({
       header: 'Iniciar inventario',
       message: '¿Estás seguro de iniciar el inventario en esta zona?',
@@ -298,7 +376,7 @@ async finalizarInventario() {
               next: (res) => {
                 this.inventaryService.setInventaryId(res.inventaryId);
                 console.log('Inventario iniciado con ID:', res.inventaryId);
-                 this.router.navigate(['/scanner', zonaId]);
+                this.router.navigate(['/scanner', zonaId]);
               },
               error: async (err) => {
                 const errorAlert = await this.alertController.create({

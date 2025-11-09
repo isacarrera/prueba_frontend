@@ -130,14 +130,14 @@
 }
 .top-actions {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   margin: 10px 0 35px;
 }
 .circle-btn {
   width: 52px;
   height: 52px;
-  margin-left: 24px;
+  margin-left: 0;
   border-radius: 50%;
   background: linear-gradient(145deg, #1e293b, #111827);
   display: flex;
@@ -162,7 +162,7 @@
   text-transform: uppercase;
   color: white;
   padding: 10px 28px;
-  margin-left: 80px;
+  margin-left: 0;
   letter-spacing: 1px;
   transition: transform 0.2s ease;
 }
@@ -329,14 +329,8 @@ width: 80px;
   display: flex;
   justify-content: center;
   gap: 16px;
-  position: fixed;  
-  top: 50%;         
-  left: 50%;       
-  transform: translate(-50%, -50%);
-  z-index: 9999; 
-  margin: 0;  
+  margin: 0; 
 }
-
 .code-box span {
   background: rgba(255,255,255,0.1);
   border: 2px solid #2563eb;
@@ -377,39 +371,13 @@ width: 80px;
 .instructions-list li {
   margin-bottom: 8px;
 }
-/* 🔹 Estilos específicos para el textarea de observaciones */
-.observaciones-box {
-  width: 100%;
-  min-height: 120px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 12px;
-  color: white;
-  font-size: 14px;
-  margin-bottom: 20px;
-  box-shadow: inset 0 0 8px rgba(37, 99, 235, 0.3);
-  resize: vertical;
-  
-  /* ✅ Asegurar que el texto sea visible y se pueda escribir */
-  --background: transparent;
-  --color: white;
-  --placeholder-color: #aaa;
-  --placeholder-opacity: 1;
-}
-
-/* ✅ Estilos para el ion-item que contiene el textarea */
 ion-item[lines="none"] {
   --background: transparent;
   --inner-border-width: 0;
   --inner-padding-end: 0;
 }
 
-/* ✅ Asegurar que el textarea tenga el foco correctamente */
-ion-textarea:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-}
+
 
 /* Botón atrás */
 .back-button {
@@ -445,4 +413,123 @@ ion-textarea:focus-within {
 .back-btn ion-icon {
   color: #fff;
   font-size: 26px;
+}
+/* 🔹🔹 NUEVOS Estilos Modal Observaciones (Bottom Sheet) 🔹🔹 */
+
+/* 1. Define el modal como una "hoja" que sube */
+ion-modal.modal-sheet {
+  --height: auto;
+  --border-radius: 24px 24px 0 0; /* Esquinas superiores redondeadas */
+  
+  /* Ancla el modal abajo */
+  align-items: flex-end; 
+}
+
+/* 2. Contenedor principal dentro del modal */
+.sheet-container {
+  width: 100%;
+  background: #0f172a; /* Color base oscuro */
+  border-top: 1px solid rgba(59, 130, 246, 0.4); /* Borde neón */
+  box-shadow: 0 -8px 25px rgba(0,0,0,0.5); /* Sombra superior */
+  padding: 16px 20px 30px 20px; /* Espaciado interno */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3. Encabezado (Título y botón de cerrar) */
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative; /* Necesario para el "handle" */
+}
+
+/* 4. "Handle" (la barra gris para arrastrar) */
+.sheet-handle {
+  position: absolute;
+  top: -8px; /* Un poco por fuera del contenedor */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.sheet-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.sheet-header ion-button {
+  --color: white;
+  font-size: 24px;
+  margin: 0;
+}
+
+/* 5. Contenido (párrafo, textarea, botón) */
+.sheet-content {
+  text-align: left; /* Alinea el texto de ayuda */
+}
+
+.sheet-content p {
+  font-size: 14px;
+  color: #aaa;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* 6. Textarea (casi igual al anterior, pero renombrado) */
+.textarea-item {
+  --background: transparent;
+  --inner-border-width: 0;
+  --inner-padding-end: 0;
+  --padding-start: 0;
+}
+
+.sheet-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 12px;
+  color: white;
+  font-size: 14px;
+  box-shadow: inset 0 0 8px rgba(37, 99, 235, 0.3);
+  --background: transparent;
+  --color: white;
+  --placeholder-color: #aaa;
+  --placeholder-opacity: 1;
+}
+
+.sheet-textarea:focus-within {
+  border-color: #3b82f6; /* Resaltar al enfocar */
+}
+
+/* 7. Nuevo botón de guardar (más grande y claro) */
+.save-btn {
+  --background: linear-gradient(135deg, #2563eb, #1e40af);
+  --border-radius: 12px;
+  font-weight: bold;
+  text-transform: none; /* Texto normal, no mayúsculas */
+  color: white;
+  margin-top: 20px;
+  height: 48px;
+}
+:global(ion-alert.custom-alert) {
+  
+  /* Botón de peligro (rojo) */
+  .alert-button-danger {
+    color: var(--ion-color-danger, #ef4444) !important;
+    font-weight: 600;
+  }
+  
+  /* Botón de cancelar (color secundario) */
+  .alert-button-cancel {
+    color: var(--ion-color-medium, #92949c) !important;
+  }
 }

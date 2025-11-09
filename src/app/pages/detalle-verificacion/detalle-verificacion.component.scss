@@ -1,4 +1,4 @@
-// Variables de diseño manteniendo el esquema original
+// Variables de diseño (sin cambios)
 :root {
   --primary-blue: #3b82f6;
   --primary-dark: #1e40af;
@@ -16,7 +16,7 @@
   --transition: all 0.3s ease;
 }
 
-// Estilos globales - Manteniendo el fondo original
+// Estilos globales
 .verification-page {
   --background: #0a0f1f;
   color: var(--text-primary);
@@ -25,18 +25,19 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-  padding-bottom: 32px;
   min-height: 100vh;
+
+  // ✅ 1. Padding inferior para que el footer fijo NO tape el último acordeón
+  padding-bottom: 140px; 
 }
 
-// Header mejorado pero manteniendo estilo original
+// Header (sin cambios)
 .header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
   padding: 8px 0;
-
   .back-btn {
     --color: #fff;
     --background: transparent;
@@ -45,7 +46,6 @@
     height: 48px;
     margin: 0;
   }
-
   .header-content {
     h2 {
       font-size: 1rem;
@@ -53,7 +53,6 @@
       margin: 0;
       color: var(--text-primary);
     }
-
     .subtitle {
       font-size: 0.875rem;
       color: var(--text-secondary);
@@ -62,12 +61,11 @@
   }
 }
 
-// Icono principal - Manteniendo el estilo original pero mejorado
+// Icono principal (sin cambios)
 .icon-section {
   display: flex;
   justify-content: center;
   margin: 20px auto;
-
   .icon-circle {
     width: 100px;
     height: 100px;
@@ -79,7 +77,7 @@
     background: radial-gradient(circle at top, #1e3a8a, #3b82f600);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
     position: relative;
-
+    animation: pulse 3s ease-in-out infinite;
     .icon-inner {
       width: 70px;
       height: 70px;
@@ -89,7 +87,6 @@
       justify-content: center;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
-
       ion-icon {
         font-size: 32px;
         color: var(--primary-light);
@@ -98,11 +95,10 @@
   }
 }
 
-// Sección de título - Mejorado pero manteniendo esencia
+// Sección de título (sin cambios)
 .title-section {
   text-align: center;
   margin-bottom: 24px;
-
   .main-title {
     font-size: 1.2rem;
     font-weight: 700;
@@ -111,7 +107,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-
   .status-badge {
     display: inline-block;
     padding: 6px 16px;
@@ -119,19 +114,16 @@
     font-size: 0.875rem;
     font-weight: 600;
     text-transform: uppercase;
-
     &.clean {
       background: rgba(16, 185, 129, 0.2);
       color: var(--success-color);
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
-
     &.issues {
       background: rgba(245, 158, 11, 0.2);
       color: var(--warning-color);
       border: 1px solid rgba(245, 158, 11, 0.3);
     }
-
     &.critical {
       background: rgba(239, 68, 68, 0.2);
       color: var(--danger-color);
@@ -140,32 +132,22 @@
   }
 }
 
-// Secciones generales
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-// Tarjetas - Manteniendo estilo original pero mejorado
-.summary-card, .notes-card {
+// Tarjeta Resumen (sin cambios)
+.summary-card {
   background: var(--background-card);
   border-radius: var(--border-radius);
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-
   .summary-header, .notes-header {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
-
     ion-icon {
       font-size: 20px;
       color: var(--primary-light);
     }
-
     h3 {
       font-size: 1.125rem;
       font-weight: 600;
@@ -174,14 +156,11 @@
     }
   }
 }
-
-// Estadísticas - Mejoradas visualmente
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-top: 16px;
-
   .stat-item {
     text-align: center;
     padding: 16px 8px;
@@ -189,35 +168,29 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition);
-
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-
     .stat-number {
       font-size: 1.5rem;
       font-weight: 700;
       margin-bottom: 4px;
     }
-
     .stat-label {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-secondary);
     }
-
     &.missing {
       border-left: 4px solid var(--danger-color);
       .stat-number { color: var(--danger-color); }
     }
-
     &.unexpected {
       border-left: 4px solid var(--warning-color);
       .stat-number { color: var(--warning-color); }
     }
-
     &.mismatch {
       border-left: 4px solid var(--primary-blue);
       .stat-number { color: var(--primary-blue); }
@@ -225,34 +198,44 @@
   }
 }
 
-// Secciones de issues - Mejorado visualmente
-.issue-section {
-  margin-bottom: 20px;
+// ✅ 2. ESTILOS PARA EL GRUPO DE ACORDEONES
+.results-accordion {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; // Espacio entre acordeones
+}
 
-  .section-header {
+ion-accordion.issue-accordion {
+  background: var(--background-card);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  
+  // Quitar la sombra fea por defecto
+  box-shadow: none;
+
+  // Header (el [slot="header"])
+  .accordion-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    margin-bottom: 1px;
-
+    width: 100%; // Asegurar que ocupe todo
+    
     .header-left {
       display: flex;
       align-items: center;
-      gap: 8px;
-
+      gap: 12px;
       ion-icon {
         font-size: 20px;
       }
-
       h3 {
         font-size: 1rem;
         font-weight: 600;
         margin: 0;
       }
     }
-
     .count-badge {
       background: rgba(255, 255, 255, 0.1);
       color: var(--text-primary);
@@ -261,157 +244,35 @@
       font-size: 0.875rem;
       font-weight: 600;
     }
-
-    &.missing {
-      background: rgba(239, 68, 68, 0.1);
-      border-left: 4px solid var(--danger-color);
-      ion-icon { color: var(--danger-color); }
-    }
-
-    &.unexpected {
-      background: rgba(245, 158, 11, 0.1);
-      border-left: 4px solid var(--warning-color);
-      ion-icon { color: var(--warning-color); }
-    }
-
-    &.mismatch {
-      background: rgba(59, 130, 246, 0.1);
-      border-left: 4px solid var(--primary-blue);
-      ion-icon { color: var(--primary-blue); }
-    }
-  }
-}
-
-// Lista de items - Mejorada
-.items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.item-card {
-  background: var(--background-card);
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  padding: 16px;
-  border-left: 4px solid;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  transition: var(--transition);
-
-  &:hover {
-    transform: translateX(4px);
   }
 
-  .item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
-
-    .item-name {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 0;
-      color: var(--text-primary);
-    }
-
-    .item-code {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      background: rgba(255, 255, 255, 0.05);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-family: monospace;
-    }
+  // Colorear headers según el tipo
+  &.missing .accordion-header {
+    border-left: 4px solid var(--danger-color);
+    ion-icon { color: var(--danger-color); }
+  }
+  &.unexpected .accordion-header {
+    border-left: 4px solid var(--warning-color);
+    ion-icon { color: var(--warning-color); }
+  }
+  &.mismatch .accordion-header {
+    border-left: 4px solid var(--primary-blue);
+    ion-icon { color: var(--primary-blue); }
+  }
+  &.notes .accordion-header {
+    border-left: 4px solid var(--text-muted);
+    ion-icon { color: var(--text-muted); }
+  }
+  
+  // Contenido (el [slot="content"])
+  .items-list, .notes-content {
+    padding: 0 16px 16px 16px;
+    background: transparent; // El fondo ya está en el acordeón
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .item-content {
-    .reason {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin: 0 0 12px 0;
-      line-height: 1.4;
-    }
-
-    .suggestion {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 12px;
-      background: rgba(245, 158, 11, 0.1);
-      border-radius: 8px;
-      border-left: 3px solid var(--warning-color);
-      font-size: 0.875rem;
-
-      ion-icon {
-        color: var(--warning-color);
-        font-size: 16px;
-        margin-top: 1px;
-        flex-shrink: 0;
-      }
-
-      span {
-        color: var(--text-secondary);
-        line-height: 1.4;
-      }
-    }
-
-    .state-comparison {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      .state-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 6px;
-
-        .state-label {
-          font-size: 0.875rem;
-          color: var(--text-secondary);
-        }
-
-        .state-value {
-          font-size: 0.875rem;
-          font-weight: 600;
-          padding: 4px 8px;
-          border-radius: 4px;
-
-          &.expected {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success-color);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-          }
-
-          &.scanned {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--primary-blue);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-          }
-        }
-      }
-    }
-  }
-
-  &.missing {
-    border-left-color: var(--danger-color);
-  }
-
-  &.unexpected {
-    border-left-color: var(--warning-color);
-  }
-
-  &.mismatch {
-    border-left-color: var(--primary-blue);
-  }
-}
-
-// Área de observaciones - Mejorada
-.notes-content {
-  .custom-textarea {
+  // Estilos para el contenido de "Observaciones"
+  .notes-content .custom-textarea {
     --background: rgba(255, 255, 255, 0.05);
     --color: var(--text-primary);
     --placeholder-color: var(--text-muted);
@@ -426,12 +287,110 @@
   }
 }
 
-// Sección de acciones - Mejorada visualmente
+// Estilos para las tarjetas de items DENTRO del acordeón
+.item-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  animation: fadeInUp 0.4s ease-out;
+
+  .item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+
+    .item-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    
+    .status-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .item-code {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+  }
+  
+  &.missing .status-icon { color: var(--danger-color); }
+  &.unexpected .status-icon { color: var(--warning-color); }
+  &.mismatch .status-icon { color: var(--primary-blue); }
+
+  .item-content {
+    .reason {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+    
+    .state-comparison {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-top: 12px;
+
+      .arrow-icon {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      .state-value {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 4px;
+        &.expected {
+          background: rgba(16, 185, 129, 0.2);
+          color: var(--success-color);
+          border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        &.scanned {
+          background: rgba(59, 130, 246, 0.2);
+          color: var(--primary-blue);
+          border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+      }
+    }
+  }
+}
+
+
+// ✅ 1. ESTILOS PARA LOS BOTONES FIJOS
 .actions-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  
+  background: var(--background-dark);
+  padding: 12px 16px 20px 16px; // Padding para safe-area
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.4);
+
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 24px;
+  flex-direction: row;
+  gap: 16px;
+  margin-top: 0; 
 
   .action-btn {
     --border-radius: 12px;
@@ -442,44 +401,36 @@
     letter-spacing: 0.5px;
     margin: 0;
     font-size: 0.95rem;
+    flex: 1; // 50% cada uno
 
     &.deny {
       --background: linear-gradient(135deg, var(--danger-color), #dc2626);
       --box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
-      
-      &:hover {
-        --box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-      }
+      &:hover { --box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
     }
 
     &.confirm {
       --background: linear-gradient(135deg, var(--success-color), #059669);
       --box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
-      
-      &:hover {
-        --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-      }
+      &:hover { --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
     }
   }
 }
 
-// Estado de carga - Mejorado
+// Estado de carga
 .loading-state {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 60px 20px;
-
   .spinner-container {
     text-align: center;
-
     ion-spinner {
       --color: var(--primary-blue);
       width: 48px;
       height: 48px;
       margin-bottom: 16px;
     }
-
     p {
       color: var(--text-secondary);
       margin: 0;
@@ -488,107 +439,47 @@
   }
 }
 
-// Responsive - Manteniendo mejoras
-@media (min-width: 450px) {
-  .icon-section .icon-circle {
-    width: 120px;
-    height: 120px;
-
-    .icon-inner {
-      width: 80px;
-      height: 80px;
-
-      ion-icon {
-        font-size: 36px;
-      }
-    }
-  }
-
-  .title-section .main-title {
-    font-size: 1.4rem;
-  }
-
-  .stats-grid {
-    gap: 16px;
-
-    .stat-item {
-      padding: 20px 12px;
-
-      .stat-number {
-        font-size: 1.75rem;
-      }
-    }
-  }
+// Animaciones
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
 }
 
+// Media Queries (sin cambios, excepto el padding del footer)
 @media (min-width: 768px) {
   .verification-page {
     max-width: 600px;
     margin: 0 auto;
     padding: 24px;
-    padding-bottom: 40px;
+    padding-bottom: 140px; // Mantenemos el padding
   }
-
   .header {
     padding: 16px 0;
-    
-    .header-content h2 {
-      font-size: 1.5rem;
-    }
+    .header-content h2 { font-size: 1.5rem; }
   }
-
+  
+  // En desktop, el footer fijo se pega al contenido
   .actions-section {
-    flex-direction: row;
-    gap: 16px;
-
-    .action-btn {
-      flex: 1;
-    }
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 600px;
+    width: 100%;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
   }
 }
 
-// Animaciones mejoradas
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
-  }
-}
-
-.item-card {
-  animation: fadeInUp 0.4s ease-out;
-}
-
-.icon-circle {
-  animation: pulse 3s ease-in-out infinite;
-}
-
-// Mejoras de accesibilidad
+// Accesibilidad
 @media (prefers-reduced-motion: reduce) {
-  .icon-circle,
-  .item-card,
-  .stat-item {
+  .icon-circle, .item-card, .stat-item {
     animation: none;
     transition: none;
   }
 }
-
-// Estados de focus para accesibilidad
-.action-btn:focus,
-.custom-textarea:focus {
+.action-btn:focus, .custom-textarea:focus {
   outline: 2px solid var(--primary-blue);
   outline-offset: 2px;
 }

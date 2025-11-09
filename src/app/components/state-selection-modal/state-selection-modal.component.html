@@ -1,6 +1,7 @@
 <ion-content class="ion-padding">
   <div class="center-wrapper">
-    <div class="modal-wrapper">
+    
+    <div *ngIf="!showFeedbackView" class="modal-wrapper">
       <header class="modal-header">
         <h2>Estado del ítem</h2>
         <span class="item-code">{{ code }}</span>
@@ -9,7 +10,6 @@
         </button>
       </header>
 
-      <!-- 🔹 Lista de estados tipo "selección", sin circulitos -->
       <ion-list class="state-list">
         <ion-item
           *ngFor="let state of stateItems"
@@ -19,7 +19,6 @@
         >
           <ion-label>
             <h3>{{ state.name }}</h3>
-          
           </ion-label>
           <ion-icon
             *ngIf="selectedStateId === state.id"
@@ -35,11 +34,31 @@
         color="primary"
         class="confirm-button"
         (click)="confirm()"
-        [disabled]="!selectedStateId"
+        [disabled]="!selectedStateId || isProcessing"
       >
-        <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+        <ion-spinner *ngIf="isProcessing" name="crescent" slot="start"></ion-spinner>
+        <ion-icon *ngIf="!isProcessing" name="checkmark-done-outline" slot="start"></ion-icon>
         Confirmar Estado
       </ion-button>
     </div>
+
+    <div *ngIf="showFeedbackView" class="modal-wrapper feedback-view">
+      
+      <div class="feedback-icon" [ngClass]="'status-' + feedbackStatus">
+        <ion-icon *ngIf="feedbackStatus === 'success'" name="checkmark-circle-outline"></ion-icon>
+        <ion-icon *ngIf="feedbackStatus === 'error'" name="close-circle-outline"></ion-icon>
+        <ion-icon *ngIf="feedbackStatus === 'warning'" name="warning-outline"></ion-icon>
+        <ion-icon *ngIf="feedbackStatus === 'info'" name="information-circle-outline"></ion-icon>
+      </div>
+      
+      <h2 class="feedback-title">Resultado</h2>
+      <p class="feedback-message">{{ feedbackMessage }}</p>
+      
+      <ion-button (click)="closeModalAndContinue()" class="confirm-button">
+        OK
+      </ion-button>
+
+    </div>
+
   </div>
 </ion-content>

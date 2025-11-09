@@ -5,20 +5,17 @@
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-     <ion-title>Scanner</ion-title>
+      <ion-title>Scanner</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="scanner-page">
   <div class="scanner-container">
-
-    <!-- Modal temporal "Apunta al QR" -->
     <div class="scan-instructions-modal" *ngIf="showInstructions">
       <ion-icon name="qr-code-outline"></ion-icon>
       <p>Apunta al código QR</p>
     </div>
 
-    <!-- Marco de escaneo -->
     <div class="scan-frame">
       <div class="scan-corner top-left"></div>
       <div class="scan-corner top-right"></div>
@@ -28,7 +25,6 @@
     </div>
   </div>
 
-  <!-- Código escaneado -->
   <div class="code-display" *ngIf="scannedCode">
     <div class="code-header">
       <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
@@ -38,4 +34,31 @@
       <p class="code-text">{{ scannedCode }}</p>
     </div>
   </div>
+
+  <ion-modal 
+    [isOpen]="isDescriptionModalOpen" 
+    (didDismiss)="closeDescriptionModal()" 
+    class="custom-modal">
+    <ng-template>
+      <div class="modal-card">
+        
+        <div class="modal-icon">
+          <ion-icon name="reader-outline"></ion-icon>
+        </div>
+
+        <h1 class="modal-title">Descripción</h1>
+        <p class="modal-subtitle">Código: {{ descriptionCode }}</p>
+
+        <p class="description-text">{{ descriptionMessage }}</p>
+        
+        <div class="modal-actions">
+          <ion-button fill="clear" (click)="closeDescriptionModal()" class="back-btn">
+            <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+      </div>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

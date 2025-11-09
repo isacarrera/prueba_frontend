@@ -4,7 +4,12 @@ const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'Codexy',
   webDir: 'www',
-  bundledWebRuntime: false
+  bundledWebRuntime: false,
+  server: {
+    cleartext: true, // permite http://
+    androidScheme: 'http', 
+    hostname: '192.168.1.8',
+  }
 };
 
 export default config;
