@@ -22,7 +22,7 @@ export class AuthService {
     if (!this._storageReady) {
       await this.storage.create();
       this._storageReady = true;
-      console.log('🗄️ Ionic Storage inicializado correctamente');
+      // console.log('🗄️ Ionic Storage inicializado correctamente');
     }
   }
 
@@ -61,7 +61,7 @@ export class AuthService {
   async getAccessToken() {
     await this.init();
     const token = await this.storage.get('access_token');
-    console.log('🔐 Token leído de Storage:', token);
+    // console.log('🔐 Token leído de Storage:', token);
     return token;
   }
 

@@ -35,30 +35,39 @@
     </div>
   </div>
 
-  <ion-modal 
-    [isOpen]="isDescriptionModalOpen" 
-    (didDismiss)="closeDescriptionModal()" 
-    class="custom-modal">
-    <ng-template>
-      <div class="modal-card">
-        
-        <div class="modal-icon">
-          <ion-icon name="reader-outline"></ion-icon>
-        </div>
-
-        <h1 class="modal-title">Descripción</h1>
-        <p class="modal-subtitle">Código: {{ descriptionCode }}</p>
-
-        <p class="description-text">{{ descriptionMessage }}</p>
-        
-        <div class="modal-actions">
-          <ion-button fill="clear" (click)="closeDescriptionModal()" class="back-btn">
-            <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+ <ion-modal [isOpen]="isDescriptionModalOpen" (willDismiss)="closeDescriptionModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Descripción del ítem</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeDescriptionModal()">
+            <ion-icon name="close-outline"></ion-icon>
           </ion-button>
-        </div>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
 
-      </div>
-    </ng-template>
-  </ion-modal>
+    <ion-content class="ion-padding">
+      <ng-container *ngIf="descriptionItem; else errorTpl">
+        <h2>{{ descriptionItem.name }}</h2>
+        <p><strong>Código:</strong> {{ descriptionItem.code }}</p>
+        <p><strong>Categoría:</strong> {{ descriptionItem.categoryName }}</p>
+        <p><strong>Estado:</strong> {{ descriptionItem.stateItemName }}</p>
+        <p><strong>Zona:</strong> {{ descriptionItem.zoneName }}</p>
+        <p><strong>Descripción:</strong></p>
+        <p>{{ descriptionItem.description }}</p>
+        <ion-img *ngIf="descriptionItem.qrPath" [src]="descriptionItem.qrPath"></ion-img>
+      </ng-container>
+
+      <ng-template #errorTpl>
+        <ion-text color="danger">
+          <p>{{ descriptionError || 'No se pudo obtener la descripción del ítem.' }}</p>
+        </ion-text>
+      </ng-template>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
 
 </ion-content>

@@ -35,6 +35,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { InventoryService } from 'src/app/services/inventary.service';
 import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
 import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
+import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 
 // Modelos
 
@@ -69,7 +70,8 @@ export class InicioOperativoPage implements OnInit {
     private inventaryService: InventoryService,
     private operatingService: OperatingService,
     private authService: AuthService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private zonasService: ZonasInventarioService,
   ) {
     addIcons({
       cloudUploadOutline,
@@ -102,18 +104,14 @@ export class InicioOperativoPage implements OnInit {
         // y que 'contador' es parte de cada objeto de categoría
         this.categorias = data;
         this.cargando = false;
-        
-        // ✅ 1. LOG PARA VER ESTRUCTURA (AL CARGAR)
-        console.log('----- ESTRUCTURA DE DATOS (AL CARGAR) -----');
-        console.log(JSON.stringify(this.categorias, null, 2));
-        console.log('-------------------------------------------');
+
       },
       error: (err) => {
         console.error('Error cargando categorías:', err);
         this.cargando = false;
       },
     });
-    
+
 
     // Obtener operatingGroupId
     if (userId) {
@@ -131,23 +129,48 @@ export class InicioOperativoPage implements OnInit {
     }
   }
   async scanItemDescription() {
-    const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
+    try {
+      const user = await this.authService.getUserFromToken();
+      const userId = user?.userId ?? 0;
 
-    if (!zonaId) {
-      console.error('No se pudo encontrar la zonaId');
+      if (!userId) {
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'No se pudo identificar el usuario actual.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+      }
+
+      // 🔹 Obtener zonas del usuario (cada una tiene su branchId)
+      const zonas = await this.zonasService.getZonas(userId).toPromise();
+      if (!zonas?.length) {
+        const alert = await this.alertController.create({
+          header: 'Sin zonas',
+          message: 'No se encontraron zonas asociadas a tu usuario.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+      }
+
+      // 🔹 Tomar el branchId de la primera zona (ajusta si necesitas elegir)
+      const branchId = zonas[0].branchId;
+
+      // 🔹 Navegar al escáner en modo descripción
+      this.router.navigate(['/scanner', branchId], {
+        state: { scanMode: 'description' },
+      });
+    } catch (error) {
+      console.error('Error al iniciar escaneo de descripción:', error);
       const alert = await this.alertController.create({
         header: 'Error',
-        message: 'No se pudo identificar la zona actual para escanear.',
+        message: 'No se pudo preparar el escáner para descripción.',
         buttons: ['OK'],
       });
       await alert.present();
-      return;
     }
-    this.router.navigate(['/scanner', zonaId], {
-      state: {
-        scanMode: 'description'
-      }
-    });
   }
   goToItem(categoria: any) {
     this.router.navigate(
@@ -161,7 +184,7 @@ export class InicioOperativoPage implements OnInit {
       }
     );
   }
-  
+
   // === Modales ===
   openInviteModal() {
     this.isInviteOpen = true;
@@ -169,25 +192,25 @@ export class InicioOperativoPage implements OnInit {
   closeInviteModal() {
     this.isInviteOpen = false;
   }
-  
-// Estado para mostrar/ocultar modal de instrucciones
-isInstructionsOpen = false;
 
-// Métodos para abrir y cerrar el modal
-openInstructionsModal() {
-  this.isInstructionsOpen = true;
-}
+  // Estado para mostrar/ocultar modal de instrucciones
+  isInstructionsOpen = false;
 
-closeInstructionsModal() {
-  this.isInstructionsOpen = false;
-}
-openObservacionesModal() {
-  this.isObservacionesOpen = true;
-}
+  // Métodos para abrir y cerrar el modal
+  openInstructionsModal() {
+    this.isInstructionsOpen = true;
+  }
 
-closeObservacionesModal() {
-  this.isObservacionesOpen = false;
-}
+  closeInstructionsModal() {
+    this.isInstructionsOpen = false;
+  }
+  openObservacionesModal() {
+    this.isObservacionesOpen = true;
+  }
+
+  closeObservacionesModal() {
+    this.isObservacionesOpen = false;
+  }
 
   openExitModal() {
     this.isExitOpen = true;
@@ -210,132 +233,123 @@ closeObservacionesModal() {
     this.isExportOpen = false;
   }
 
-// === Guardar observación ===
-async guardarObservacion() {
-  console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
-  this.closeObservacionesModal();
+  // === Guardar observación ===
+  async guardarObservacion() {
+    console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
+    this.closeObservacionesModal();
 
-  const alert = await this.alertController.create({
-    header: '✅ Observación guardada',
-    message: this.observacionTexto.trim()
-      ? 'Tu observación ha sido guardada correctamente.'
-      : 'No escribiste ninguna observación, pero fue guardada como vacía.',
-    buttons: ['OK'],
-  });
-  await alert.present();
-}
-
-// === Lógica de Finalizar Inventario (REESTRUCTURADA) ===
-
-async finalizarInventario() {
-  
-  console.log('----- FINALIZANDO INVENTARIO -----');
-  // ✅ 2. LOG PARA VER LOS DATOS JUSTO ANTES DE SUMAR
-  console.log('Datos de categorías AHORA MISMO:', JSON.stringify(this.categorias, null, 2));
-
-  // ✅ 3. LOG DENTRO DEL .reduce()
-  const totalEsperado = this.categorias.reduce((sum, cat) => {
-    // ESTE LOG ES EL MÁS IMPORTANTE
-    console.log(`Sumando cat.contador: ${cat.name}, PROPIEDADES:`, cat);
-    return sum + (cat.contador || 0);
-  }, 0);
-  
-  const totalEscaneado = this.inventaryService.getScannedItems().length;
-
-  // ✅ 4. LOG DE COMPARACIÓN
-  console.log('Total Escaneado (Servicio):', totalEscaneado);
-  console.log('Total Esperado (Suma de "cat.contador"):', totalEsperado);
-  console.log('------------------------------------');
-
-  if (totalEscaneado < totalEsperado) {
-    const itemsFaltantes = totalEsperado - totalEscaneado;
-    
     const alert = await this.alertController.create({
-      header: '⚠️ ¡Atención!',
-      message: `Has escaneado ${totalEscaneado} de ${totalEsperado} ítems.\n\nFaltan ${itemsFaltantes} ítems. ¿Estás seguro de que quieres finalizar?`,
-      cssClass: 'custom-alert',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'alert-button-cancel',
-          handler: () => {
-            console.log('Finalización cancelada por el usuario.');
-            this.closeConfirmModal();
+      header: '✅ Observación guardada',
+      message: this.observacionTexto.trim()
+        ? 'Tu observación ha sido guardada correctamente.'
+        : 'No escribiste ninguna observación, pero fue guardada como vacía.',
+      buttons: ['OK'],
+    });
+    await alert.present();
+  }
+
+  // === Lógica de Finalizar Inventario (REESTRUCTURADA) ===
+
+  async finalizarInventario() {
+
+
+    const totalEsperado = this.categorias.reduce((sum, cat) => {
+
+      return sum + (cat.contador || 0);
+    }, 0);
+
+    const totalEscaneado = this.inventaryService.getScannedItems().length;
+
+
+    if (totalEscaneado < totalEsperado) {
+      const itemsFaltantes = totalEsperado - totalEscaneado;
+
+      const alert = await this.alertController.create({
+        header: '⚠️ ¡Atención!',
+        message: `Has escaneado ${totalEscaneado} de ${totalEsperado} ítems.\n\nFaltan ${itemsFaltantes} ítems. ¿Estás seguro de que quieres finalizar?`,
+        cssClass: 'custom-alert',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            cssClass: 'alert-button-cancel',
+            handler: () => {
+              console.log('Finalización cancelada por el usuario.');
+              this.closeConfirmModal();
+            }
+          },
+          {
+            text: 'Finalizar de todos modos',
+            cssClass: 'alert-button-danger',
+            handler: () => {
+              console.log('Finalizando de todos modos...');
+              this.procederConFinalizacion();
+            }
           }
-        },
-        {
-          text: 'Finalizar de todos modos',
-          cssClass: 'alert-button-danger',
-          handler: () => {
-            console.log('Finalizando de todos modos...');
-            this.procederConFinalizacion(); 
-          }
-        }
-      ]
-    });
-    await alert.present();
+        ]
+      });
+      await alert.present();
 
-  } else {
-    // Si el inventario está completo, proceder normalmente
-    console.log('Inventario completo o igualado (Esto es lo que está pasando). Finalizando...');
-    this.procederConFinalizacion();
-  }
-}
-
-async procederConFinalizacion() {
-  const inventaryId = this.inventaryService.getInventaryId();
-
-  if (!inventaryId) {
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: 'No hay un inventario activo para finalizar.',
-      buttons: ['OK']
-    });
-    await alert.present();
-    return;
+    } else {
+      // Si el inventario está completo, proceder normalmente
+      console.log('Inventario completo o igualado (Esto es lo que está pasando). Finalizando...');
+      this.procederConFinalizacion();
+    }
   }
 
-  const observations = this.observacionTexto?.trim() || '';
-  const request: FinishRequestDto = {
-    inventaryId: inventaryId,
-    observations
-  };
+  async procederConFinalizacion() {
+    const inventaryId = this.inventaryService.getInventaryId();
 
-  try {
-    await this.inventaryService.finish(request).toPromise();
+    if (!inventaryId) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No hay un inventario activo para finalizar.',
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    }
 
-    this.inventaryService.setInventaryId(0);
-    this.observacionTexto = ''; 
-    this.closeConfirmModal();   
+    const observations = this.observacionTexto?.trim() || '';
+    const request: FinishRequestDto = {
+      inventaryId: inventaryId,
+      observations
+    };
 
-    const alert = await this.alertController.create({
-      header: '✅ Éxito',
-      message: 'Inventario finalizado correctamente.',
-      buttons: ['OK']
-    });
-    await alert.present();
+    try {
+      await this.inventaryService.finish(request).toPromise();
 
-    alert.onDidDismiss().then(() => {
-      this.router.navigate(['/login']);
-    });
-  } catch (error: any) {
-    console.error('Error al finalizar inventario:', error);
+      this.inventaryService.setInventaryId(0);
+      this.observacionTexto = '';
+      this.closeConfirmModal();
 
-    let errorMessage = 'No se pudo finalizar el inventario.';
+      const alert = await this.alertController.create({
+        header: '✅ Éxito',
+        message: 'Inventario finalizado correctamente.',
+        buttons: ['OK']
+      });
+      await alert.present();
 
-    if (error?.error?.message) errorMessage = error.error.message;
-    else if (error?.status === 400) errorMessage = 'Datos inválidos. Verifica la información.';
-    else if (error?.status === 404) errorMessage = 'Inventario no encontrado.';
+      alert.onDidDismiss().then(() => {
+        this.router.navigate(['/login']);
+      });
+    } catch (error: any) {
+      console.error('Error al finalizar inventario:', error);
 
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: errorMessage,
-      buttons: ['OK']
-    });
-    await alert.present();
+      let errorMessage = 'No se pudo finalizar el inventario.';
+
+      if (error?.error?.message) errorMessage = error.error.message;
+      else if (error?.status === 400) errorMessage = 'Datos inválidos. Verifica la información.';
+      else if (error?.status === 404) errorMessage = 'Inventario no encontrado.';
+
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: errorMessage,
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
   }
-}
 
   // === Iniciar inventario (sin cambios) ===
   async iniciarInventario() {

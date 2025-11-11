@@ -6,6 +6,10 @@ import { environment } from 'src/environments/environment.prod';
 export interface ZonaInventario {
   id: number;
   name: string;
+  // description?: string;
+  branchId: number;
+  // branchName: string;
+  // companyName: string;
 }
 
 @Injectable({

@@ -1,11 +1,8 @@
 <ion-content class="zones-content" [fullscreen]="true">
   <!-- Agrega el refresher aquí -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-    <ion-refresher-content
-      pullingIcon="chevron-down-circle-outline"
-      pullingText="Arrastra para recargar"
-      refreshingSpinner="circles"
-      refreshingText="Recargando...">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" pullingText="Arrastra para recargar"
+      refreshingSpinner="circles" refreshingText="Recargando...">
     </ion-refresher-content>
   </ion-refresher>
 
@@ -21,11 +18,10 @@
       <h1 class="title">Zonas Operativas</h1>
     </div>
 
-    <ion-searchbar
-      placeholder="Buscar zona..."
-      [(ngModel)]="searchTerm"
-      debounce="300"
-      class="custom-search">
+    <ion-button class="scan-button" fill="clear" (click)="scanItemDescription()">
+      <ion-icon slot="icon-only" name="qr-code-outline"></ion-icon>
+    </ion-button>
+    <ion-searchbar placeholder="Buscar zona..." [(ngModel)]="searchTerm" debounce="300" class="custom-search">
     </ion-searchbar>
 
     <!-- Estado de carga -->
@@ -36,11 +32,8 @@
 
     <!-- Grid de zonas -->
     <div class="zones-grid" *ngIf="!cargando">
-      <div 
-        class="card-zona" 
-        *ngFor="let zona of filteredZonas()" 
-        (click)="goToOperativo(zona.id)">
-        
+      <div class="card-zona" *ngFor="let zona of filteredZonas()" (click)="goToOperativo(zona.id)">
+
         <div class="card-info">
           <span class="label">{{ zona.name }}</span>
           <span class="badge-disponible">Zona Disponible</span>

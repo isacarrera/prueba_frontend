@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { 
-  arrowBackOutline, 
-  lockClosedOutline, 
+import {
+  arrowBackOutline,
+  lockClosedOutline,
   lockOpenOutline,
-  chevronDownCircleOutline 
+  chevronDownCircleOutline
 } from 'ionicons/icons';
 import { ZonaInventario, ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -31,11 +31,11 @@ export class HomePage {
     private authService: AuthService,
     private alertController: AlertController
   ) {
-    addIcons({ 
-      arrowBackOutline, 
-      lockClosedOutline, 
+    addIcons({
+      arrowBackOutline,
+      lockClosedOutline,
       lockOpenOutline,
-      chevronDownCircleOutline 
+      chevronDownCircleOutline
     });
   }
 
@@ -58,7 +58,7 @@ export class HomePage {
   }
 
   goToOperativo(zonaId: number) {
-    this.router.navigate(['/inicio-operativo', zonaId]); 
+    this.router.navigate(['/inicio-operativo', zonaId]);
   }
 
   filteredZonas() {
@@ -71,7 +71,7 @@ export class HomePage {
   // 👇 Método modificado para ser reutilizable
   async cargarZonas() {
     this.cargando = true;
-    
+
     try {
       const user = await this.authService.getUserFromToken();
       if (user?.userId) {
@@ -117,6 +117,51 @@ export class HomePage {
     } catch (error) {
       this.cargando = false;
       console.error('Error al obtener usuario:', error);
+    }
+  }
+
+  async scanItemDescription() {
+    try {
+      const user = await this.authService.getUserFromToken();
+      const userId = user?.userId ?? 0;
+
+      if (!userId) {
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'No se pudo identificar el usuario actual.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+      }
+
+      // 🔹 Obtener zonas del usuario (cada una tiene su branchId)
+      const zonas = await this.zonasService.getZonas(userId).toPromise();
+      if (!zonas?.length) {
+        const alert = await this.alertController.create({
+          header: 'Sin zonas',
+          message: 'No se encontraron zonas asociadas a tu usuario.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+      }
+
+      // 🔹 Tomar el branchId de la primera zona (ajusta si necesitas elegir)
+      const branchId = zonas[0].branchId;
+
+      // 🔹 Navegar al escáner en modo descripción
+      this.router.navigate(['/scanner', branchId], {
+        state: { scanMode: 'description' },
+      });
+    } catch (error) {
+      console.error('Error al iniciar escaneo de descripción:', error);
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se pudo preparar el escáner para descripción.',
+        buttons: ['OK'],
+      });
+      await alert.present();
     }
   }
 }
