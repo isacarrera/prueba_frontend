@@ -174,7 +174,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     this.isDescriptionModalOpen = false;
 
     if (this.scanMode === 'description') {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/inicio-operativo']);
     } else {
       this.router.navigate(['/inicio-operativo', this.zonaId]);
     }

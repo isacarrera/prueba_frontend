@@ -260,3 +260,139 @@ ion-modal.custom-modal::part(content) {
   color: #3b82f6;
   font-size: 24px;
 }
+
+/* Estilos para que el modal ocupe toda la pantalla y cubra todo */
+ion-modal.description-modal-full {
+  /* ¡Importante! Esto asegura que el modal cubra todo, ignorando la transición modal por defecto */
+  --height: 100%;
+  --width: 100%;
+  --border-radius: 0;
+  --box-shadow: none;
+}
+
+/* Aplicar el fondo oscuro directamente al ion-content del modal */
+ion-modal.description-modal-full ion-content {
+  --background: radial-gradient(circle at center, #02060a 0%, #000 100%);
+  color: white;
+  display: flex; /* Para centrar la tarjeta si es necesario en pantallas grandes */
+  justify-content: center;
+  align-items: flex-start; /* Alinea al inicio, no en el centro vertical */
+}
+
+/* Estilo de la tarjeta de descripción */
+.description-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  margin-top: 40px; /* Espacio para el top de la pantalla */
+  background: rgba(11, 15, 44, 0.9); /* Fondo oscuro semitransparente */
+  border-radius: 12px;
+  border: 2px solid #00bfff; /* Borde de neón */
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.4), inset 0 0 10px rgba(0, 191, 255, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 191, 255, 0.3);
+}
+
+.card-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #00bfff;
+  text-shadow: 0 0 8px rgba(0, 191, 255, 0.5);
+}
+
+.item-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Grid para los datos del ítem */
+.data-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(0, 191, 255, 0.05); /* Ligero fondo para el bloque de datos */
+  border-radius: 8px;
+  border-left: 4px solid #00bfff;
+}
+
+.data-grid p {
+  margin: 0;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.data-grid p strong {
+  color: #94a3b8; /* Títulos de datos */
+  font-weight: 400;
+}
+
+.data-grid p span {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Estado Disponible - Neon Green */
+.data-grid .available {
+  color: #38ff38 !important;
+  text-shadow: 0 0 5px rgba(56, 255, 56, 0.5);
+}
+
+/* Caja de descripción larga */
+.description-box {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px dashed rgba(0, 191, 255, 0.4);
+}
+
+.description-label {
+  font-weight: 600;
+  color: #00bfff;
+  margin-bottom: 5px;
+}
+
+.description-text-content {
+  margin: 0;
+  font-style: italic;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+/* Estilos para el QR o ícono de código */
+.qr-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.qr-container ion-img {
+  max-width: 150px;
+  max-height: 150px;
+}
+
+.qr-container ion-icon {
+  font-size: 50px;
+  color: #00bfff;
+  opacity: 0.6;
+}
+.button-inner{
+  color: #fff;
+}

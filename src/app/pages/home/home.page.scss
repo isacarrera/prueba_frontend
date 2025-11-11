@@ -235,3 +235,25 @@ ion-refresher-content {
     height: 140px;
   }
 }
+
+/* Estilo para el botón de escanear (nuevo) */
+.scan-button {
+  position: absolute;
+  top: max(28px, env(safe-area-inset-top)); /* Misma altura que el .back-button */
+  right: 16px; /* <-- La clave: alineado a la derecha */
+  z-index: 10;
+
+  /* Estilos copiados del .back-button para consistencia visual */
+  --background: rgba(10, 15, 44, 0.55);
+  --color: #fff;
+  border-radius: 50%;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.scan-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
+}
