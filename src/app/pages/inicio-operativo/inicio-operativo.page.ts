@@ -206,6 +206,10 @@ export class InicioOperativoPage implements OnInit {
   }
   openObservacionesModal() {
     this.isObservacionesOpen = true;
+    setTimeout(() => {
+    const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
+    textarea?.setFocus?.();
+  }, 300);
   }
 
   closeObservacionesModal() {

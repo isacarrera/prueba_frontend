@@ -1,27 +1,27 @@
 <ion-content class="custom-bg" [fullscreen]="true">
   <div class="wrap">
 
-  <!-- Header -->
+    <!-- Header -->
     <div class="header">
       <ion-icon name="log-out-outline" class="icon-left" (click)="openExitModal()"></ion-icon>
       <h1 class="title">Inicio</h1>
       <div class="circle-btn" (click)="openInviteModal()"><ion-icon name="person-circle-outline"></ion-icon>
-      </div>      
+      </div>
     </div>
 
     <!-- Top Actions -->
- <div class="top-actions">
+    <div class="top-actions">
 
-  <div class="circle-btn" (click)="openInstructionsModal()">
-    <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
-  </div>
+      <div class="circle-btn" (click)="openInstructionsModal()">
+        <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
+      </div>
 
-  <ion-button class="confirm-btn" (click)="openConfirmModal()">Confirmar</ion-button>
-  
-  <div class="circle-btn" (click)="openObservacionesModal()">
-    <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-  </div>
-</div>
+      <ion-button class="confirm-btn" (click)="openConfirmModal()">Confirmar</ion-button>
+
+      <div class="circle-btn" (click)="openObservacionesModal()">
+        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      </div>
+    </div>
 
     <!-- Card List -->
     <div class="card-list">
@@ -36,21 +36,21 @@
 
     <!-- Bottom Bar -->
     <div class="bottom-bar">
-  <div class="nav-item active">
-    <ion-icon name="home-outline"></ion-icon>
-    <span>Inicio</span>
-  </div>
-  <div class="nav-item" (click)="iniciarInventario()">
-    <ion-icon name="qr-code-outline"></ion-icon>
-  </div>
-  
-  <div class="nav-item" (click)="scanItemDescription()">
-    <ion-icon name="reader-outline"></ion-icon>
-  </div>
-</div>
+      <div class="nav-item active">
+        <ion-icon name="home-outline"></ion-icon>
+        <span>Inicio</span>
+      </div>
+      <div class="nav-item" (click)="iniciarInventario()">
+        <ion-icon name="qr-code-outline"></ion-icon>
+      </div>
+
+      <div class="nav-item" (click)="scanItemDescription()">
+        <ion-icon name="reader-outline"></ion-icon>
+      </div>
+    </div>
     <!-- 🔹 Modales -->
 
-   
+
     <!-- Modal Salir -->
     <ion-modal [isOpen]="isExitOpen" (didDismiss)="closeExitModal()" class="custom-modal">
       <ng-template>
@@ -132,45 +132,38 @@
         </div>
       </ng-template>
     </ion-modal>
-<ion-modal 
-  [isOpen]="isObservacionesOpen" 
-  (didDismiss)="closeObservacionesModal()"
-  class="modal-sheet"
-  [initialBreakpoint]="1"
-  [breakpoints]="[0, 1]">
-  
-  <ng-template>
-    <div class="sheet-container">
-      
-      <div class="sheet-header">
-        <div class="sheet-handle"></div>
-        <h1 class="sheet-title">Observaciones</h1>
-        <ion-button fill="clear" (click)="closeObservacionesModal()">
-          <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-        </ion-button>
-      </div>
+    <ion-modal [isOpen]="isObservacionesOpen" (didDismiss)="closeObservacionesModal()" class="modal-sheet"
+      [initialBreakpoint]="1" [breakpoints]="[0, 1]">
 
-      <div class="sheet-content">
-        <p>Añade cualquier detalle o incidencia sobre el inventario.</p>
-        
-        <ion-item lines="none" class="textarea-item">
-          <ion-textarea
-            [(ngModel)]="observacionTexto"
-            placeholder="Escribe tus observaciones..."
-            auto-grow="true"
-            class="sheet-textarea">
-          </ion-textarea>
-        </ion-item>
+      <ng-template>
+        <div class="sheet-container">
 
-        <ion-button expand="block" class="save-btn" (click)="guardarObservacion()">
-          Guardar Observación
-          <ion-icon slot="end" name="checkmark-outline"></ion-icon>
-        </ion-button>
-      </div>
+          <div class="sheet-header">
+            <div class="sheet-handle"></div>
+            <h1 class="sheet-title">Observaciones</h1>
+            <ion-button fill="clear" (click)="closeObservacionesModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </div>
 
-    </div>
-  </ng-template>
-</ion-modal>
+          <div class="sheet-content">
+            <p>Añade cualquier detalle o incidencia sobre el inventario.</p>
 
-  </div> 
+            <ion-item lines="none" class="textarea-item">
+              <ion-textarea [(ngModel)]="observacionTexto" placeholder="Escribe tus observaciones..." auto-grow="true"
+                class="sheet-textarea">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-button expand="block" class="save-btn" (click)="guardarObservacion()">
+              Guardar Observación
+              <ion-icon slot="end" name="checkmark-outline"></ion-icon>
+            </ion-button>
+          </div>
+
+        </div>
+      </ng-template>
+    </ion-modal>
+
+  </div>
 </ion-content>
