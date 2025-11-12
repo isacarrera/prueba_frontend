@@ -3,5 +3,25 @@
     "@ionic/angular/common",
     "@ionic/angular"
   ],
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+
+  "files.exclude": {
+    ".editorconfig": true,
+    "angular.json": true,
+    "package-lock.json": true,
+    "package.json": true,
+    "tsconfig.app.json": true,
+    "tsconfig.json": true,
+    "tsconfig.spec.json": true,
+    ".angular":true,
+    "dist":true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "node_modules": true,
+    "ios": true,
+    ".browserslistrc":true,
+  }
 }
