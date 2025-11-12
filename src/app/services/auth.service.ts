@@ -5,7 +5,7 @@ import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
 import { IdleService } from './idle.service';
 import { jwtDecode } from 'jwt-decode';
-import { SignalrService } from './socket/signalr.service';
+import { SignalrService } from './Connection/signalr.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

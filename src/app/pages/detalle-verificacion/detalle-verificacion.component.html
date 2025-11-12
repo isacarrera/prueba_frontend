@@ -35,15 +35,15 @@
         <p>{{ comparacion.shortSummary || 'Resumen de la verificación del inventario' }}</p>
         <div class="stats-grid">
           <div class="stat-item missing">
-            <div class="stat-number">{{ comparacion.missingItems?.length || 0 }}</div>
+            <div class="stat-number">{{ comparacion.missingItems.length || 0 }}</div>
             <div class="stat-label">Faltantes</div>
           </div>
           <div class="stat-item unexpected">
-            <div class="stat-number">{{ comparacion.unexpectedItems?.length || 0 }}</div>
+            <div class="stat-number">{{ comparacion.unexpectedItems.length || 0 }}</div>
             <div class="stat-label">Inesperados</div>
           </div>
           <div class="stat-item mismatch">
-            <div class="stat-number">{{ comparacion.stateMismatches?.length || 0 }}</div>
+            <div class="stat-number">{{ comparacion.stateMismatches.length || 0 }}</div>
             <div class="stat-label">Discrepancias</div>
           </div>
         </div>
@@ -53,7 +53,7 @@
 
   <ion-accordion-group class="results-accordion" *ngIf="comparacion">
 
-    <ion-accordion value="missing" class="issue-accordion missing" *ngIf="comparacion.missingItems?.length">
+    <ion-accordion value="missing" class="issue-accordion missing" *ngIf="comparacion.missingItems.length">
       <div slot="header" class="accordion-header">
         <div class="header-left">
           <ion-icon name="warning-outline"></ion-icon>
@@ -75,7 +75,7 @@
       </div>
     </ion-accordion>
 
-    <ion-accordion value="unexpected" class="issue-accordion unexpected" *ngIf="comparacion.unexpectedItems?.length">
+    <ion-accordion value="unexpected" class="issue-accordion unexpected" *ngIf="comparacion.unexpectedItems.length">
       <div slot="header" class="accordion-header">
         <div class="header-left">
           <ion-icon name="help-circle-outline"></ion-icon>
@@ -97,7 +97,7 @@
       </div>
     </ion-accordion>
 
-    <ion-accordion value="mismatch" class="issue-accordion mismatch" *ngIf="comparacion.stateMismatches?.length">
+    <ion-accordion value="mismatch" class="issue-accordion mismatch" *ngIf="comparacion.stateMismatches.length">
       <div slot="header" class="accordion-header">
         <div class="header-left">
           <ion-icon name="swap-horizontal-outline"></ion-icon>
