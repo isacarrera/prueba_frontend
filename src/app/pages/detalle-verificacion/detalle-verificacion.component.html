@@ -122,22 +122,6 @@
         </div>
       </div>
     </ion-accordion>
-
-    <section class="section" *ngIf="!cargando">
-      <div class="summary-card">
-        <div class="summary-header">
-          <ion-icon name="create-outline"></ion-icon>
-          <h3>Observaciones</h3>
-        </div>
-        <div class="summary-content">
-          <ion-textarea [(ngModel)]="observaciones" placeholder="Escribe observaciones adicionales..." autoGrow="true"
-            rows="4" class="custom-textarea">
-          </ion-textarea>
-        </div>
-      </div>
-    </section>
-
-
   </ion-accordion-group>
 
   <div class="actions-section" *ngIf="!cargando">
