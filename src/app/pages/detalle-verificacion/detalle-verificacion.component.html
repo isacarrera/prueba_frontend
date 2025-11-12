@@ -1,5 +1,5 @@
 <ion-content class="verification-page">
-  
+
   <div class="header">
     <ion-button fill="clear" (click)="volver()" class="back-btn">
       <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
@@ -123,42 +123,31 @@
       </div>
     </ion-accordion>
 
-    <ion-accordion value="notes" class="issue-accordion notes" *ngIf="!cargando">
-      <div slot="header" class="accordion-header">
-        <div class="header-left">
+    <section class="section" *ngIf="!cargando">
+      <div class="summary-card">
+        <div class="summary-header">
           <ion-icon name="create-outline"></ion-icon>
           <h3>Observaciones</h3>
         </div>
+        <div class="summary-content">
+          <ion-textarea [(ngModel)]="observaciones" placeholder="Escribe observaciones adicionales..." autoGrow="true"
+            rows="4" class="custom-textarea">
+          </ion-textarea>
+        </div>
       </div>
-      <div class="notes-content" slot="content">
-        <ion-textarea
-          [(ngModel)]="observaciones"
-          placeholder="Escribe observaciones adicionales sobre la verificación..."
-          rows="4"
-          autoGrow="true"
-          class="custom-textarea">
-        </ion-textarea>
-      </div>
-    </ion-accordion>
+    </section>
+
 
   </ion-accordion-group>
 
   <div class="actions-section" *ngIf="!cargando">
-    <ion-button 
-      color="danger" 
-      expand="block" 
-      (click)="negarVerificacion()" 
-      [disabled]="cargando"
+    <ion-button color="danger" expand="block" (click)="negarVerificacion()" [disabled]="cargando"
       class="action-btn deny">
       <ion-icon name="close-circle-outline" slot="start"></ion-icon>
       Negar Verificación
     </ion-button>
-    
-    <ion-button 
-      color="success" 
-      expand="block" 
-      (click)="confirmarCierre()" 
-      [disabled]="cargando"
+
+    <ion-button color="success" expand="block" (click)="confirmarCierre()" [disabled]="cargando"
       class="action-btn confirm">
       <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
       Confirmar Verificación

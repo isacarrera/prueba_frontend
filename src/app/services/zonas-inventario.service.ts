@@ -18,10 +18,15 @@ export interface ZonaInventario {
 export class ZonasInventarioService {
 
   private urlBase = environment.apiURL + 'api/Zone'
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getZonas(userId: number) {
     return this.http.get<ZonaInventario[]>(`${this.urlBase}/user/${userId}`);
   }
-  
+
+  getById(zoneId: number): Observable<any> {
+    return this.http.get(`${this.urlBase}/GetById/${zoneId}`);
+  }
+
+
 }

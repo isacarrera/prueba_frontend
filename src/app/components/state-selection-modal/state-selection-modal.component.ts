@@ -1,9 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { STATE_ITEMS, StateItem } from 'src/app/Interfaces/state-item.model';
 import { InventoryService } from 'src/app/services/inventary.service';
+import { StateItem } from 'src/app/Interfaces/state-item.model';
+import { firstValueFrom } from 'rxjs';
+import { StateItemService } from 'src/app/services/stateItem.service';
 
 @Component({
   selector: 'app-state-selection-modal',
@@ -12,12 +14,12 @@ import { InventoryService } from 'src/app/services/inventary.service';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class StateSelectionModalComponent {
+export class StateSelectionModalComponent implements OnInit {
   @Input() code!: string;
   @Input() inventaryId!: number;
 
   selectedStateId: number | null = null;
-  stateItems: StateItem[] = STATE_ITEMS;
+  stateItems: StateItem[] = [];
   isProcessing = false;
 
   showFeedbackView = false;
@@ -27,8 +29,26 @@ export class StateSelectionModalComponent {
 
   constructor(
     private modalCtrl: ModalController,
-    private inventoryService: InventoryService
+    private inventoryService : InventoryService,
+    private stateItemService : StateItemService
   ) {}
+
+  async ngOnInit() {
+    await this.loadStateItems();
+  }
+
+  /** 🔹 Carga los estados reales desde la API */
+  private async loadStateItems() {
+    try {
+      this.stateItems = await firstValueFrom(this.stateItemService.getStateItems());
+      if (!this.stateItems.length) {
+        console.warn('⚠️ No se encontraron estados en el backend.');
+      }
+    } catch (err) {
+      console.error('❌ Error al cargar estados de ítem:', err);
+      this.stateItems = [];
+    }
+  }
 
   async confirm() {
     if (this.isProcessing || !this.selectedStateId) return;
@@ -42,12 +62,10 @@ export class StateSelectionModalComponent {
     };
 
     try {
-      const response = await this.inventoryService.scan(request).toPromise();
+      const response = await firstValueFrom(this.inventoryService.scan(request));
       this.lastResponse = response;
 
-      if (!response) {
-        throw new Error('No se recibió respuesta del servidor.');
-      }
+      if (!response) throw new Error('No se recibió respuesta del servidor.');
 
       if (response.isValid && response.itemId && response.status === 'Correct') {
         this.inventoryService.addScannedItem(response.itemId);
@@ -92,9 +110,9 @@ export class StateSelectionModalComponent {
       success && this.lastResponse.isValid && this.lastResponse.itemId;
 
     this.modalCtrl.dismiss({
-      success: success,
+      success,
       response: this.lastResponse,
-      itemScanned: itemScanned,
+      itemScanned,
       canContinue: true,
     });
   }
