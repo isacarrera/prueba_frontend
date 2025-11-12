@@ -27,7 +27,7 @@ import {
   appsOutline,
   documentTextOutline,
   chevronDownOutline
-  
+
 } from 'ionicons/icons';
 
 @Component({
@@ -39,19 +39,12 @@ import {
     CommonModule,
     FormsModule,
     IonContent,
-    IonButtons,
     IonButton,
     IonIcon,
     IonItem,
-    IonList,
     IonSelect,
     IonSelectOption,
     IonInput,
-    IonHeader,
-    IonToolbar,
-    IonBackButton,
-    IonTitle,
-    IonLabel,
     CommonModule,
     FormsModule,
     IonContent
@@ -60,7 +53,7 @@ import {
 export class OperativoPage {
   tipoDoc?: string;
   numeroDoc = '';
-  
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -86,7 +79,7 @@ export class OperativoPage {
       this.showAlert('Datos incompletos', 'Debes seleccionar tipo y número de documento.');
       return;
     }
-  
+
     this.authService.loginOperativo(this.tipoDoc, this.numeroDoc).subscribe({
       next: () => {
         this.router.navigate(['/home']);
