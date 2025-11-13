@@ -3,6 +3,7 @@ import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signal
 import { environment } from 'src/environments/environment.prod'; // Tu archivo con la IP local
 import { AlertController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
+import { InventoryService } from '../inventary.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class SignalrService {
 
   constructor(
     private authService: AuthService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private inventoryService: InventoryService
   ) { }
 
   /**
@@ -45,8 +47,8 @@ export class SignalrService {
       await this.hubConnection.start();
       console.log('✅ Conexión SignalR establecida con éxito. ID:', this.hubConnection.connectionId);
 
-      // 2. Registrar los listeners (escuchas)
       this.registerTestListener();
+      this.registerInventoryListeners();
 
     } catch (err) {
       console.error('❌ Error al conectar con SignalR:', err);
@@ -91,5 +93,22 @@ export class SignalrService {
       this.hubConnection = null;
       console.log('🛑 Conexión SignalR detenida.');
     }
+  }
+
+  private registerInventoryListeners() {
+    if (!this.hubConnection) return;
+
+    // "ReceiveItemUpdate" -> Coincide con tu servicio .NET
+    this.hubConnection.on('ReceiveItemUpdate', (payload: { itemId: number, stateItemId: number, inventaryId: number }) => {
+
+      console.log('🔔 Evento [ReceiveItemUpdate] Recibido:', payload);
+
+      if (payload && typeof payload.itemId === 'number') {
+        // Le pasamos el ID a nuestro servicio de estado
+        this.inventoryService.addScannedItem(payload.itemId);
+      } else {
+        console.error('Payload de ReceiveItemUpdate inválido:', payload);
+      }
+    });
   }
 }

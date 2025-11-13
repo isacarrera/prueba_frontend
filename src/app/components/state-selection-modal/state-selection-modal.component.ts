@@ -67,9 +67,9 @@ export class StateSelectionModalComponent implements OnInit {
 
       if (!response) throw new Error('No se recibió respuesta del servidor.');
 
-      if (response.isValid && response.itemId && response.status === 'Correct') {
-        this.inventoryService.addScannedItem(response.itemId);
-      }
+      // if (response.isValid && response.itemId && response.status === 'Correct') {
+      //   this.inventoryService.addScannedItem(response.itemId);
+      // }
 
       switch (response.status) {
         case 'Correct':

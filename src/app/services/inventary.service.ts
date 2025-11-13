@@ -1,14 +1,13 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 
-import { StartInventoryResponseDto } from '../Interfaces/start-inventory-response.model';
+import { environment } from 'src/environments/environment.prod';
+import { FinishRequestDto } from '../Interfaces/finish-request.model';
 import { ScanRequestDto } from '../Interfaces/scan-request.model';
 import { ScanResponseDto } from '../Interfaces/scan-response.model';
-import { FinishRequestDto } from '../Interfaces/finish-request.model';
-import { environment } from 'src/environments/environment.prod';
 import { StartInventoryRequestDto } from '../Interfaces/start-inventory-request.model';
+import { StartInventoryResponseDto } from '../Interfaces/start-inventory-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +19,10 @@ export class InventoryService {
   private currentInventaryIdSubject = new BehaviorSubject<number | null>(null);
   public currentInventaryId$ = this.currentInventaryIdSubject.asObservable();
 
-  private scannedItems: number[] = [];
+  private scannedItemsSubject = new BehaviorSubject<Set<number>>(new Set());
+  public scannedItems$ = this.scannedItemsSubject.asObservable();
+
+  // private scannedItems: number[] = [];
 
   constructor(private http: HttpClient) { }
 
@@ -34,9 +36,9 @@ export class InventoryService {
   }
 
   setInventaryId(id: number): void {
-    this.currentInventaryIdSubject.next(id);
-    this.scannedItems = [];
-  }
+  this.currentInventaryIdSubject.next(id);
+  this.clearScannedItems();
+}
 
   getInventaryId(): number | null {
     return this.currentInventaryIdSubject.value;
@@ -48,20 +50,36 @@ export class InventoryService {
   }
 
   addScannedItem(itemId: number): void {
-    this.scannedItems.push(itemId);
-    console.log('📦 Item agregado a escaneados:', itemId, 'Total:', this.scannedItems.length);
+    const currentSet = this.scannedItemsSubject.value;
+
+    // El Set maneja duplicados automáticamente, pero validamos por si acaso
+    if (currentSet.has(itemId)) {
+      return;
+    }
+
+    // Creamos un nuevo Set para mantener la inmutabilidad y forzar la detección
+    const newSet = new Set(currentSet);
+    newSet.add(itemId);
+
+    console.log('📦 [Inventario] Item agregado por Socket:', itemId);
+    this.scannedItemsSubject.next(newSet); // Emitimos el nuevo valor
   }
 
+  // Modificamos isItemScanned para leer el valor actual del Subject
   isItemScanned(itemId: number): boolean {
-    return this.scannedItems.includes(itemId);
+    // Leemos el valor síncrono actual del Set
+    return this.scannedItemsSubject.value.has(itemId);
   }
 
+  // Modificamos getScannedItems para leer el valor actual
   getScannedItems(): number[] {
-    return this.scannedItems;
+    // Convertimos el Set (valor actual) a un Array
+    return Array.from(this.scannedItemsSubject.value);
   }
 
+  // Modificamos clearScannedItems para resetear el Subject
   clearScannedItems(): void {
-    this.scannedItems = [];
+    this.scannedItemsSubject.next(new Set());
   }
 
   finish(finishRequest: FinishRequestDto): Observable<any> {
