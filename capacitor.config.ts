@@ -7,8 +7,8 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   server: {
     cleartext: true, // permite http://
-    androidScheme: 'http', 
-    hostname: '10.219.47.185',
+    androidScheme: 'http',
+    hostname: '172.30.6.122',
   }
 };
 
