@@ -7,25 +7,25 @@
 
     <!-- Icono superior -->
     <div class="icon-circle">
-      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Categoría" />
+      <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Categoria" />
     </div>
 
     <h1 class="title">{{ categoria?.name }}</h1>
-    <p class="subtitle">Cantidad de ítems: {{ items.length }}</p>
+    <p class="subtitle">Cantidad de items: {{ items.length || 0 }}</p>
 
-    <!-- Lista de ítems con checkpoint -->
+    <!-- Lista de items con checkpoint -->
     <div class="card-list">
       <div class="card-item" *ngFor="let item of items">
-        <div class="card-left">
-          <span class="label">{{ item.name }}</span>
-          <span class="count">{{ item.description }}</span>
-        </div>
+      <div class="card-left">
+        <span class="label">{{ item.name }}</span>
+        <span class="count">{{ item.description }}</span>
+      </div>
 
-        <!-- Toggle para marcar completado -->
-        <ion-toggle
-          [checked]="item.completado"
-          (ionChange)="toggleItem(item, $event.detail.checked)">
-        </ion-toggle>
+      <!-- Toggle para marcar completado (solo lectura) -->
+      <ion-toggle
+        [checked]="item.completado"
+        [disabled]="true"> <!-- Deshabilitado, el estado se actualiza por escaneo -->
+      </ion-toggle>
       </div>
     </div>
 

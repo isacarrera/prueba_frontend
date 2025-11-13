@@ -1,43 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { IonicModule, IonTextarea, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { ViewChild } from '@angular/core';
-import { IonTextarea } from '@ionic/angular';
-import { AlertController } from '@ionic/angular';
 import {
-  arrowBackOutline,
   cloudUploadOutline,
   personCircleOutline,
   chatbubbleEllipsesOutline,
   documentTextOutline,
-  readerOutline,
   homeOutline,
-  informationCircleOutline,
   qrCodeOutline,
+  informationCircleOutline,
   ellipsisHorizontalCircleOutline,
   personAddOutline,
+  arrowBackOutline,
   checkmarkOutline,
+  readerOutline,
   logOutOutline,
   checkmarkDoneOutline,
   closeOutline,
 } from 'ionicons/icons';
 
-// Componentes
-import { ExportadorComponent } from 'src/app/components/exportador/exportador.component';
-
-// Servicios
-import { CategoryService } from 'src/app/services/category.service';
 import { OperatingService } from 'src/app/services/operating.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { InventoryService } from 'src/app/services/inventary.service';
+import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
 import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
-import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
-
-// Modelos
+import { InventoryStateService } from 'src/app/services/Connection/inventory-state-service.service';
 
 @Component({
   selector: 'app-inicio-operativo',
@@ -48,17 +38,20 @@ import { ZonasInventarioService } from 'src/app/services/zonas-inventario.servic
 })
 export class InicioOperativoPage implements OnInit {
   @ViewChild('observacionesTextarea') observacionesTextarea!: IonTextarea;
-  categorias: any[] = [];
-  cargando = true;
+
+  // --- [SSOT PROPIEDADES] ---
+  readonly categorias = this.inventoryStateService.categoriasConEstado;
+  readonly cargando = this.inventoryStateService.isLoading;
+
+  // Propiedades locales
   operatingGroupId: number | null = null;
+
   isInviteOpen = false;
   code = ['D', '8', 'K', '4'];
 
-  // Modales de observaciones
   isObservacionesOpen = false;
   observacionTexto: string = '';
 
-  // Modales de sistema
   isExitOpen = false;
   isConfirmOpen = false;
   isExportOpen = false;
@@ -66,8 +59,7 @@ export class InicioOperativoPage implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private categoryService: CategoryService,
-    private inventaryService: InventoryService,
+    private inventoryStateService: InventoryStateService,
     private operatingService: OperatingService,
     private authService: AuthService,
     private alertController: AlertController,
@@ -97,28 +89,16 @@ export class InicioOperativoPage implements OnInit {
     const user = await this.authService.getUserFromToken();
     const userId = user?.userId ?? 0;
 
-    // Cargar categorías
-    this.categoryService.getItemsByCategory(zonaId).subscribe({
-      next: (data) => {
-        // Asumiendo que 'data' es un array de categorías
-        // y que 'contador' es parte de cada objeto de categoría
-        this.categorias = data;
-        this.cargando = false;
+    // Cargar categorias desde el SSOT
+    await this.inventoryStateService.loadCategoriasPorZona(zonaId);
 
-      },
-      error: (err) => {
-        console.error('Error cargando categorías:', err);
-        this.cargando = false;
-      },
-    });
-
-
-    // Obtener operatingGroupId
+    // Obtener operatingGroupId (Sigue siendo logica de auth/session)
     if (userId) {
       this.operatingService.GetOperatingId(userId).subscribe({
         next: (data) => {
-          console.log('Operating obtenido:', data);
           this.operatingGroupId = data.operatingGroupId;
+          // NOTA: Aqui seria un buen punto para unirse al grupo de SignalR
+          // si ya tuvieramos la funcionalidad de grupos implementada
         },
         error: (err) => {
           console.error('Error obteniendo operating ❌', err);
@@ -128,54 +108,56 @@ export class InicioOperativoPage implements OnInit {
       console.warn('No se pudo obtener userId del token');
     }
   }
+
   async scanItemDescription() {
     try {
-      const user = await this.authService.getUserFromToken();
-      const userId = user?.userId ?? 0;
+        const user = await this.authService.getUserFromToken();
+        const userId = user?.userId ?? 0;
 
-      if (!userId) {
-        const alert = await this.alertController.create({
-          header: 'Error',
-          message: 'No se pudo identificar el usuario actual.',
-          buttons: ['OK'],
+        if (!userId) {
+            const alert = await this.alertController.create({
+              header: 'Error',
+              message: 'No se pudo identificar el usuario actual.',
+              buttons: ['OK'],
+            });
+            await alert.present();
+            return;
+        }
+
+        // Obtener zonas
+        const zonas = await this.zonasService.getZonas(userId).toPromise();
+        if (!zonas?.length) {
+            const alert = await this.alertController.create({
+              header: 'Sin zonas',
+              message: 'No se encontraron zonas asociadas a tu usuario.',
+              buttons: ['OK'],
+            });
+            await alert.present();
+            return;
+        }
+
+        const branchId = zonas[0].branchId;
+
+        // Navegar al escaner en modo descripción
+        this.router.navigate(['/scanner', branchId], {
+            state: { scanMode: 'description' },
         });
-        await alert.present();
-        return;
-      }
-
-      // 🔹 Obtener zonas del usuario (cada una tiene su branchId)
-      const zonas = await this.zonasService.getZonas(userId).toPromise();
-      if (!zonas?.length) {
-        const alert = await this.alertController.create({
-          header: 'Sin zonas',
-          message: 'No se encontraron zonas asociadas a tu usuario.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-        return;
-      }
-
-      // 🔹 Tomar el branchId de la primera zona (ajusta si necesitas elegir)
-      const branchId = zonas[0].branchId;
-
-      // 🔹 Navegar al escáner en modo descripción
-      this.router.navigate(['/scanner', branchId], {
-        state: { scanMode: 'description' },
-      });
     } catch (error) {
-      console.error('Error al iniciar escaneo de descripción:', error);
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No se pudo preparar el escáner para descripción.',
-        buttons: ['OK'],
-      });
-      await alert.present();
+        console.error('Error al iniciar escaneo de descripcion:', error);
+        const alert = await this.alertController.create({
+            header: 'Error',
+            message: 'No se pudo preparar el escaner para descripcion.',
+            buttons: ['OK'],
+        });
+        await alert.present();
     }
   }
+
   goToItem(categoria: any) {
+    // La navegacion pasa la categoria, que ahora contiene los items con el estado 'completado'
     this.router.navigate(
       [
-        '/inicio-mouse',
+        '/items',
         categoria.id,
         this.route.snapshot.paramMap.get('zonaId'),
       ],
@@ -185,7 +167,7 @@ export class InicioOperativoPage implements OnInit {
     );
   }
 
-  // === Modales ===
+  // === Modales (Sin cambios) ===
   openInviteModal() {
     this.isInviteOpen = true;
   }
@@ -193,10 +175,8 @@ export class InicioOperativoPage implements OnInit {
     this.isInviteOpen = false;
   }
 
-  // Estado para mostrar/ocultar modal de instrucciones
   isInstructionsOpen = false;
 
-  // Métodos para abrir y cerrar el modal
   openInstructionsModal() {
     this.isInstructionsOpen = true;
   }
@@ -237,40 +217,37 @@ export class InicioOperativoPage implements OnInit {
     this.isExportOpen = false;
   }
 
-  // === Guardar observación ===
   async guardarObservacion() {
-    console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
+    console.log('Observacion guardada:', this.observacionTexto || '(sin texto)');
     this.closeObservacionesModal();
 
     const alert = await this.alertController.create({
-      header: '✅ Observación guardada',
+      header: '✅ Observacion guardada',
       message: this.observacionTexto.trim()
-        ? 'Tu observación ha sido guardada correctamente.'
-        : 'No escribiste ninguna observación, pero fue guardada como vacía.',
+        ? 'Tu observacion ha sido guardada correctamente.'
+        : 'No escribiste ninguna observacion, pero fue guardada como vacia.',
       buttons: ['OK'],
     });
     await alert.present();
   }
 
-  // === Lógica de Finalizar Inventario (REESTRUCTURADA) ===
+  // === Logica de Finalizar Inventario ===
 
   async finalizarInventario() {
-
-
-    const totalEsperado = this.categorias.reduce((sum, cat) => {
-
+    // Usa la data reactiva 'categorias()' para calcular el total
+    const totalEsperado = this.categorias().reduce((sum, cat) => {
       return sum + (cat.contador || 0);
     }, 0);
 
-    const totalEscaneado = this.inventaryService.getScannedItems().length;
-
+    // Usa el SSOT para obtener la cuenta de escaneados
+    const totalEscaneado = this.inventoryStateService.getScannedIds().size;
 
     if (totalEscaneado < totalEsperado) {
       const itemsFaltantes = totalEsperado - totalEscaneado;
 
       const alert = await this.alertController.create({
-        header: '⚠️ ¡Atención!',
-        message: `Has escaneado ${totalEscaneado} de ${totalEsperado} ítems.\n\nFaltan ${itemsFaltantes} ítems. ¿Estás seguro de que quieres finalizar?`,
+        header: '⚠️ ¡Atencion!',
+        message: `Has escaneado ${totalEscaneado} de ${totalEsperado} items.\n\nFaltan ${itemsFaltantes} items. ¿Estas seguro de que quieres finalizar?`,
         cssClass: 'custom-alert',
         buttons: [
           {
@@ -278,7 +255,7 @@ export class InicioOperativoPage implements OnInit {
             role: 'cancel',
             cssClass: 'alert-button-cancel',
             handler: () => {
-              console.log('Finalización cancelada por el usuario.');
+              console.log('Finalizacion cancelada por el usuario.');
               this.closeConfirmModal();
             }
           },
@@ -295,14 +272,14 @@ export class InicioOperativoPage implements OnInit {
       await alert.present();
 
     } else {
-      // Si el inventario está completo, proceder normalmente
-      console.log('Inventario completo o igualado (Esto es lo que está pasando). Finalizando...');
+      console.log('Inventario completo. Finalizando...');
       this.procederConFinalizacion();
     }
   }
 
   async procederConFinalizacion() {
-    const inventaryId = this.inventaryService.getInventaryId();
+    // Usa el SSOT para obtener el ID del inventario activo
+    const inventaryId = this.inventoryStateService.currentInventaryId();
 
     if (!inventaryId) {
       const alert = await this.alertController.create({
@@ -321,14 +298,15 @@ export class InicioOperativoPage implements OnInit {
     };
 
     try {
-      await this.inventaryService.finish(request).toPromise();
+      // Llama al metodo del SSOT para finalizar
+      await this.inventoryStateService.finishInventory(request);
 
-      this.inventaryService.setInventaryId(0);
+      // El SSOT se encarga de llamar a inventaryService.finish() y resetInventoryState()
       this.observacionTexto = '';
       this.closeConfirmModal();
 
       const alert = await this.alertController.create({
-        header: '✅ Éxito',
+        header: '✅ Exito',
         message: 'Inventario finalizado correctamente.',
         buttons: ['OK']
       });
@@ -343,7 +321,7 @@ export class InicioOperativoPage implements OnInit {
       let errorMessage = 'No se pudo finalizar el inventario.';
 
       if (error?.error?.message) errorMessage = error.error.message;
-      else if (error?.status === 400) errorMessage = 'Datos inválidos. Verifica la información.';
+      else if (error?.status === 400) errorMessage = 'Datos invalidos. Verifica la informacion.';
       else if (error?.status === 404) errorMessage = 'Inventario no encontrado.';
 
       const alert = await this.alertController.create({
@@ -355,7 +333,7 @@ export class InicioOperativoPage implements OnInit {
     }
   }
 
-  // === Iniciar inventario (sin cambios) ===
+  // === Iniciar inventario ===
   async iniciarInventario() {
     const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
     if (!this.operatingGroupId) {
@@ -368,7 +346,8 @@ export class InicioOperativoPage implements OnInit {
       return;
     }
 
-    const currentInventaryId = this.inventaryService.getInventaryId();
+    // Usa el SSOT para verificar si ya hay inventario activo
+    const currentInventaryId = this.inventoryStateService.currentInventaryId();
     if (currentInventaryId) {
       this.router.navigate(['/scanner/', zonaId]);
       return;
@@ -376,7 +355,7 @@ export class InicioOperativoPage implements OnInit {
 
     const alert = await this.alertController.create({
       header: 'Iniciar inventario',
-      message: '¿Estás seguro de iniciar el inventario en esta zona?',
+      message: '¿Estas seguro de iniciar el inventario en esta zona?',
       buttons: [
         {
           text: 'Cancelar',
@@ -384,41 +363,36 @@ export class InicioOperativoPage implements OnInit {
         },
         {
           text: 'Iniciar',
-          handler: () => {
+          handler: async () => { // Handler ahora es async
             const request: StartInventoryRequestDto = {
               zoneId: zonaId,
               operatingGroupId: this.operatingGroupId!,
             };
 
-            this.inventaryService.start(request).subscribe({
-              next: (res) => {
-                this.inventaryService.setInventaryId(res.inventaryId);
-                console.log('Inventario iniciado con ID:', res.inventaryId);
-                this.router.navigate(['/scanner', zonaId]);
-              },
-              error: async (err) => {
+            try {
+                // Llama al metodo del SSOT
+                const res = await this.inventoryStateService.startInventory(request);
+
+                // El SSOT ya establecio el inventaryId y la conexion SignalR
+                if (res?.inventaryId) {
+                    console.log('Inventario iniciado con ID:', res.inventaryId);
+                    this.router.navigate(['/scanner', zonaId]);
+                } else {
+                    throw new Error('No se recibio ID del inventario.');
+                }
+            } catch (err) {
                 const errorAlert = await this.alertController.create({
                   header: 'Error',
                   message: 'No se pudo iniciar el inventario.',
                   buttons: ['OK'],
                 });
                 await errorAlert.present();
-              },
-            });
+            }
           },
         },
       ],
     });
 
     await alert.present();
-  }
-
-
-
-
-  // === Confirmar inventario (notificación) ===
-  confirmarInventario() {
-    console.log('Inventario confirmado y notificado al encargado de zona');
-    this.closeConfirmModal();
   }
 }

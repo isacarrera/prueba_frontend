@@ -25,7 +25,7 @@
 
     <!-- Card List -->
     <div class="card-list">
-      <div class="card-item" *ngFor="let categoria of categorias" (click)="goToItem(categoria)">
+      <div class="card-item" *ngFor="let categoria of categorias()" (click)="goToItem(categoria)">
         <div class="card-left">
           <span class="label">{{ categoria.name }}</span>
           <span class="count">{{ categoria.contador }}</span>

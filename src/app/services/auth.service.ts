@@ -51,6 +51,11 @@ export class AuthService {
     }).pipe(
       tap(async (res) => {
         if (res.token && res.refreshToken) {
+          // --- INICIO: Log temporal para pruebas ---
+          console.log('--- TOKEN DE ACCESO PARA PRUEBAS ---');
+          console.log(res.token);
+          console.log('--- COPIAR ESTE TOKEN ---');
+          // --- FIN: Log temporal ---
           await this.init(); // Asegura que el storage este listo
           await this.storage.set('access_token', res.token);
           await this.storage.set('refresh_token', res.refreshToken);
@@ -77,7 +82,7 @@ export class AuthService {
     return await this.storage.get('refresh_token');
   }
 
-    async logout() {
+  async logout() {
     await this.init();
     await this.storage.remove('access_token');
     await this.storage.remove('refresh_token');

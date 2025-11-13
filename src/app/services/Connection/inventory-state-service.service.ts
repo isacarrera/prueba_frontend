@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs/interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { InventoryCategory } from 'src/app/Interfaces/Connection/inventory.model';
+import { InventoryCategory, ItemScannedPayload } from 'src/app/Interfaces/Connection/inventory.model';
 import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
 import { ScanRequestDto } from 'src/app/Interfaces/scan-request.model';
 import { ScanResponseDto } from 'src/app/Interfaces/scan-response.model';
@@ -21,25 +21,19 @@ export class InventoryStateService {
   private categoryApi = inject(CategoryService);
   private destroyRef = inject(DestroyRef);
 
-  // --- Estado Privado (La Fuente de Verdad) ---
 
-  // El ID del inventario activo
   private inventaryId = signal<number | null>(null);
-
-  // La lista completa de categorias e items (datos maestros)
   private categoriasMaestras = signal<InventoryCategory[]>([]);
 
-  // Un Set que almacena los IDs de los items ya escaneados
+  // Set que almacena los IDs de los items ya escaneados
   private scannedItemIds = signal<Set<number>>(new Set());
 
-  // Estado de carga y error
   public isLoading = signal(false);
   public error = signal<string | null>(null);
 
-  // Estado Publico (Signals Computados) ---
 
   /**
-   * El ID del inventario activo (solo lectura).
+   * El ID del inventario activo
    */
   public readonly currentInventaryId = this.inventaryId.asReadonly();
 
@@ -87,7 +81,6 @@ export class InventoryStateService {
     this.resetInventoryState(); // Limpia el estado anterior
 
     try {
-      // Se asume que categoryApi.getItemsByCategory devuelve el formato correcto
       const data = await this.categoryApi.getItemsByCategory(zonaId).toPromise();
 
       // Se transforman los datos maestros para anadir el estado inicial

@@ -27,13 +27,14 @@ export class ItemsPage implements OnInit {
 
     this.zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
     const nav = this.router.getCurrentNavigation();
+
+    // Se lee la categoria y los items desde el estado de navegacion
     if (nav?.extras.state && nav.extras.state['categoria']) {
       this.categoria = nav.extras.state['categoria'];
+
+      // La lista de items ya viene con el estado 'completado'
+      // calculado por el InventoryStateService.
       this.items = this.categoria.items;
-        this.items = this.categoria.items.map((item: any) => ({
-      ...item,
-      completado: false 
-    }));
     }
   }
 
@@ -41,7 +42,4 @@ export class ItemsPage implements OnInit {
     this.router.navigate(['/inicio-operativo', this.zonaId]);
   }
 
-  toggleItem(item: any, checked: boolean) {
-    item.completado = checked;
-  }
 }
