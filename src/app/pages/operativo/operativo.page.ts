@@ -1,34 +1,27 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
 import {
-  IonContent,
-  IonButtons,
+  AlertController,
   IonButton,
+  IonContent,
   IonIcon,
-  IonItem,
-  IonList,
-  IonSelect,
-  IonSelectOption,
   IonInput,
-  IonHeader,
-  IonToolbar,
-  IonBackButton,
-  IonTitle,
-  IonLabel,
-  AlertController
+  IonItem,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  arrowBackOutline,
-  keypadOutline,
   appsOutline,
+  arrowBackOutline,
+  chevronDownOutline,
   documentTextOutline,
-  chevronDownOutline
-  
+  keypadOutline
 } from 'ionicons/icons';
+import { AuthService } from 'src/app/services/auth.service';
+import { SignalrService } from 'src/app/services/Connections/signalr.service';
 
 @Component({
   selector: 'app-operativo',
@@ -39,19 +32,12 @@ import {
     CommonModule,
     FormsModule,
     IonContent,
-    IonButtons,
     IonButton,
     IonIcon,
     IonItem,
-    IonList,
     IonSelect,
     IonSelectOption,
     IonInput,
-    IonHeader,
-    IonToolbar,
-    IonBackButton,
-    IonTitle,
-    IonLabel,
     CommonModule,
     FormsModule,
     IonContent
@@ -60,11 +46,12 @@ import {
 export class OperativoPage {
   tipoDoc?: string;
   numeroDoc = '';
-  
+
   constructor(
     private router: Router,
     private authService: AuthService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private signalrService: SignalrService
   ) {
     addIcons({
       keypadOutline,
@@ -80,24 +67,19 @@ export class OperativoPage {
   }
 
   acceder() {
-    // console.log('DEBUG >> TipoDoc:', this.tipoDoc, 'NumeroDoc:', this.numeroDoc);
+    if (!this.tipoDoc || !this.numeroDoc) { /* ... validación ... */ return; }
 
-    if (!this.tipoDoc || !this.numeroDoc) {
-      this.showAlert('Datos incompletos', 'Debes seleccionar tipo y número de documento.');
-      return;
-    }
-  
     this.authService.loginOperativo(this.tipoDoc, this.numeroDoc).subscribe({
-      next: () => {
+      next: async () => { // Hacemos el callback async
+        console.log('🔐 Login exitoso, iniciando conexión socket...');
+
+        // 👇 INICIAR SIGNALR AQUÍ
+        // No usamos await para no bloquear la navegación, que conecte en segundo plano
+        this.signalrService.startConnection();
+
         this.router.navigate(['/home']);
       },
-      error: async (err) => {
-        let msg = 'Ocurrió un error al iniciar sesión.';
-        if (err.status === 401) {
-          msg = err.error || 'Credenciales inválidas o rol no autorizado.';
-        }
-        await this.showAlert('Acceso denegado', msg);
-      }
+      error: async (err) => { /* ... manejo de error ... */ }
     });
   }
 
