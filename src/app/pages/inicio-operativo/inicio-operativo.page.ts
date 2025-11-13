@@ -90,7 +90,14 @@ export class InicioOperativoPage implements OnInit {
     const userId = user?.userId ?? 0;
 
     // Cargar categorias desde el SSOT
-    await this.inventoryStateService.loadCategoriasPorZona(zonaId);
+    // Solo carga las categorías desde la API si el estado está vacío
+    // (es decir, si no hay un inventario activo).
+    if (!this.inventoryStateService.currentInventaryId()) {
+      console.log('[InicioOperativo] No hay inventario, cargando categorías...');
+      await this.inventoryStateService.loadCategoriasPorZona(zonaId);
+    } else {
+      console.log('[InicioOperativo] Hay un inventario activo, el estado ya está cargado.');
+    }
 
     // Obtener operatingGroupId (Sigue siendo logica de auth/session)
     if (userId) {
@@ -111,45 +118,45 @@ export class InicioOperativoPage implements OnInit {
 
   async scanItemDescription() {
     try {
-        const user = await this.authService.getUserFromToken();
-        const userId = user?.userId ?? 0;
+      const user = await this.authService.getUserFromToken();
+      const userId = user?.userId ?? 0;
 
-        if (!userId) {
-            const alert = await this.alertController.create({
-              header: 'Error',
-              message: 'No se pudo identificar el usuario actual.',
-              buttons: ['OK'],
-            });
-            await alert.present();
-            return;
-        }
-
-        // Obtener zonas
-        const zonas = await this.zonasService.getZonas(userId).toPromise();
-        if (!zonas?.length) {
-            const alert = await this.alertController.create({
-              header: 'Sin zonas',
-              message: 'No se encontraron zonas asociadas a tu usuario.',
-              buttons: ['OK'],
-            });
-            await alert.present();
-            return;
-        }
-
-        const branchId = zonas[0].branchId;
-
-        // Navegar al escaner en modo descripción
-        this.router.navigate(['/scanner', branchId], {
-            state: { scanMode: 'description' },
-        });
-    } catch (error) {
-        console.error('Error al iniciar escaneo de descripcion:', error);
+      if (!userId) {
         const alert = await this.alertController.create({
-            header: 'Error',
-            message: 'No se pudo preparar el escaner para descripcion.',
-            buttons: ['OK'],
+          header: 'Error',
+          message: 'No se pudo identificar el usuario actual.',
+          buttons: ['OK'],
         });
         await alert.present();
+        return;
+      }
+
+      // Obtener zonas
+      const zonas = await this.zonasService.getZonas(userId).toPromise();
+      if (!zonas?.length) {
+        const alert = await this.alertController.create({
+          header: 'Sin zonas',
+          message: 'No se encontraron zonas asociadas a tu usuario.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+      }
+
+      const branchId = zonas[0].branchId;
+
+      // Navegar al escaner en modo descripción
+      this.router.navigate(['/scanner', branchId], {
+        state: { scanMode: 'description' },
+      });
+    } catch (error) {
+      console.error('Error al iniciar escaneo de descripcion:', error);
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se pudo preparar el escaner para descripcion.',
+        buttons: ['OK'],
+      });
+      await alert.present();
     }
   }
 
@@ -187,9 +194,9 @@ export class InicioOperativoPage implements OnInit {
   openObservacionesModal() {
     this.isObservacionesOpen = true;
     setTimeout(() => {
-    const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
-    textarea?.setFocus?.();
-  }, 300);
+      const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
+      textarea?.setFocus?.();
+    }, 300);
   }
 
   closeObservacionesModal() {
@@ -370,23 +377,23 @@ export class InicioOperativoPage implements OnInit {
             };
 
             try {
-                // Llama al metodo del SSOT
-                const res = await this.inventoryStateService.startInventory(request);
+              // Llama al metodo del SSOT
+              const res = await this.inventoryStateService.startInventory(request);
 
-                // El SSOT ya establecio el inventaryId y la conexion SignalR
-                if (res?.inventaryId) {
-                    console.log('Inventario iniciado con ID:', res.inventaryId);
-                    this.router.navigate(['/scanner', zonaId]);
-                } else {
-                    throw new Error('No se recibio ID del inventario.');
-                }
+              // El SSOT ya establecio el inventaryId y la conexion SignalR
+              if (res?.inventaryId) {
+                console.log('Inventario iniciado con ID:', res.inventaryId);
+                this.router.navigate(['/scanner', zonaId]);
+              } else {
+                throw new Error('No se recibio ID del inventario.');
+              }
             } catch (err) {
-                const errorAlert = await this.alertController.create({
-                  header: 'Error',
-                  message: 'No se pudo iniciar el inventario.',
-                  buttons: ['OK'],
-                });
-                await errorAlert.present();
+              const errorAlert = await this.alertController.create({
+                header: 'Error',
+                message: 'No se pudo iniciar el inventario.',
+                buttons: ['OK'],
+              });
+              await errorAlert.present();
             }
           },
         },

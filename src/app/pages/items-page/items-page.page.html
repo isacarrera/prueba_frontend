@@ -15,7 +15,7 @@
 
     <!-- Lista de items con checkpoint -->
     <div class="card-list">
-      <div class="card-item" *ngFor="let item of items">
+      <div class="card-item" *ngFor="let item of items()">
       <div class="card-left">
         <span class="label">{{ item.name }}</span>
         <span class="count">{{ item.description }}</span>

@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { InventoryCategory, ItemScannedPayload } from 'src/app/Interfaces/Connection/inventory.model';
@@ -78,7 +78,7 @@ export class InventoryStateService {
   public async loadCategoriasPorZona(zonaId: number) {
     this.isLoading.set(true);
     this.error.set(null);
-    this.resetInventoryState(); // Limpia el estado anterior
+    this.categoriasMaestras.set([]);
 
     try {
       const data = await this.categoryApi.getItemsByCategory(zonaId).toPromise();
@@ -188,5 +188,12 @@ export class InventoryStateService {
       });
 
     // Se pueden anadir mas listeners aqui (ej: "GroupUpdate", "InventoryFinished")
+  }
+
+  public getCategoryStateById(categoryId: number): Signal<InventoryCategory | undefined> {
+    return computed(() => {
+      // Usamos el computed principal como fuente
+      return this.categoriasConEstado().find(cat => cat.id === categoryId);
+    });
   }
 }
