@@ -63,7 +63,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'items/:zonaId',
+    path: 'items/:idCategoria/:zonaId',
     loadComponent: () =>
       import('./pages/items-page/items-page.page').then((m) => m.ItemsPage),
   },

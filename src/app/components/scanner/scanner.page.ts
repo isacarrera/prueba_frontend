@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, IonicModule, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -23,6 +23,7 @@ import {
 import { Item, ItemService } from 'src/app/services/item.service';
 import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { InventoryStateService } from 'src/app/services/Connection/inventory-state-service.service';
 
 @Component({
   selector: 'app-scanner',
@@ -32,6 +33,9 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class ScannerPage implements OnInit, OnDestroy {
+
+  private inventoryStateService = inject(InventoryStateService);
+
   scannedCode: string | null = null;
   showInstructions = true;
   scanMode: 'inventory' | 'description' = 'inventory';
@@ -45,7 +49,6 @@ export class ScannerPage implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private inventoryService: InventoryService,
     private alertController: AlertController,
     private modalController: ModalController,
     private route: ActivatedRoute,
@@ -76,12 +79,14 @@ export class ScannerPage implements OnInit, OnDestroy {
   async ngOnInit() {
     const paramId = Number(this.route.snapshot.paramMap.get('zonaId'));
 
-    // 🔹 Inventario → usa zonaId
+    // Inventario → usa zonaId
     if (this.scanMode === 'inventory') {
       this.zonaId = paramId;
-      const inventaryId = this.inventoryService.getInventaryId();
 
-      if (!inventaryId) {
+      // LEEMOS DEL SIGNAL (SSOT)
+      const inventaryId = this.inventoryStateService.currentInventaryId();
+
+      if (!inventaryId) { // Esta guarda ahora funciona como debe
         await this.showError('No hay un inventario activo.');
         this.router.navigate(['/inicio-operativo', this.zonaId]);
         return;
@@ -182,11 +187,21 @@ export class ScannerPage implements OnInit, OnDestroy {
 
   // 🔹 Modal de selección de estado (modo inventario)
   private async openStateSelectionModal(code: string) {
+
+    // 🔽 LEEMOS DEL SIGNAL (SSOT) DE NUEVO
+    const inventaryId = this.inventoryStateService.currentInventaryId();
+
+    if (!inventaryId) {
+      await this.showError('Error de sesión de inventario. Volviendo.');
+      this.cancelScan();
+      return;
+    }
+
     const modal = await this.modalController.create({
       component: StateSelectionModalComponent,
       componentProps: {
         code,
-        inventaryId: this.inventoryService.getInventaryId()!,
+        inventaryId: inventaryId,
       },
     });
 
