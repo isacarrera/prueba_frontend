@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Storage } from '@ionic/storage-angular';
 import { tap } from 'rxjs/operators';
@@ -15,10 +15,18 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private storage: Storage,
-    private idleService: IdleService
+    private idleService: IdleService,
+    private injector: Injector
   ) { }
 
-  private readonly signalrService = inject(SignalrService)
+  private _signalrService?: SignalrService;
+
+  private get signalrService(): SignalrService {
+    if (!this._signalrService) {
+      this._signalrService = this.injector.get(SignalrService);
+    }
+    return this._signalrService;
+  }
 
   /** Inicializa el motor de almacenamiento */
   async init(): Promise<void> {
