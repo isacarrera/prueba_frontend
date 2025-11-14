@@ -35,3 +35,11 @@ export interface ZonaInventarioBranch {
   stateLabel: string;
   iconName: string;
 }
+
+export interface FilterState {
+  id: number;
+  name: string;
+  state: StateZone | null;
+  icon: string;
+  active: boolean;
+}

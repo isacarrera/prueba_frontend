@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { CheckerService } from 'src/app/services/checker.service';
 import { addIcons } from 'ionicons';
-import { 
+import {
   arrowBackOutline,
   documentTextOutline,
   personOutline,
@@ -38,7 +38,7 @@ export class RevisionInventarioPage implements OnInit {
     private checkerService: CheckerService,
     private inventoryService: InventoryService
   ) {
-    addIcons({ 
+    addIcons({
       arrowBackOutline,
       documentTextOutline,
       personOutline,
@@ -51,11 +51,11 @@ export class RevisionInventarioPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loadInventories(); 
+    await this.loadInventories();
   }
 
   async ionViewWillEnter() {
-    await this.loadInventories(); 
+    await this.loadInventories();
   }
   async loadInventories() {
     const user = await this.authService.getUserFromToken();
@@ -91,6 +91,48 @@ export class RevisionInventarioPage implements OnInit {
     });
   }
 
+  getFormattedDate(dateString: string): string {
+    if (!dateString) return 'Fecha no disponible';
+
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+
+      return `${day}-${month}-${year}`;
+    } catch {
+      return 'Fecha inválida';
+    }
+  }
+
+  getFormattedTime(dateString: string): string {
+    if (!dateString) return 'Hora no disponible';
+
+    try {
+      const date = new Date(dateString);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+
+      return `${hours}:${minutes}`;
+    } catch {
+      return 'Hora inválida';
+    }
+  }
+
+  getFormattedDateTime(dateString: string): string {
+    if (!dateString) return 'Fecha/hora no disponible';
+
+    try {
+      const date = this.getFormattedDate(dateString);
+      const time = this.getFormattedTime(dateString);
+
+      return `${date} ${time}`;
+    } catch {
+      return 'Fecha/hora inválida';
+    }
+  }
+
   // Métodos auxiliares para la vista
   getCardStatusClass(inventario: any): string {
     return inventario?.stateZone?.toLowerCase() || 'pending';
@@ -111,21 +153,6 @@ export class RevisionInventarioPage implements OnInit {
       case 'completed': return 'Completado';
       case 'in-progress': return 'En Progreso';
       default: return 'Pendiente';
-    }
-  }
-
-  getFormattedDate(dateString: string): string {
-    if (!dateString) return 'Fecha no disponible';
-    
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-    } catch {
-      return 'Fecha inválida';
     }
   }
 

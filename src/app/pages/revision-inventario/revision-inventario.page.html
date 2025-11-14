@@ -4,12 +4,12 @@
        <ion-button class="back-button" fill="clear" (click)="goBack()">
       <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
     </ion-button>
-    
+
     <div class="icon-circle">
       <img src="../../../assets/images/3D_Forma_Sesion.png" alt="Ubicación" />
     </div>
       <h1 class="title">Revisión Inventario</h1>
-   
+
 
     <div class="card-list">
      <div class="card-item" *ngFor="let categoria of categorias" (click)="goToItems(categoria)">
@@ -42,8 +42,10 @@
       <div class="card-item" *ngFor="let inv of inventariosEnVerificacion" (click)="irADetalle(inv)">
         <div class="card-left">
           <span class="label">{{ inv.zoneName }}</span>
-          <span class="count">Inventario #{{ inv.date }}</span>
-          <span class="status">{{ inv.stateZone }}</span>
+          <div class="date-time-info">
+            <span class="date">{{ getFormattedDate(inv.date) }}</span>
+            <span class="time">{{ getFormattedTime(inv.date) }}</span>
+          </div>
         </div>
         <ion-icon name="chevron-forward-outline"></ion-icon>
       </div>

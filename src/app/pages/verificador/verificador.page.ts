@@ -1,17 +1,17 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonicModule, AlertController } from '@ionic/angular';
-import { AuthService } from 'src/app/services/auth.service';
+import { AlertController, IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  personOutline,
+  arrowBackOutline,
   keyOutline,
   lockClosedOutline,
-  arrowBackOutline,
+  personOutline,
 } from 'ionicons/icons';
-import { firstValueFrom } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-verificador',
@@ -21,9 +21,9 @@ import { firstValueFrom } from 'rxjs';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class VerificadorPage {
-recuperar() {
-throw new Error('Method not implemented.');
-}
+  recuperar() {
+    throw new Error('Method not implemented.');
+  }
   usuario = '';
   contrasena = '';
 
@@ -45,25 +45,33 @@ throw new Error('Method not implemented.');
   }
 
   async acceder() {
-  if (!this.usuario || !this.contrasena) {
-    this.showAlert('Datos incompletos', 'Debes ingresar usuario y contraseña.');
-    return;
-  }
-
-  try {
-    const res = await firstValueFrom(this.authService.login(this.usuario, this.contrasena));
-
-    if (res?.token) {
-      this.showAlert('Acceso correcto', 'Bienvenido al sistema');
-      this.router.navigate(['/revision-inventario']);
-    } else {
-      this.showAlert('Acceso denegado', 'Credenciales inválidas');
+    if (!this.usuario || !this.contrasena) {
+      this.showAlert('Datos incompletos', 'Debes ingresar usuario y contraseña.');
+      return;
     }
-  } catch (error) {
-    console.error('Error en login:', error);
-    this.showAlert('Error', 'No fue posible iniciar sesión.');
+
+    this.authService.login(this.usuario, this.contrasena).subscribe({
+      next: async (res) => {
+        if (res?.token) {
+          this.showAlert('Acceso correcto', 'Bienvenido al sistema');
+          this.router.navigate(['/revision-inventario']);
+        } else {
+          this.showAlert('Acceso denegado', 'Credenciales inválidas');
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Error en login:', error);
+
+        if (error.status === 401) {
+          this.showAlert('Acceso denegado', 'Usuario o contraseña incorrectos.');
+        } else if (error.status === 0) {
+          this.showAlert('Error de conexión', 'No hay conexión con el servidor.');
+        } else {
+          this.showAlert('Error', 'No fue posible iniciar sesión.');
+        }
+      }
+    });
   }
-}
 
   private async showAlert(header: string, message: string) {
     const alert = await this.alertCtrl.create({

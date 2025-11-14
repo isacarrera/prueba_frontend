@@ -88,6 +88,99 @@
   box-shadow: 0 0 14px rgba(59, 130, 246, 0.5);
 }
 
+.filters-container {
+  width: 90%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filters-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  padding: 4px 0;
+  scrollbar-width: none; /* Firefox */
+}
+
+.filters-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(17, 23, 56, 0.4);
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #e2e8f0;
+}
+
+.filter-button.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
+  color: white;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.filter-button ion-icon {
+  font-size: 16px;
+}
+
+.clear-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.clear-filters-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.clear-filters-empty-btn {
+  margin-top: 16px;
+  padding: 10px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.clear-filters-empty-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
 /* Estados de carga y vacío */
 .loading-state, .empty-state {
   display: flex;
@@ -271,6 +364,18 @@ ion-refresher-content {
   .card-zona {
     width: 100%;
     height: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clear-filters-btn {
+    align-self: flex-end;
+    margin-top: 8px;
   }
 }
 

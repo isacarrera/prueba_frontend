@@ -17,8 +17,35 @@
       <h1 class="title">Zonas Operativas</h1>
     </div>
 
-    <ion-searchbar placeholder="Buscar zona..." [(ngModel)]="searchTerm" debounce="300" class="custom-search">
+    <!-- Barra de búsqueda -->
+    <ion-searchbar
+      placeholder="Buscar zona..."
+      [(ngModel)]="searchTerm"
+      debounce="300"
+      class="custom-search">
     </ion-searchbar>
+
+    <div class="filters-container">
+      <div class="filters-scroll">
+        <button
+          *ngFor="let filter of filters"
+          class="filter-button"
+          [class.active]="filter.active"
+          (click)="setFilter(filter)">
+          <ion-icon [name]="filter.icon"></ion-icon>
+          <span>{{ filter.name }}</span>
+        </button>
+      </div>
+
+      <!-- Botón para limpiar filtros (solo visible cuando hay filtros activos) -->
+      <button
+        *ngIf="activeFilter !== null || searchTerm"
+        class="clear-filters-btn"
+        (click)="clearFilters()">
+        <ion-icon name="close-circle-outline"></ion-icon>
+        Limpiar
+      </button>
+    </div>
 
     <!-- Estado de carga -->
     <div *ngIf="cargando" class="loading-state">
@@ -31,12 +58,10 @@
       <div class="card-zona"
            *ngFor="let zona of filteredZonas()"
            [class.disabled]="!zona.isAvailable"
-           (click)="zona.isAvailable && goToOperativo(zona.id)">
+           (click)="zona.isAvailable && goToOperativo(zona.id, zona.name)">
 
         <div class="card-info">
           <span class="label">{{ zona.name }}</span>
-
-          <!-- Badge dinámico según estado -->
           <span class="badge" [ngClass]="{
             'badge-disponible': zona.stateZone === 1,
             'badge-inventario': zona.stateZone === 2,
@@ -46,7 +71,6 @@
           </span>
         </div>
 
-        <!-- Icono dinámico según estado -->
         <div class="icon-circle-big" [ngClass]="{
           'free': zona.stateZone === 1,
           'inventory': zona.stateZone === 2,
@@ -54,7 +78,6 @@
         }">
           <ion-icon [name]="zona.iconName"></ion-icon>
         </div>
-
       </div>
     </div>
 
@@ -64,12 +87,18 @@
         <ion-icon name="map-outline"></ion-icon>
       </div>
       <h3>No se encontraron zonas</h3>
-      <p *ngIf="searchTerm">
-        No hay resultados para "{{ searchTerm }}"
+      <p *ngIf="searchTerm || activeFilter !== null">
+        No hay resultados para los filtros aplicados.
       </p>
-      <p *ngIf="!searchTerm">
+      <p *ngIf="!searchTerm && activeFilter === null">
         No hay zonas operativas disponibles.
       </p>
+      <button
+        *ngIf="searchTerm || activeFilter !== null"
+        class="clear-filters-empty-btn"
+        (click)="clearFilters()">
+        Limpiar filtros
+      </button>
     </div>
   </div>
 </ion-content>

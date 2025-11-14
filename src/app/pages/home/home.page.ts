@@ -9,9 +9,12 @@ import {
   chevronDownCircleOutline,
   lockClosedOutline,
   lockOpenOutline,
-  shieldCheckmarkOutline
+  shieldCheckmarkOutline,
+  appsOutline,
+  closeOutline,
+  closeCircleOutline
 } from 'ionicons/icons';
-import { ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
+import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 
@@ -28,6 +31,15 @@ export class HomePage {
   zonas: ZonaInventarioBranch[] = [];
   cargando = true;
 
+  filters: FilterState[] = [
+    { id: 1, name: 'Todos', state: null, icon: 'apps-outline', active: true },
+    { id: 2, name: 'Disponible', state: StateZone.Available, icon: 'lock-open-outline', active: false },
+    { id: 3, name: 'En Inventario', state: StateZone.InInventory, icon: 'lock-close-outline', active: false },
+    { id: 4, name: 'En Verificación', state: StateZone.InVerification, icon: 'shield-checkmark-outline', active: false }
+  ];
+
+  activeFilter: StateZone | null = null;
+
   constructor(
     private router: Router,
     private zonasService: ZonasInventarioService,
@@ -37,9 +49,11 @@ export class HomePage {
     addIcons({
       arrowBackOutline,
       chevronDownCircleOutline,
+      'close-circle-outline': closeCircleOutline,
       'lock-open-outline': lockOpenOutline,
       'lock-close-outline': lockClosedOutline,
-      'shield-checkmark-outline': shieldCheckmarkOutline
+      'shield-checkmark-outline': shieldCheckmarkOutline,
+      'apps-outline': appsOutline
     });
   }
 
@@ -61,16 +75,64 @@ export class HomePage {
     this.router.navigate(['/login']);
   }
 
-  goToOperativo(zonaId: number) {
-    this.router.navigate(['/inicio-operativo', zonaId]);
+  async goToOperativo(zonaId: number, zonaName: string) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Zona',
+      message: `¿Estás seguro que deseas ingresar a la zona <strong>${zonaName}</strong>?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Operación cancelada');
+          }
+        },
+        {
+          text: 'Confirmar',
+          cssClass: 'primary',
+          handler: () => {
+            this.router.navigate(['/inicio-operativo', zonaId]);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  setFilter(filter: FilterState) {
+    // Desactivar todos los filtros
+    this.filters.forEach(f => f.active = false);
+
+    // Activar el filtro seleccionado
+    filter.active = true;
+    this.activeFilter = filter.state;
   }
 
   filteredZonas() {
-    if (!this.searchTerm) return this.zonas;
-    return this.zonas.filter(z =>
-      z.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+    let filtered = this.zonas;
+
+    // Filtro por texto de búsqueda
+    if (this.searchTerm) {
+      filtered = filtered.filter(z =>
+        z.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtro por estado
+    if (this.activeFilter !== null) {
+      filtered = filtered.filter(z => z.stateZone === this.activeFilter);
+    }
+
+    return filtered;
   }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.setFilter(this.filters[0]); // Volver a "Todos"
+  }
+
 
   async cargarZonas() {
     this.cargando = true;
