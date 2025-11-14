@@ -5,8 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, lockClosedOutline, lockOpenOutline } from 'ionicons/icons';
-import { ZonaInventario, ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
+import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { ZonaInventario } from 'src/app/Interfaces/zone.model';
 
 @Component({
   selector: 'app-verificador-operativo',

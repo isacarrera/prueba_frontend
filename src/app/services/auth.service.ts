@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Storage } from '@ionic/storage-angular';
-import { tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
 import { IdleService } from './idle.service';
 import { jwtDecode } from 'jwt-decode';
@@ -15,7 +15,7 @@ export class AuthService {
     private http: HttpClient,
     private storage: Storage,
     private idleService: IdleService
-  ) {}
+  ) { }
 
   /** Inicializa el motor de almacenamiento */
   async init(): Promise<void> {
@@ -46,17 +46,42 @@ export class AuthService {
     documentType,
     documentNumber
   }).pipe(
-    tap(async (res) => {
-      if (res.token && res.refreshToken) {
-        await this.init(); // ⚙️ aseguramos que el storage esté listo
-        await this.storage.set('access_token', res.token);
-        await this.storage.set('refresh_token', res.refreshToken);
-        // console.log('✅ Login operativo: tokens guardados');
-        this.idleService.startWatching();
+    // 👇 MOVEMOS toda la lógica al switchMap para manejar tanto success como errors
+    switchMap(async (res) => {
+      await this.init();
+
+      // Si el backend responde con success: false pero código HTTP 200
+      if (res.success === false) {
+        throw new Error(res.message || 'Acceso denegado');
+      }
+
+      // Si no trae tokens, también es error
+      if (!res.token || !res.refreshToken) {
+        throw new Error('El servidor no envió los tokens');
+      }
+
+      // 👇 GUARDAR TOKENS solo si es exitoso
+      await this.storage.set('access_token', res.token);
+      await this.storage.set('refresh_token', res.refreshToken);
+      this.idleService.startWatching();
+
+      // Devolvemos la respuesta para el next()
+      return res;
+    }),
+    catchError((error: HttpErrorResponse) => {
+      // 👇 MANEJAMOS ERRORES HTTP (401, 403, 500, etc.)
+      if (error.status === 401 || error.status === 403) {
+        // Para 401/403, el backend envía el mensaje en error.error
+        const message = error.error?.message || error.message;
+        throw new Error(message);
+      } else {
+        // Otros errores (conexión, servidor, etc.)
+        throw new Error('Problema de conexión. Intenta nuevamente.');
       }
     })
   );
 }
+
 
   async getAccessToken() {
     await this.init();
@@ -80,16 +105,16 @@ export class AuthService {
   refreshToken(refreshToken: string) {
     return this.http.post<any>(`${this.apiUrl}/refresh`, { refreshToken });
   }
-   async getUserFromToken() {
-  const token = await this.getAccessToken();
-  if (!token) return null;
+  async getUserFromToken() {
+    const token = await this.getAccessToken();
+    if (!token) return null;
 
-  const decoded: any = jwtDecode(token);
-  return {
-    userId: decoded['nameid'],    
-    personId: decoded['personId'],
-    username: decoded['unique_name'],
-    role: decoded['role']
-  };
-}
+    const decoded: any = jwtDecode(token);
+    return {
+      userId: decoded['nameid'],
+      personId: decoded['personId'],
+      username: decoded['unique_name'],
+      role: decoded['role']
+    };
+  }
 }

@@ -1,5 +1,5 @@
 export const environment = {
   // apiURL : 'https://codexy-jif-api.azurewebsites.net/',
-  apiURL : 'http://172.30.6.122:7051/',
+  apiURL : 'http://192.168.1.6:7051/',
 
 };

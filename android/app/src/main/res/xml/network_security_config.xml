@@ -2,7 +2,7 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <!-- Confía en tu IP de desarrollo -->
-        <domain includeSubdomains="true">172.30.6.122</domain>
+        <domain includeSubdomains="true">192.168.1.6</domain>
         <!-- También confía en el localhost de desarrollo de Android -->
         <domain includeSubdomains="true">10.0.2.2</domain>
     </domain-config>

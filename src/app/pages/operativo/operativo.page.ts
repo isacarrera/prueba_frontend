@@ -67,19 +67,24 @@ export class OperativoPage {
   }
 
   acceder() {
-    if (!this.tipoDoc || !this.numeroDoc) { /* ... validación ... */ return; }
+    if (!this.tipoDoc || !this.numeroDoc) {
+      this.showAlert('Error', 'Debes completar los datos.');
+      return;
+    }
 
     this.authService.loginOperativo(this.tipoDoc, this.numeroDoc).subscribe({
-      next: async () => { // Hacemos el callback async
-        console.log('🔐 Login exitoso, iniciando conexión socket...');
-
-        // 👇 INICIAR SIGNALR AQUÍ
-        // No usamos await para no bloquear la navegación, que conecte en segundo plano
+      next: async (res: any) => {
+        // 👇 ESTO SOLO SE EJECUTA SI EL LOGIN ES EXITOSO
+        console.log('Login exitoso, iniciando SignalR...');
         this.signalrService.startConnection();
-
         this.router.navigate(['/home']);
       },
-      error: async (err) => { /* ... manejo de error ... */ }
+      error: async (err: Error) => {
+        console.error('Error en login:', err);
+
+        // 👇 TODOS LOS ERRORES (tanto HTTP como lógicos) vienen aquí
+        this.showAlert('Acceso denegado', err.message);
+      }
     });
   }
 

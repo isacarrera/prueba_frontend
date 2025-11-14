@@ -1,17 +1,19 @@
-import { Component } from '@angular/core';
-import { IonicModule, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AlertController, IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
+  chevronDownCircleOutline,
   lockClosedOutline,
   lockOpenOutline,
-  chevronDownCircleOutline
+  shieldCheckmarkOutline
 } from 'ionicons/icons';
-import { ZonaInventario, ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
+import { ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
 import { AuthService } from 'src/app/services/auth.service';
+import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 
 @Component({
   selector: 'app-home',
@@ -21,8 +23,9 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class HomePage {
+
   searchTerm: string = '';
-  zonas: ZonaInventario[] = [];
+  zonas: ZonaInventarioBranch[] = [];
   cargando = true;
 
   constructor(
@@ -33,18 +36,19 @@ export class HomePage {
   ) {
     addIcons({
       arrowBackOutline,
-      lockClosedOutline,
-      lockOpenOutline,
-      chevronDownCircleOutline
+      chevronDownCircleOutline,
+      'lock-open-outline': lockOpenOutline,
+      'lock-close-outline': lockClosedOutline,
+      'shield-checkmark-outline': shieldCheckmarkOutline
     });
   }
 
-  // 👇 se ejecuta cada vez que la vista entra en pantalla
+  // Se ejecuta cada vez que la vista entra en pantalla
   async ionViewWillEnter() {
     await this.cargarZonas();
   }
 
-  // 👇 MÉTODO NUEVO PARA PULL-TO-REFRESH
+  //  MÉTODO NUEVO PARA PULL-TO-REFRESH
   async handleRefresh(event: any) {
     console.log('Iniciando recarga...');
     await this.cargarZonas();
@@ -68,7 +72,6 @@ export class HomePage {
     );
   }
 
-  // 👇 Método modificado para ser reutilizable
   async cargarZonas() {
     this.cargando = true;
 
@@ -76,17 +79,12 @@ export class HomePage {
       const user = await this.authService.getUserFromToken();
       if (user?.userId) {
         this.zonasService.getZonas(user.userId).subscribe({
-          next: async (data) => {
+          next: (data: ZonaInventarioBranch[]) => {
             this.zonas = data;
             this.cargando = false;
 
-            if (!this.zonas || this.zonas.length === 0) {
-              const alert = await this.alertController.create({
-                header: 'Aviso',
-                message: 'No tienes inventarios asignados en este momento.',
-                buttons: ['OK']
-              });
-              await alert.present();
+            if (this.zonas.length === 0) {
+              this.mostrarAlerta('Aviso', 'No tienes inventarios asignados en este momento.');
             }
           },
           error: async (err) => {
@@ -94,30 +92,31 @@ export class HomePage {
             this.cargando = false;
 
             if (err.status === 404) {
-              const alert = await this.alertController.create({
-                header: 'Aviso',
-                message: 'No tienes inventarios asignados en este momento.',
-                buttons: ['OK']
-              });
-              await alert.present();
+              this.mostrarAlerta('Aviso', 'No tienes inventarios asignados en este momento.');
             } else {
-              const alert = await this.alertController.create({
-                header: 'Error',
-                message: 'Ocurrió un problema al cargar las zonas.',
-                buttons: ['OK']
-              });
-              await alert.present();
+              this.mostrarAlerta('Error', 'Ocurrió un problema al cargar las zonas.');
             }
           }
         });
       } else {
         this.cargando = false;
         console.error('Usuario no autenticado');
+        this.mostrarAlerta('Error', 'Usuario no autenticado.');
       }
     } catch (error) {
       this.cargando = false;
       console.error('Error al obtener usuario:', error);
+      this.mostrarAlerta('Error', 'Error al cargar las zonas.');
     }
+  }
+
+  private async mostrarAlerta(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
   }
 
   async scanItemDescription() {

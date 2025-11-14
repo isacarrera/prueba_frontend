@@ -1,5 +1,4 @@
 <ion-content class="zones-content" [fullscreen]="true">
-  <!-- Agrega el refresher aquí -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content pullingIcon="chevron-down-circle-outline" pullingText="Arrastra para recargar"
       refreshingSpinner="circles" refreshingText="Recargando...">
@@ -18,9 +17,6 @@
       <h1 class="title">Zonas Operativas</h1>
     </div>
 
-    <!-- <ion-button class="scan-button" fill="clear" (click)="scanItemDescription()">
-      <ion-icon slot="icon-only" name="qr-code-outline"></ion-icon>
-    </ion-button> -->
     <ion-searchbar placeholder="Buscar zona..." [(ngModel)]="searchTerm" debounce="300" class="custom-search">
     </ion-searchbar>
 
@@ -32,16 +28,33 @@
 
     <!-- Grid de zonas -->
     <div class="zones-grid" *ngIf="!cargando">
-      <div class="card-zona" *ngFor="let zona of filteredZonas()" (click)="goToOperativo(zona.id)">
+      <div class="card-zona"
+           *ngFor="let zona of filteredZonas()"
+           [class.disabled]="!zona.isAvailable"
+           (click)="zona.isAvailable && goToOperativo(zona.id)">
 
         <div class="card-info">
           <span class="label">{{ zona.name }}</span>
-          <span class="badge-disponible">Zona Disponible</span>
+
+          <!-- Badge dinámico según estado -->
+          <span class="badge" [ngClass]="{
+            'badge-disponible': zona.stateZone === 1,
+            'badge-inventario': zona.stateZone === 2,
+            'badge-verificacion': zona.stateZone === 3
+          }">
+            {{ zona.stateLabel }}
+          </span>
         </div>
 
-        <div class="icon-circle-big">
-          <ion-icon name="lock-closed-outline"></ion-icon>
+        <!-- Icono dinámico según estado -->
+        <div class="icon-circle-big" [ngClass]="{
+          'free': zona.stateZone === 1,
+          'inventory': zona.stateZone === 2,
+          'verification': zona.stateZone === 3
+        }">
+          <ion-icon [name]="zona.iconName"></ion-icon>
         </div>
+
       </div>
     </div>
 
