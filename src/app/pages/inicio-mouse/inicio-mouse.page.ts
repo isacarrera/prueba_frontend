@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core'; 
+import { IonicModule } from '@ionic/angular'; 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
@@ -16,14 +16,19 @@ import { InventoryService } from 'src/app/services/inventary.service';
 })
 export class InicioMousePage implements OnInit {
   categoria: any;
-  items: any[] = [];
+  items: any[] = []; // Esta es tu lista COMPLETA
   cargando = true;
   zonaId!: number;
+
+  displayedItems: any[] = []; 
+  
+  private itemsPerBatch = 15; // Cuántos cargar cada vez
+  private currentIndex = 0;
 
   constructor(
     private router: Router, 
     private route: ActivatedRoute,
-    private inventoryService: InventoryService // ← Inyectado
+    private inventoryService: InventoryService
   ) {
     addIcons({ arrowBackOutline, timeOutline });
   }
@@ -37,10 +42,24 @@ export class InicioMousePage implements OnInit {
       this.items = this.categoria.items;
     }
 
+    this.loadInitialBatch();
     this.cargando = false;
   }
 
-  // ✅ NUEVO: Verificar si un item está escaneado
+  loadInitialBatch() {
+    this.displayedItems = this.items.slice(0, this.itemsPerBatch);
+    this.currentIndex = this.itemsPerBatch;
+  }
+
+  loadMore() {
+    const nextBatch = this.items.slice(this.currentIndex, this.currentIndex + this.itemsPerBatch);
+    
+    this.displayedItems.push(...nextBatch);
+    
+    this.currentIndex += this.itemsPerBatch;
+    
+  }
+  
   isScanned(item: any): boolean {
     return this.inventoryService.isItemScanned(item.id);
   }

@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/verification"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list lines="none" class="ion-padding-vertical">
+    <div *ngFor="let item of displayedItems" class="item-card item-detail">
+      <div class="item-header">
+        <h4 class="item-name">{{ item.name }}</h4>
+        <span class="item-code">{{ item.code }}</span>
+      </div>
+      <p class="item-reason">Razón: {{ item.reason || 'Sin razón registrada' }}</p>
+
+      <div *ngIf="item.expectedState" class="state-comparison">
+        <span class="state-label">Base: {{ item.expectedState }}</span>
+        <span class="state-label">Escaneado: {{ item.scannedState }}</span>
+      </div>
+    </div>
+  </ion-list>
+
+  <div *ngIf="!allItems?.length" class="empty-state ion-padding">
+    <p>No hay ítems en esta categoría para mostrar.</p>
+  </div>
+
+  <div class="load-more-container ion-padding" *ngIf="displayedItems.length < allItems.length">
+    <ion-button expand="block" fill="outline" (click)="loadMore()">
+      Cargar Más ({{ displayedItems.length }} de {{ allItems.length }})
+    </ion-button>
+  </div>
+
+  <p *ngIf="allItems.length > 0" 
+    class="summary-count" 
+    [class.ion-padding]="displayedItems.length >= allItems!.length" 
+    style="text-align: center; color: var(--ion-color-medium); padding-bottom: 20px;">
+    Total de ítems: **{{ allItems!.length }}** </p>
+</ion-content>

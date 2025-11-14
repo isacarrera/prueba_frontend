@@ -7,22 +7,18 @@
       <img src="../../../assets/images/Vector2.png" alt="Mouse" />
     </div>
     <h1 class="title">{{ categoria?.name }}</h1>
-    <p class="subtitle">Cantidad: {{ items.length }}</p>
+    <p class="subtitle">Cantidad: {{ items.length }}</p> 
     
-    <!-- ✅ QUITAR el (click) para que no sea interactivo -->
     <div 
       class="device-card" 
-      *ngFor="let item of items"
+      *ngFor="let item of displayedItems" 
       [class.scanned]="isScanned(item)">
-      <!-- QUITAR: (click)="markAsScanned(item)" -->
       
       <div class="device-left">
         <span class="device-id">Nombre: {{ item.name }}</span>
         <span class="device-serial">Descripción: {{ item.description }}</span>
       </div>
-
       <div class="device-right">
-        <!-- ✅ Estado de escaneado (solo visual) -->
         <span 
           class="status" 
           [class.escaneado]="isScanned(item)"
@@ -31,6 +27,18 @@
         </span>
         <ion-icon name="time-outline"></ion-icon>
       </div>
+    </div>
+
+    <div 
+      class="load-more-container"
+      *ngIf="displayedItems.length < items.length">
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="loadMore()">
+        Cargar Más ({{ displayedItems.length }} / {{ items.length }})
+      </ion-button>
     </div>
 
   </div>

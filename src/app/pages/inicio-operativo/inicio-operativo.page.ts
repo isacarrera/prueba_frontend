@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { ViewChild } from '@angular/core';
-import { IonTextarea } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
 import {
   arrowBackOutline,
@@ -24,9 +22,6 @@ import {
   checkmarkDoneOutline,
   closeOutline,
 } from 'ionicons/icons';
-
-// Componentes
-import { ExportadorComponent } from 'src/app/components/exportador/exportador.component';
 
 // Servicios
 import { CategoryService } from 'src/app/services/category.service';
@@ -47,7 +42,6 @@ import { ZonasInventarioService } from 'src/app/services/zonas-inventario.servic
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class InicioOperativoPage implements OnInit {
-  @ViewChild('observacionesTextarea') observacionesTextarea!: IonTextarea;
   categorias: any[] = [];
   cargando = true;
   operatingGroupId: number | null = null;
@@ -206,10 +200,6 @@ export class InicioOperativoPage implements OnInit {
   }
   openObservacionesModal() {
     this.isObservacionesOpen = true;
-    setTimeout(() => {
-    const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
-    textarea?.setFocus?.();
-  }, 300);
   }
 
   closeObservacionesModal() {
