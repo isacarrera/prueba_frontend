@@ -30,6 +30,7 @@
     "@ericblade/quagga2": "^1.8.4",
     "@ionic/angular": "^8.0.0",
     "@ionic/storage-angular": "^4.0.0",
+    "@microsoft/signalr": "^10.0.0",
     "@zxing/browser": "^0.1.5",
     "file-saver": "^2.0.5",
     "ionicons": "^8.0.13",

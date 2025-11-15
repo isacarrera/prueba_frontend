@@ -223,13 +223,16 @@ export class HomePage {
   async presentJoinPrompt() {
     const alert = await this.alertController.create({
       header: 'Unirse a Inventario',
-      message: 'Ingresa el código de inventario proporcionado por el anfitrión.',
+      message: 'Ingresa el código de invitación (ej: D8K4) proporcionado por el anfitrión.',
       inputs: [
         {
-          name: 'inventaryId',
-          type: 'number',
-          placeholder: 'Código (ej: 101)',
-          min: 1,
+          name: 'invitationCode',
+          type: 'text',
+          placeholder: 'Código (ej: D8K4)',
+          attributes: {
+            autocapitalize: 'off',
+            autocorrect: 'off'
+          }
         },
       ],
       buttons: [
@@ -239,24 +242,20 @@ export class HomePage {
         },
         {
           text: 'Unirse',
-          handler: (data) => {
-            if (!data.inventaryId || Number(data.inventaryId) <= 0) {
-              this.mostrarAlerta('Error', 'Debes ingresar un código válido.');
-              return false;
+          // Usamos el handler ASYNC robusto
+          handler: async (data) => {
+            // 1. Limpiar y validar el CÓDIGO
+            const code = data.invitationCode?.trim().toUpperCase();
+            if (!code) {
+              this.mostrarAlerta('Error', 'Debes ingresar un código.');
+              return false; // Evita que se cierre
             }
-            return data;
+
+            // 2. Llamar a la lógica de unión (que ahora es bool)
+            return await this.handleJoinInventory(code);
           },
         },
       ],
-    });
-
-    alert.onDidDismiss().then(async (result) => {
-      if (result.role !== 'cancel' && result.data && result.data.inventaryId) {
-
-        const inventaryId = Number(result.data.inventaryId);
-        await this.handleJoinInventory(inventaryId);
-
-      }
     });
 
     await alert.present();
@@ -265,27 +264,21 @@ export class HomePage {
   /**
    * Maneja la lógica de validación y navegación del invitado.
    */
-  private async handleJoinInventory(inventaryId: number): Promise<boolean> {
+  private async handleJoinInventory(invitationCode: string): Promise<boolean> {
     try {
-      const zoneId = await this.inventoryService.joinInventory(inventaryId);
+      // Llama al servicio actualizado
+      const { zoneId } = await this.inventoryService.joinInventory(invitationCode);
 
+      // Navegar al invitado al Scanner.
       this.router.navigate(['/scanner', zoneId], {
         state: { isGuest: true }
       });
-      return true;
+      return true; // Cierra la alerta
 
     } catch (err: any) {
-
       console.error('[handleJoinInventory] ¡ERROR! La llamada al servicio falló:', err);
-
-      const alert = await this.alertController.create({
-        header: 'Error al unirse',
-        message: err?.message || 'Error desconocido.',
-        buttons: ['OK']
-      });
-      await alert.present();
-
-      return false;
+      this.mostrarAlerta('Error al unirse', err?.message || 'Error desconocido.');
+      return false; // Mantiene la alerta abierta
     }
   }
 }

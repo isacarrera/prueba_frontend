@@ -124,7 +124,7 @@
           <h1></h1>
           <p>Código de Invitación</p>
           <div class="code-box">
-            <span *ngFor="let char of code">{{ char }}</span>
+            <span *ngFor="let char of codeArray">{{ char }}</span>
           </div>
           <ion-button fill="clear" (click)="closeInviteModal()" class="back-btn">
             <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>

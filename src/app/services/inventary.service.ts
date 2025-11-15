@@ -66,34 +66,34 @@ export class InventoryService {
   /**
   * Valida y une a un invitado a un inventario.
   */
-  async joinInventory(inventaryId: number): Promise<number> {
-    const requestBody = { inventaryId };
+  async joinInventory(invitationCode: string): Promise<{ zoneId: number, inventaryId: number }> {
+    const requestBody = { invitationCode };
 
     try {
-      // Validar permiso via HTTP (POST /join)
+      console.log(`[Guest Flow] Validando permiso para CÓDIGO ${invitationCode}...`);
       const response = await firstValueFrom(
         this.http.post<any>(`${this.baseUrl}/join`, requestBody)
       );
 
-      if (!response || !response.zoneId) {
-        throw new Error('La API de validación no devolvió un ZoneId.');
+      // Procesar la NUEVA respuesta del backend
+      if (!response || !response.zoneId || !response.inventaryId) {
+        throw new Error('La API de validación no devolvió ZoneId o InventaryId.');
       }
 
-      const zoneId = response.zoneId;
+      const { zoneId, inventaryId } = response;
+      console.log(`[Guest Flow] Validación HTTP exitosa. ZoneId: ${zoneId}, InventaryId: ${inventaryId}`);
 
-      // Unirse al grupo de SignalR (Invoke Hub)
+      // Unirse al grupo de SignalR (usando el ID que devolvio la API)
       await this.signalrService.joinInventoryGroup(inventaryId);
 
       // Setear el ID en el servicio para que el ScannerPage lo detecte
       this.setInventaryId(inventaryId);
 
-      // Devolver el ZoneId para la navegación
-      return zoneId;
+      // Devolver el objeto para la navegacion
+      return { zoneId, inventaryId };
 
     } catch (error: any) {
       console.error('[Guest Flow] Error al unirse al inventario:', error);
-
-      // Re-lanzar el error para que el componente de UI lo maneje
       const errorMessage = error?.error?.Message || error?.message || 'Error desconocido al unirse.';
       throw new Error(errorMessage);
     }

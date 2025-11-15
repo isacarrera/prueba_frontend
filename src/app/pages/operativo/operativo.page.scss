@@ -206,24 +206,6 @@ ion-alert button.alert-button:hover {
   box-shadow: 0 0 18px rgba(96,165,250,0.35);
 }
 
-/* --- Texto inferior --- */
-.hint {
-  margin-top: 28px;
-  font-size: 15px;
-  color: #dddddd;
-  animation: fadeIn 1.3s ease;
-}
-
-.hint a {
-  color: #4da3ff;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.hint a:hover {
-  color: #8ec8ff;
-  text-shadow: 0 0 8px rgba(77, 163, 255, 0.5);
-}
 
 /* --- Animaciones --- */
 @keyframes fadeIn {
@@ -291,4 +273,4 @@ ion-alert button.alert-button:hover {
 @keyframes popIn {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
-}  
+}

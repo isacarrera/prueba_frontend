@@ -86,9 +86,6 @@ export class OperativoPage {
     });
   }
 
-  unirse() {
-    this.router.navigate(['/unirse']);
-  }
 
   private async showAlert(header: string, message: string) {
     const alert = await this.alertCtrl.create({

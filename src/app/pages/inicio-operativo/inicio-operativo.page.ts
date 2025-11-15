@@ -42,11 +42,16 @@ import { ZonasInventarioService } from 'src/app/services/zonas-inventario.servic
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class InicioOperativoPage implements OnInit {
+
   categorias: any[] = [];
   cargando = true;
   operatingGroupId: number | null = null;
   isInviteOpen = false;
-  code = ['D', '8', 'K', '4'];
+  invitationCode: string | null = null
+
+  get codeArray(): string[] {
+    return this.invitationCode ? this.invitationCode.split('') : ['-', '-', '-', '-'];
+  }
 
   // Modales de observaciones
   isObservacionesOpen = false;
@@ -388,9 +393,11 @@ export class InicioOperativoPage implements OnInit {
             try {
               const res = await firstValueFrom(this.inventaryService.start(request));
 
-              if (!res || !res.inventaryId) {
-                throw new Error('El backend no devolvió un ID de inventario.');
+              if (!res || !res.inventaryId || !res.invitationCode) {
+                throw new Error('El backend no devolvió ID o Código de Invitación.');
               }
+
+              this.invitationCode = res.invitationCode;
 
               this.inventaryService.setInventaryId(res.inventaryId);
 
