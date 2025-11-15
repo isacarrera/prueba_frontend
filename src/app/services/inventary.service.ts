@@ -94,8 +94,24 @@ export class InventoryService {
 
     } catch (error: any) {
       console.error('[Guest Flow] Error al unirse al inventario:', error);
-      const errorMessage = error?.error?.Message || error?.message || 'Error desconocido al unirse.';
-      throw new Error(errorMessage);
+
+      let cleanErrorMessage = 'Codigo Invalido.';
+
+      if (error?.error) {
+        if (typeof error.error === 'string') {
+          try {
+            const parsedError = JSON.parse(error.error);
+            cleanErrorMessage = parsedError?.Message || 'Error al parsear respuesta del servidor.';
+          } catch (e) {
+            cleanErrorMessage = 'Respuesta de error ilegible del servidor.';
+          }
+        } else if (error.error.Message) {
+          cleanErrorMessage = error.error.Message;
+        }
+      } else if (error?.message) {
+        cleanErrorMessage = error.message;
+      }
+      throw new Error(cleanErrorMessage);
     }
   }
 

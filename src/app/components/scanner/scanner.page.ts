@@ -12,6 +12,7 @@ import {
   closeCircleOutline,
   closeOutline,
   informationCircleOutline,
+  qrCodeOutline,
   warningOutline
 } from 'ionicons/icons';
 import { AuthService } from 'src/app/services/auth.service';
@@ -61,6 +62,7 @@ export class ScannerPage implements OnInit, OnDestroy {
       closeCircleOutline,
       warningOutline,
       informationCircleOutline,
+      'qr-code-outline': qrCodeOutline
     });
 
     try {
