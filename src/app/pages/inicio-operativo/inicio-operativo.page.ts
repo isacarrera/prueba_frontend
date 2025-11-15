@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
@@ -21,18 +21,10 @@ import {
   qrCodeOutline,
   readerOutline,
 } from 'ionicons/icons';
-
-// Servicios
-import { firstValueFrom } from 'rxjs';
-import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
-import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
-import { AuthService } from 'src/app/services/auth.service';
-import { CategoryService } from 'src/app/services/category.service';
-import { InventoryService } from 'src/app/services/inventary.service';
-import { OperatingService } from 'src/app/services/operating.service';
-import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
-
-// Modelos
+import { AlertHelperService } from 'src/app/services/Inicio-Operativo/alert-helper.service';
+import { CategoryFacadeService } from 'src/app/services/Inicio-Operativo/category-facade.service';
+import { InventoryFacadeService } from 'src/app/services/Inicio-Operativo/inventory-facade.service';
+import { NavigationService } from 'src/app/services/Inicio-Operativo/navigation.service';
 
 @Component({
   selector: 'app-inicio-operativo',
@@ -42,36 +34,235 @@ import { ZonasInventarioService } from 'src/app/services/zonas-inventario.servic
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class InicioOperativoPage implements OnInit {
+  private readonly route = inject(ActivatedRoute);
 
+  private readonly inventoryFacade = inject(InventoryFacadeService);
+  private readonly categoryFacade = inject(CategoryFacadeService);
+  private readonly navigationService = inject(NavigationService);
+  private readonly alertHelper = inject(AlertHelperService);
+
+  // Estado del componente
   categorias: any[] = [];
   cargando = true;
   operatingGroupId: number | null = null;
-  isInviteOpen = false;
-  invitationCode: string | null = null
+  invitationCode: string | null = null;
+  observacionTexto: string = '';
 
+  // Estados de modales
+  isInviteOpen = false;
+  isObservacionesOpen = false;
+  isExitOpen = false;
+  isConfirmOpen = false;
+  isExportOpen = false;
+  isInstructionsOpen = false;
+
+  // Getter para código de invitación
   get codeArray(): string[] {
     return this.invitationCode ? this.invitationCode.split('') : ['-', '-', '-', '-'];
   }
 
-  // Modales de observaciones
-  isObservacionesOpen = false;
-  observacionTexto: string = '';
+  constructor() {
+    this.registerIcons();
+  }
 
-  // Modales de sistema
-  isExitOpen = false;
-  isConfirmOpen = false;
-  isExportOpen = false;
+  async ngOnInit() {
+    await this.loadInitialData();
+  }
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private categoryService: CategoryService,
-    private inventaryService: InventoryService,
-    private operatingService: OperatingService,
-    private authService: AuthService,
-    private alertController: AlertController,
-    private zonasService: ZonasInventarioService,
-  ) {
+  // ========================================
+  // INICIALIZACIÓN
+  // ========================================
+
+  private async loadInitialData(): Promise<void> {
+    const zonaId = this.getZonaIdFromRoute();
+
+    // Cargar categorías
+    this.loadCategories(zonaId);
+
+    // Obtener operating group ID
+    this.operatingGroupId = await this.inventoryFacade.getOperatingGroupId();
+  }
+
+  private loadCategories(zonaId: number): void {
+    this.categoryFacade.getCategoriesByZone(zonaId).subscribe({
+      next: (result) => {
+        this.categorias = result.data;
+        this.cargando = result.loading;
+
+        if (result.error) {
+          this.alertHelper.showError(result.error);
+        }
+      }
+    });
+  }
+
+  // ========================================
+  // NAVEGACIÓN
+  // ========================================
+
+  goToItem(categoria: any): void {
+    const zonaId = this.route.snapshot.paramMap.get('zonaId');
+    this.navigationService.navigateToItem(categoria.id, zonaId, categoria);
+  }
+
+  async scanItemDescription(): Promise<void> {
+    await this.navigationService.navigateToScannerDescription();
+  }
+
+  // ========================================
+  // INICIAR INVENTARIO
+  // ========================================
+
+  async iniciarInventario(): Promise<void> {
+    const zonaId = this.getZonaIdFromRoute();
+
+    if (!this.operatingGroupId) {
+      await this.alertHelper.showError('No se pudo obtener el grupo operativo.');
+      return;
+    }
+
+    // Si ya hay inventario activo, ir directo al scanner
+    if (this.inventoryFacade.hasActiveInventory()) {
+      this.navigationService.navigateToScanner(zonaId, false);
+      return;
+    }
+
+    // Confirmar inicio
+    await this.alertHelper.showConfirmation(
+      'Iniciar inventario',
+      '¿Estás seguro de iniciar el inventario en esta zona?',
+      async () => await this.executeStartInventory(zonaId),
+      'Iniciar'
+    );
+  }
+
+  private async executeStartInventory(zonaId: number): Promise<void> {
+    const result = await this.inventoryFacade.startInventory(
+      zonaId,
+      this.operatingGroupId!
+    );
+
+    if (result.success) {
+      this.invitationCode = result.invitationCode ?? null;
+      this.navigationService.navigateToScanner(zonaId, false);
+    } else {
+      await this.alertHelper.showError(result.error || 'No se pudo iniciar el inventario.');
+    }
+  }
+
+  // ========================================
+  // FINALIZAR INVENTARIO
+  // ========================================
+
+  async finalizarInventario(): Promise<void> {
+    const validation = this.inventoryFacade.validateInventoryCompletion(this.categorias);
+
+    // Si está incompleto, pedir confirmación
+    if (!validation.isComplete) {
+      const shouldProceed = await this.inventoryFacade.showIncompleteInventoryAlert(validation);
+
+      if (!shouldProceed) {
+        this.closeConfirmModal();
+        return;
+      }
+    }
+
+    await this.executeFinishInventory();
+  }
+
+  private async executeFinishInventory(): Promise<void> {
+    const result = await this.inventoryFacade.finishInventory(this.observacionTexto);
+
+    if (result.success) {
+      this.observacionTexto = '';
+      this.closeConfirmModal();
+
+      await this.alertHelper.showInfoWithCallback(
+        '✅ Éxito',
+        'Inventario finalizado correctamente.',
+        () => this.navigationService.navigateToLogin()
+      );
+    } else {
+      await this.alertHelper.showError(result.error || 'No se pudo finalizar el inventario.');
+    }
+  }
+
+  // ========================================
+  // OBSERVACIONES
+  // ========================================
+
+  async guardarObservacion(): Promise<void> {
+    console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
+    this.closeObservacionesModal();
+
+    const mensaje = this.observacionTexto.trim()
+      ? 'Tu observación ha sido guardada correctamente.'
+      : 'No escribiste ninguna observación, pero fue guardada como vacía.';
+
+    await this.alertHelper.showSuccess(mensaje);
+  }
+
+  // ========================================
+  // GESTIÓN DE MODALES (UI PURA)
+  // ========================================
+
+  openInviteModal(): void {
+    this.isInviteOpen = true;
+  }
+
+  closeInviteModal(): void {
+    this.isInviteOpen = false;
+  }
+
+  openInstructionsModal(): void {
+    this.isInstructionsOpen = true;
+  }
+
+  closeInstructionsModal(): void {
+    this.isInstructionsOpen = false;
+  }
+
+  openObservacionesModal(): void {
+    this.isObservacionesOpen = true;
+  }
+
+  closeObservacionesModal(): void {
+    this.isObservacionesOpen = false;
+  }
+
+  openExitModal(): void {
+    this.isExitOpen = true;
+  }
+
+  closeExitModal(): void {
+    this.isExitOpen = false;
+  }
+
+  openConfirmModal(): void {
+    this.isConfirmOpen = true;
+  }
+
+  closeConfirmModal(): void {
+    this.isConfirmOpen = false;
+  }
+
+  openExportModal(): void {
+    this.isExportOpen = true;
+  }
+
+  closeExportModal(): void {
+    this.isExportOpen = false;
+  }
+
+  // ========================================
+  // HELPERS PRIVADOS
+  // ========================================
+
+  private getZonaIdFromRoute(): number {
+    return Number(this.route.snapshot.paramMap.get('zonaId'));
+  }
+
+  private registerIcons(): void {
     addIcons({
       cloudUploadOutline,
       personCircleOutline,
@@ -89,342 +280,5 @@ export class InicioOperativoPage implements OnInit {
       checkmarkDoneOutline,
       closeOutline,
     });
-  }
-
-  async ngOnInit() {
-    const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
-    const user = await this.authService.getUserFromToken();
-    const userId = user?.userId ?? 0;
-
-    // Cargar categorías
-    this.categoryService.getItemsByCategory(zonaId).subscribe({
-      next: (data) => {
-        // Asumiendo que 'data' es un array de categorías
-        // y que 'contador' es parte de cada objeto de categoría
-        this.categorias = data;
-        this.cargando = false;
-
-      },
-      error: (err) => {
-        console.error('Error cargando categorías:', err);
-        this.cargando = false;
-      },
-    });
-
-
-    // Obtener operatingGroupId
-    if (userId) {
-      this.operatingService.GetOperatingId(userId).subscribe({
-        next: (data) => {
-          console.log('Operating obtenido:', data);
-          this.operatingGroupId = data.operatingGroupId;
-        },
-        error: (err) => {
-          console.error('Error obteniendo operating ❌', err);
-        },
-      });
-    } else {
-      console.warn('No se pudo obtener userId del token');
-    }
-  }
-  async scanItemDescription() {
-    try {
-      const user = await this.authService.getUserFromToken();
-      const userId = user?.userId ?? 0;
-
-      if (!userId) {
-        const alert = await this.alertController.create({
-          header: 'Error',
-          message: 'No se pudo identificar el usuario actual.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-        return;
-      }
-
-      // Obtener zonas del usuario (cada una tiene su branchId)
-      const zonas = await this.zonasService.getZonas(userId).toPromise();
-      if (!zonas?.length) {
-        const alert = await this.alertController.create({
-          header: 'Sin zonas',
-          message: 'No se encontraron zonas asociadas a tu usuario.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-        return;
-      }
-
-      // Tomar el branchId de la primera zona (ajusta si necesitas elegir)
-      const branchId = zonas[0].branchId;
-
-      // Navegar al escáner en modo descripción
-      this.router.navigate(['/scanner', branchId], {
-        state: {
-          scanMode: 'description',
-          isGuest: false
-        },
-      });
-    } catch (error) {
-      console.error('Error al iniciar escaneo de descripción:', error);
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No se pudo preparar el escáner para descripción.',
-        buttons: ['OK'],
-      });
-      await alert.present();
-    }
-  }
-  goToItem(categoria: any) {
-    this.router.navigate(
-      [
-        '/inicio-mouse',
-        categoria.id,
-        this.route.snapshot.paramMap.get('zonaId'),
-      ],
-      {
-        state: { categoria },
-      }
-    );
-  }
-
-  // === Modales ===
-  openInviteModal() {
-    this.isInviteOpen = true;
-  }
-  closeInviteModal() {
-    this.isInviteOpen = false;
-  }
-
-  // Estado para mostrar/ocultar modal de instrucciones
-  isInstructionsOpen = false;
-
-  // Métodos para abrir y cerrar el modal
-  openInstructionsModal() {
-    this.isInstructionsOpen = true;
-  }
-
-  closeInstructionsModal() {
-    this.isInstructionsOpen = false;
-  }
-  openObservacionesModal() {
-    this.isObservacionesOpen = true;
-  }
-
-  closeObservacionesModal() {
-    this.isObservacionesOpen = false;
-  }
-
-  openExitModal() {
-    this.isExitOpen = true;
-  }
-  closeExitModal() {
-    this.isExitOpen = false;
-  }
-
-  openConfirmModal() {
-    this.isConfirmOpen = true;
-  }
-  closeConfirmModal() {
-    this.isConfirmOpen = false;
-  }
-
-  openExportModal() {
-    this.isExportOpen = true;
-  }
-  closeExportModal() {
-    this.isExportOpen = false;
-  }
-
-  // === Guardar observación ===
-  async guardarObservacion() {
-    console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
-    this.closeObservacionesModal();
-
-    const alert = await this.alertController.create({
-      header: '✅ Observación guardada',
-      message: this.observacionTexto.trim()
-        ? 'Tu observación ha sido guardada correctamente.'
-        : 'No escribiste ninguna observación, pero fue guardada como vacía.',
-      buttons: ['OK'],
-    });
-    await alert.present();
-  }
-
-  // === Lógica de Finalizar Inventario (REESTRUCTURADA) ===
-
-  async finalizarInventario() {
-
-
-    const totalEsperado = this.categorias.reduce((sum, cat) => {
-
-      return sum + (cat.contador || 0);
-    }, 0);
-
-    const totalEscaneado = this.inventaryService.getScannedItems().length;
-
-
-    if (totalEscaneado < totalEsperado) {
-      const itemsFaltantes = totalEsperado - totalEscaneado;
-
-      const alert = await this.alertController.create({
-        header: '⚠️ ¡Atención!',
-        message: `Has escaneado ${totalEscaneado} de ${totalEsperado} ítems.\n\nFaltan ${itemsFaltantes} ítems. ¿Estás seguro de que quieres finalizar?`,
-        cssClass: 'custom-alert',
-        buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel',
-            cssClass: 'alert-button-cancel',
-            handler: () => {
-              console.log('Finalización cancelada por el usuario.');
-              this.closeConfirmModal();
-            }
-          },
-          {
-            text: 'Finalizar de todos modos',
-            cssClass: 'alert-button-danger',
-            handler: () => {
-              console.log('Finalizando de todos modos...');
-              this.procederConFinalizacion();
-            }
-          }
-        ]
-      });
-      await alert.present();
-
-    } else {
-      // Si el inventario está completo, proceder normalmente
-      console.log('Inventario completo o igualado (Esto es lo que está pasando). Finalizando...');
-      this.procederConFinalizacion();
-    }
-  }
-
-  async procederConFinalizacion() {
-    const inventaryId = this.inventaryService.getInventaryId();
-
-    if (!inventaryId) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No hay un inventario activo para finalizar.',
-        buttons: ['OK']
-      });
-      await alert.present();
-      return;
-    }
-
-    const observations = this.observacionTexto?.trim() || '';
-    const request: FinishRequestDto = {
-      inventaryId: inventaryId,
-      observations
-    };
-
-    try {
-      await this.inventaryService.finish(request).toPromise();
-
-      this.inventaryService.setInventaryId(0);
-      this.observacionTexto = '';
-      this.closeConfirmModal();
-
-      const alert = await this.alertController.create({
-        header: '✅ Éxito',
-        message: 'Inventario finalizado correctamente.',
-        buttons: ['OK']
-      });
-      await alert.present();
-
-      alert.onDidDismiss().then(() => {
-        this.router.navigate(['/login']);
-      });
-    } catch (error: any) {
-      console.error('Error al finalizar inventario:', error);
-
-      let errorMessage = 'No se pudo finalizar el inventario.';
-
-      if (error?.error?.message) errorMessage = error.error.message;
-      else if (error?.status === 400) errorMessage = 'Datos inválidos. Verifica la información.';
-      else if (error?.status === 404) errorMessage = 'Inventario no encontrado.';
-
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: errorMessage,
-        buttons: ['OK']
-      });
-      await alert.present();
-    }
-  }
-
-  // === Iniciar inventario (sin cambios) ===
-  async iniciarInventario() {
-    const zonaId = Number(this.route.snapshot.paramMap.get('zonaId'));
-    if (!this.operatingGroupId) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No se pudo obtener el grupo operativo.',
-        buttons: ['OK'],
-      });
-      await alert.present();
-      return;
-    }
-
-    const currentInventaryId = this.inventaryService.getInventaryId();
-    if (currentInventaryId) {
-      this.router.navigate(['/scanner', zonaId], {
-        state: { isGuest: false }
-      });
-      return;
-    }
-
-    const alert = await this.alertController.create({
-      header: 'Iniciar inventario',
-      message: '¿Estás seguro de iniciar el inventario en esta zona?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Iniciar',
-          handler: async () => {
-            const request: StartInventoryRequestDto = {
-              zoneId: zonaId,
-              operatingGroupId: this.operatingGroupId!,
-            };
-
-            try {
-              const res = await firstValueFrom(this.inventaryService.start(request));
-
-              if (!res || !res.inventaryId || !res.invitationCode) {
-                throw new Error('El backend no devolvió ID o Código de Invitación.');
-              }
-
-              this.invitationCode = res.invitationCode;
-
-              this.inventaryService.setInventaryId(res.inventaryId);
-
-              this.router.navigate(['/scanner', zonaId], {
-                state: { isGuest: false }
-              });
-
-            } catch (err: any) {
-              // await loading.dismiss();
-              const errorAlert = await this.alertController.create({
-                header: 'Error',
-                message: err?.message || 'No se pudo iniciar el inventario.',
-                buttons: ['OK'],
-              });
-              await errorAlert.present();
-            }
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  // === Confirmar inventario (notificacion) ===
-  confirmarInventario() {
-    console.log('Inventario confirmado y notificado al encargado de zona');
-    this.closeConfirmModal();
   }
 }
