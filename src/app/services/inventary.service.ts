@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, Injector } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, tap } from 'rxjs';
 
 import { environment } from 'src/environments/environment.prod';
 import { FinishRequestDto } from '../Interfaces/finish-request.model';
@@ -48,6 +48,18 @@ export class InventoryService {
     return this.http.post<StartInventoryResponseDto>(
       `${this.baseUrl}/start`,
       request
+    ).pipe(
+      tap(async (response) => {
+        if (response && response.inventaryId) {
+          try {
+            console.log(`[Host Flow] Inventario iniciado, uniendo al host al grupo ${response.inventaryId}...`);
+            // El Host se une a su propio grupo
+            await this.signalrService.joinInventoryGroup(response.inventaryId);
+          } catch (err) {
+            console.error('[Host Flow] El host no pudo unirse al grupo de SignalR:', err);
+          }
+        }
+      })
     );
   }
 

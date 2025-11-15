@@ -37,14 +37,14 @@ export class SignalrService {
       .build();
 
     try {
+      console.log('[SignalR] Iniciando conexión...');
       await this.hubConnection.start();
       console.log('Conexión SignalR establecida con éxito. ID:', this.hubConnection.connectionId);
-
       this.registerInventoryListeners();
 
     } catch (err) {
       console.error('Error al conectar con SignalR:', err);
-      setTimeout(() => this.startConnection(), 5000);
+      throw err
     }
   }
 
@@ -70,16 +70,26 @@ export class SignalrService {
 
   public async joinInventoryGroup(inventaryId: number | string): Promise<void> {
     if (this.hubConnection?.state !== 'Connected') {
-      console.error('No se puede unir al grupo, SignalR no está conectado.');
-      await this.startConnection();
-      return Promise.reject('SignalR no está conectado.');
+      console.warn(`[SignalR] Conexión no activa ('${this.hubConnection?.state}'). Forzando (re)conexión...`);
+      try {
+        await this.startConnection();
+        console.log('[SignalR] Reconexión exitosa.');
+      } catch (err) {
+        console.error('[SignalR] Falla en la reconexión.', err);
+        throw new Error('No se pudo establecer la conexión de SignalR.');
+      }
+    }
+
+    if (!this.hubConnection) {
+      throw new Error('Conexión SignalR no disponible después del intento de reconexión.');
     }
 
     try {
       await this.hubConnection.invoke('JoinInventoryGroup', inventaryId.toString());
+      console.log(`[SignalR] Unido exitosamente al grupo: Inventary-${inventaryId}`);
     } catch (err) {
-      console.error(`[SignalR] Error al unirse al grupo Inventary-${inventaryId}:`, err);
-      return Promise.reject(err);
+      console.error(`[SignalR] Error al invocar 'JoinInventoryGroup':`, err);
+      throw err;
     }
   }
 }

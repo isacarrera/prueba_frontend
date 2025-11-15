@@ -397,31 +397,17 @@ export class InicioOperativoPage implements OnInit {
             };
 
             try {
-              // 2. Esperar (await) la respuesta HTTP
-              // Usamos firstValueFrom para convertir el Observable en Promesa
               const res = await firstValueFrom(this.inventaryService.start(request));
 
               if (!res || !res.inventaryId) {
-                // await loading.dismiss();
                 throw new Error('El backend no devolvió un ID de inventario.');
               }
 
-              console.log('Inventario iniciado con ID:', res.inventaryId);
-
-              // 3. Sincronizar el estado
               this.inventaryService.setInventaryId(res.inventaryId);
 
-              // 4. Esperar (await) la unión a SignalR
-              // (Necesitarás hacer público el SignalrService en InventoryService
-              // o inyectar SignalrService aquí también)
-              console.log('Uniéndose al grupo de SignalR...');
-              await this.inventaryService.signalrService.joinInventoryGroup(res.inventaryId);
-              console.log('Unido al grupo. Navegando al escáner...');
-
-              // await loading.dismiss();
-
-              // 5. Navegar SÓLO cuando todo esté listo
-              this.router.navigate(['/scanner', zonaId]);
+              this.router.navigate(['/scanner', zonaId], {
+                state: { isGuest: false }
+              });
 
             } catch (err: any) {
               // await loading.dismiss();
