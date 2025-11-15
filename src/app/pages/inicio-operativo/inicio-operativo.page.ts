@@ -1,42 +1,36 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AlertController, IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { ViewChild } from '@angular/core';
-import { IonTextarea } from '@ionic/angular';
-import { AlertController } from '@ionic/angular';
 import {
   arrowBackOutline,
-  cloudUploadOutline,
-  personCircleOutline,
   chatbubbleEllipsesOutline,
+  checkmarkDoneOutline,
+  checkmarkOutline,
+  closeOutline,
+  cloudUploadOutline,
   documentTextOutline,
-  readerOutline,
+  ellipsisHorizontalCircleOutline,
   homeOutline,
   informationCircleOutline,
-  qrCodeOutline,
-  ellipsisHorizontalCircleOutline,
-  personAddOutline,
-  checkmarkOutline,
   logOutOutline,
-  checkmarkDoneOutline,
-  closeOutline,
+  personAddOutline,
+  personCircleOutline,
+  qrCodeOutline,
+  readerOutline,
 } from 'ionicons/icons';
 
-// Componentes
-import { ExportadorComponent } from 'src/app/components/exportador/exportador.component';
-
 // Servicios
-import { CategoryService } from 'src/app/services/category.service';
-import { OperatingService } from 'src/app/services/operating.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { InventoryService } from 'src/app/services/inventary.service';
-import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
-import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
-import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { firstValueFrom } from 'rxjs';
+import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
+import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
+import { AuthService } from 'src/app/services/auth.service';
+import { CategoryService } from 'src/app/services/category.service';
+import { InventoryService } from 'src/app/services/inventary.service';
+import { OperatingService } from 'src/app/services/operating.service';
+import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 
 // Modelos
 
@@ -48,7 +42,6 @@ import { firstValueFrom } from 'rxjs';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class InicioOperativoPage implements OnInit {
-  @ViewChild('observacionesTextarea') observacionesTextarea!: IonTextarea;
   categorias: any[] = [];
   cargando = true;
   operatingGroupId: number | null = null;
@@ -210,10 +203,6 @@ export class InicioOperativoPage implements OnInit {
   }
   openObservacionesModal() {
     this.isObservacionesOpen = true;
-    setTimeout(() => {
-      const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
-      textarea?.setFocus?.();
-    }, 300);
   }
 
   closeObservacionesModal() {

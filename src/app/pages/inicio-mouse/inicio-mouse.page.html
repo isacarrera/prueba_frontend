@@ -8,29 +8,26 @@
     </div>
     <h1 class="title">{{ categoria?.name }}</h1>
     <p class="subtitle">Cantidad: {{ items.length }}</p>
-    
-    <!-- ✅ QUITAR el (click) para que no sea interactivo -->
-    <div 
-      class="device-card" 
-      *ngFor="let item of items"
-      [class.scanned]="isScanned(item)">
-      <!-- QUITAR: (click)="markAsScanned(item)" -->
-      
+
+    <div class="device-card" *ngFor="let item of displayedItems" [class.scanned]="isScanned(item)">
+
       <div class="device-left">
         <span class="device-id">Nombre: {{ item.name }}</span>
         <span class="device-serial">Descripción: {{ item.description }}</span>
       </div>
-
       <div class="device-right">
-        <!-- ✅ Estado de escaneado (solo visual) -->
-        <span 
-          class="status" 
-          [class.escaneado]="isScanned(item)"
-          [class.pendiente]="!isScanned(item)">
-          {{ isScanned(item) ? 'Escaneado' :  'Pendiente' }}
+        <span class="status" [class.escaneado]="isScanned(item)" [class.pendiente]="!isScanned(item)">
+          {{ isScanned(item) ? 'Escaneado' : 'Pendiente' }}
         </span>
         <ion-icon name="time-outline"></ion-icon>
       </div>
+    </div>
+
+    <div class="load-more-container" *ngIf="displayedItems.length < items.length">
+
+      <ion-button expand="block" fill="outline" (click)="loadMore()">
+        Cargar Más ({{ displayedItems.length }} / {{ items.length }})
+      </ion-button>
     </div>
 
   </div>

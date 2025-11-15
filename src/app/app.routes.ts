@@ -79,5 +79,8 @@ export const routes: Routes = [
       import('./pages/detalle-verificacion/detalle-verificacion.component').then(
         (m) => m.DetalleVerificacionPage
       ),
+  }, {
+    path: 'detalle-inventario',
+    loadComponent: () => import('./pages/detalle-inventario/detalle-inventario.page').then(m => m.DetalleInventarioPage)
   },
 ];

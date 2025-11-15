@@ -28,7 +28,7 @@
   min-height: 100vh;
 
   // ✅ 1. Padding inferior para que el footer fijo NO tape el último acordeón
-  padding-bottom: 140px; 
+  padding-bottom: 140px;
 }
 
 // Header (sin cambios)
@@ -38,6 +38,7 @@
   justify-content: flex-start;
   gap: 8px;
   padding: 8px 0;
+
   .back-btn {
     --color: #fff;
     --background: transparent;
@@ -46,6 +47,7 @@
     height: 48px;
     margin: 0;
   }
+
   .header-content {
     h2 {
       font-size: 1rem;
@@ -53,6 +55,7 @@
       margin: 0;
       color: var(--text-primary);
     }
+
     .subtitle {
       font-size: 0.875rem;
       color: var(--text-secondary);
@@ -66,6 +69,7 @@
   display: flex;
   justify-content: center;
   margin: 20px auto;
+
   .icon-circle {
     width: 100px;
     height: 100px;
@@ -78,6 +82,7 @@
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
     position: relative;
     animation: pulse 3s ease-in-out infinite;
+
     .icon-inner {
       width: 70px;
       height: 70px;
@@ -87,6 +92,7 @@
       justify-content: center;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
+
       ion-icon {
         font-size: 32px;
         color: var(--primary-light);
@@ -99,14 +105,15 @@
 .title-section {
   text-align: center;
   margin-bottom: 24px;
+
   .main-title {
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 16px;
     background: linear-gradient(to right, #60a5fa, #93c5fd);
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
   .status-badge {
     display: inline-block;
     padding: 6px 16px;
@@ -114,16 +121,19 @@
     font-size: 0.875rem;
     font-weight: 600;
     text-transform: uppercase;
+
     &.clean {
       background: rgba(16, 185, 129, 0.2);
       color: var(--success-color);
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
+
     &.issues {
       background: rgba(245, 158, 11, 0.2);
       color: var(--warning-color);
       border: 1px solid rgba(245, 158, 11, 0.3);
     }
+
     &.critical {
       background: rgba(239, 68, 68, 0.2);
       color: var(--danger-color);
@@ -139,15 +149,19 @@
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  .summary-header, .notes-header {
+
+  .summary-header,
+  .notes-header {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
+
     ion-icon {
       font-size: 20px;
       color: var(--primary-light);
     }
+
     h3 {
       font-size: 1.125rem;
       font-weight: 600;
@@ -156,11 +170,13 @@
     }
   }
 }
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-top: 16px;
+
   .stat-item {
     text-align: center;
     padding: 16px 8px;
@@ -168,32 +184,47 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition);
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
+
     .stat-number {
       font-size: 1.5rem;
       font-weight: 700;
       margin-bottom: 4px;
     }
+
     .stat-label {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-secondary);
     }
+
     &.missing {
       border-left: 4px solid var(--danger-color);
-      .stat-number { color: var(--danger-color); }
+
+      .stat-number {
+        color: var(--danger-color);
+      }
     }
+
     &.unexpected {
       border-left: 4px solid var(--warning-color);
-      .stat-number { color: var(--warning-color); }
+
+      .stat-number {
+        color: var(--warning-color);
+      }
     }
+
     &.mismatch {
       border-left: 4px solid var(--primary-blue);
-      .stat-number { color: var(--primary-blue); }
+
+      .stat-number {
+        color: var(--primary-blue);
+      }
     }
   }
 }
@@ -211,7 +242,7 @@ ion-accordion.issue-accordion {
   border-radius: var(--border-radius);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  
+
   // Quitar la sombra fea por defecto
   box-shadow: none;
 
@@ -222,20 +253,23 @@ ion-accordion.issue-accordion {
     align-items: center;
     padding: 16px;
     width: 100%; // Asegurar que ocupe todo
-    
+
     .header-left {
       display: flex;
       align-items: center;
       gap: 12px;
+
       ion-icon {
         font-size: 20px;
       }
+
       h3 {
         font-size: 1rem;
         font-weight: 600;
         margin: 0;
       }
     }
+
     .count-badge {
       background: rgba(255, 255, 255, 0.1);
       color: var(--text-primary);
@@ -249,23 +283,39 @@ ion-accordion.issue-accordion {
   // Colorear headers según el tipo
   &.missing .accordion-header {
     border-left: 4px solid var(--danger-color);
-    ion-icon { color: var(--danger-color); }
+
+    ion-icon {
+      color: var(--danger-color);
+    }
   }
+
   &.unexpected .accordion-header {
     border-left: 4px solid var(--warning-color);
-    ion-icon { color: var(--warning-color); }
+
+    ion-icon {
+      color: var(--warning-color);
+    }
   }
+
   &.mismatch .accordion-header {
     border-left: 4px solid var(--primary-blue);
-    ion-icon { color: var(--primary-blue); }
+
+    ion-icon {
+      color: var(--primary-blue);
+    }
   }
+
   &.notes .accordion-header {
     border-left: 4px solid var(--text-muted);
-    ion-icon { color: var(--text-muted); }
+
+    ion-icon {
+      color: var(--text-muted);
+    }
   }
-  
+
   // Contenido (el [slot="content"])
-  .items-list, .notes-content {
+  .items-list,
+  .notes-content {
     padding: 0 16px 16px 16px;
     background: transparent; // El fondo ya está en el acordeón
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -309,7 +359,7 @@ ion-accordion.issue-accordion {
       color: var(--text-primary);
       flex: 1;
     }
-    
+
     .status-icon {
       font-size: 1.4rem;
       flex-shrink: 0;
@@ -324,10 +374,18 @@ ion-accordion.issue-accordion {
       font-family: monospace;
     }
   }
-  
-  &.missing .status-icon { color: var(--danger-color); }
-  &.unexpected .status-icon { color: var(--warning-color); }
-  &.mismatch .status-icon { color: var(--primary-blue); }
+
+  &.missing .status-icon {
+    color: var(--danger-color);
+  }
+
+  &.unexpected .status-icon {
+    color: var(--warning-color);
+  }
+
+  &.mismatch .status-icon {
+    color: var(--primary-blue);
+  }
 
   .item-content {
     .reason {
@@ -336,7 +394,7 @@ ion-accordion.issue-accordion {
       margin: 0;
       line-height: 1.4;
     }
-    
+
     .state-comparison {
       display: flex;
       flex-direction: row;
@@ -358,11 +416,13 @@ ion-accordion.issue-accordion {
         font-weight: 600;
         padding: 4px 8px;
         border-radius: 4px;
+
         &.expected {
           background: rgba(16, 185, 129, 0.2);
           color: var(--success-color);
           border: 1px solid rgba(16, 185, 129, 0.3);
         }
+
         &.scanned {
           background: rgba(59, 130, 246, 0.2);
           color: var(--primary-blue);
@@ -381,7 +441,7 @@ ion-accordion.issue-accordion {
   left: 0;
   right: 0;
   z-index: 10;
-  
+
   background: var(--background-dark);
   padding: 12px 16px 20px 16px; // Padding para safe-area
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -390,7 +450,7 @@ ion-accordion.issue-accordion {
   display: flex;
   flex-direction: row;
   gap: 16px;
-  margin-top: 0; 
+  margin-top: 0;
 
   .action-btn {
     --border-radius: 12px;
@@ -406,13 +466,19 @@ ion-accordion.issue-accordion {
     &.deny {
       --background: linear-gradient(135deg, var(--danger-color), #dc2626);
       --box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
-      &:hover { --box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
+
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      }
     }
 
     &.confirm {
       --background: linear-gradient(135deg, var(--success-color), #059669);
       --box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
-      &:hover { --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      }
     }
   }
 }
@@ -423,14 +489,17 @@ ion-accordion.issue-accordion {
   justify-content: center;
   align-items: center;
   padding: 60px 20px;
+
   .spinner-container {
     text-align: center;
+
     ion-spinner {
       --color: var(--primary-blue);
       width: 48px;
       height: 48px;
       margin-bottom: 16px;
     }
+
     p {
       color: var(--text-secondary);
       margin: 0;
@@ -441,12 +510,27 @@ ion-accordion.issue-accordion {
 
 // Animaciones
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-  50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+  }
 }
 
 // Media Queries (sin cambios, excepto el padding del footer)
@@ -457,11 +541,15 @@ ion-accordion.issue-accordion {
     padding: 24px;
     padding-bottom: 140px; // Mantenemos el padding
   }
+
   .header {
     padding: 16px 0;
-    .header-content h2 { font-size: 1.5rem; }
+
+    .header-content h2 {
+      font-size: 1.5rem;
+    }
   }
-  
+
   // En desktop, el footer fijo se pega al contenido
   .actions-section {
     left: 50%;
@@ -474,13 +562,17 @@ ion-accordion.issue-accordion {
 
 // Accesibilidad
 @media (prefers-reduced-motion: reduce) {
-  .icon-circle, .item-card, .stat-item {
+
+  .icon-circle,
+  .item-card,
+  .stat-item {
     animation: none;
     transition: none;
   }
 }
-.action-btn:focus, .custom-textarea:focus {
+
+.action-btn:focus,
+.custom-textarea:focus {
   outline: 2px solid var(--primary-blue);
   outline-offset: 2px;
 }
-

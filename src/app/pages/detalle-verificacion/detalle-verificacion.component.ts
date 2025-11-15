@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
@@ -322,5 +322,19 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
       cssClass: 'custom-alert'
     });
     await alert.present();
+  }
+
+  verDetalle(title: string, items: any[]) {
+    // 1. Prepara los datos a pasar (la lista completa y el título)
+    const navigationExtras: NavigationExtras = {
+      state: {
+        title: title,
+        // Pasamos el array completo de ítems que le corresponde a ese acordeón
+        allItems: items
+      }
+    };
+
+    // 2. Navega a la nueva página genérica.
+    this.router.navigate(['/detalle-inventario'], navigationExtras);
   }
 }

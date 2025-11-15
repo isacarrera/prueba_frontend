@@ -133,7 +133,8 @@
       </ng-template>
     </ion-modal>
     <ion-modal [isOpen]="isObservacionesOpen" (didDismiss)="closeObservacionesModal()" class="modal-sheet"
-      [initialBreakpoint]="1" [breakpoints]="[0, 1]">
+      [initialBreakpoint]="1" [breakpoints]="[0, 1]" backdropDismiss="false" [canDismiss]="true"
+      [backdropBreakpoint]="0.5">
 
       <ng-template>
         <div class="sheet-container">
@@ -150,8 +151,8 @@
             <p>Añade cualquier detalle o incidencia sobre el inventario.</p>
 
             <ion-item lines="none" class="textarea-item">
-              <ion-textarea [(ngModel)]="observacionTexto" placeholder="Escribe tus observaciones..." auto-grow="true"
-                class="sheet-textarea">
+              <ion-textarea [(ngModel)]="observacionTexto" placeholder="Escribe tus observaciones..." autoGrow="true"
+                autofocus="true" rows="4" class="sheet-textarea">
               </ion-textarea>
             </ion-item>
 
