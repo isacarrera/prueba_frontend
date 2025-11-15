@@ -28,6 +28,7 @@ import { StateSelectionModalComponent } from '../state-selection-modal/state-sel
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class ScannerPage implements OnInit, OnDestroy {
+
   scannedCode: string | null = null;
   showInstructions = true;
   scanMode: 'inventory' | 'description' = 'inventory';
@@ -70,41 +71,32 @@ export class ScannerPage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    console.log('[ScannerPage] ngOnInit: Iniciando...');
     const paramId = Number(this.route.snapshot.paramMap.get('zonaId'));
 
-    // 🔹 Inventario → usa zonaId
     if (this.scanMode === 'inventory') {
       this.zonaId = paramId;
       const inventaryId = this.inventoryService.getInventaryId();
-      console.log(`[ScannerPage] Modo inventario. ID: ${inventaryId}, ZonaID: ${this.zonaId}`);
 
       if (!inventaryId) {
-        console.error('[ScannerPage] ¡ERROR! inventaryId es nulo. Redirigiendo.');
         await this.showError('No hay un inventario activo.');
         this.router.navigate(['/inicio-operativo', this.zonaId]);
         return;
       }
     }
 
-    // 🔹 Descripción → usa branchId
     if (this.scanMode === 'description') {
       this.branchId = paramId;
     }
 
-    // Permiso de cámara
-    console.log('[ScannerPage] Revisando permiso de cámara...');
+    // Permiso de camara
     const permission = await BarcodeScanner.checkPermission({ force: true });
-    console.log('[ScannerPage] Resultado del permiso:', JSON.stringify(permission));
 
     if (!permission.granted) {
-      console.error('[ScannerPage] ¡ERROR! Permiso de cámara denegado. Redirigiendo.');
       await this.showError('Permiso de cámara requerido para escanear.');
       this.router.navigate(['/inicio-operativo', this.zonaId]);
       return;
     }
 
-    console.log('[ScannerPage] Permiso concedido. Iniciando escáner...');
     document.body.classList.add('scanner-active');
     document.querySelector('html')?.classList.add('scanner-active');
     await BarcodeScanner.hideBackground();
@@ -117,7 +109,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     this.stopScanner();
   }
 
-  // 🔹 Inicia el escaneo
+  // Inicia el escaneo
   private async startScanning() {
     try {
       const result = await BarcodeScanner.startScan();
@@ -127,18 +119,16 @@ export class ScannerPage implements OnInit, OnDestroy {
         await this.handleScanResult(cleanCode);
 
         if (this.scanMode === 'inventory') {
-          // vuelve a escanear automáticamente
-          this.startScanning();
+          this.startScanning(); // vuelve a escanear automáticamente
         }
       }
     } catch (err) {
-      console.error('Error en escaneo:', err);
-      console.error('⛔️ [ScannerPage] BarcodeScanner.startScan() falló:', err);
+      console.error('[ScannerPage] Error en startScan() / Plugin falló:', err);
       this.stopScanner();
     }
   }
 
-  // 🔹 Maneja el resultado del escaneo
+  // Maneja el resultado del escaneo
   private async handleScanResult(cleanCode: string) {
     if (this.scanMode === 'description') {
       await BarcodeScanner.stopScan();
@@ -170,10 +160,6 @@ export class ScannerPage implements OnInit, OnDestroy {
     }
   }
 
-  /** 🔹 Cierra el modal de descripción:
-   * - Si es inventario → vuelve a inicio-operativo/:zonaId
-   * - Si es descripción → vuelve al home
-   */
   closeDescriptionModal() {
     this.isDescriptionModalOpen = false;
 
@@ -184,7 +170,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     }
   }
 
-  // 🔹 Modal de selección de estado (modo inventario)
+  // Modal de seleccion de estado (modo inventario)
   private async openStateSelectionModal(code: string) {
     const modal = await this.modalController.create({
       component: StateSelectionModalComponent,
@@ -198,7 +184,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     await modal.onDidDismiss();
   }
 
-  // 🔹 Mensaje de error reutilizable
+  // Mensaje de error reutilizable
   private async showError(message: string) {
     const alert = await this.alertController.create({
       header: 'Error',
@@ -208,7 +194,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  // 🔹 Cancela el escaneo y vuelve a inicio-operativo (solo inventario)
+  // Cancela el escaneo y vuelve a inicio-operativo (solo inventario)
   async cancelScan() {
     await this.stopScanner();
     this.router.navigate([
@@ -217,7 +203,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     ]);
   }
 
-  // 🔹 Detiene y limpia el estado del escáner
+  // Detiene y limpia el estado del escáner
   private async stopScanner() {
     try {
       await BarcodeScanner.stopScan();
@@ -230,7 +216,7 @@ export class ScannerPage implements OnInit, OnDestroy {
     document.querySelector('html')?.classList.remove('scanner-active');
   }
 
-  // 🔹 Control del flash
+  // Control del flash
   async toggleFlash() {
     const alert = await this.alertController.create({
       header: 'Flash',

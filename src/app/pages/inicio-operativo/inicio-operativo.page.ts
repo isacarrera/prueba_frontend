@@ -435,10 +435,7 @@ export class InicioOperativoPage implements OnInit {
     await alert.present();
   }
 
-
-
-
-  // === Confirmar inventario (notificación) ===
+  // === Confirmar inventario (notificacion) ===
   confirmarInventario() {
     console.log('Inventario confirmado y notificado al encargado de zona');
     this.closeConfirmModal();

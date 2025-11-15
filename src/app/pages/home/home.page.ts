@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonicModule, LoadingController } from '@ionic/angular';
+import { AlertController, IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   appsOutline,
@@ -47,7 +47,6 @@ export class HomePage {
     private authService: AuthService,
     private alertController: AlertController,
     private inventoryService: InventoryService,
-    private loadingController: LoadingController
   ) {
     addIcons({
       arrowBackOutline,
@@ -61,18 +60,13 @@ export class HomePage {
     });
   }
 
-  // Se ejecuta cada vez que la vista entra en pantalla
   async ionViewWillEnter() {
     await this.cargarZonas();
   }
 
-  //  MÉTODO NUEVO PARA PULL-TO-REFRESH
   async handleRefresh(event: any) {
-    console.log('Iniciando recarga...');
     await this.cargarZonas();
-    // Completar el refresh
     event.target.complete();
-    console.log('Recarga completada');
   }
 
   goBack() {
@@ -88,9 +82,6 @@ export class HomePage {
           text: 'Cancelar',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            console.log('Operación cancelada');
-          }
         },
         {
           text: 'Confirmar',
@@ -106,10 +97,7 @@ export class HomePage {
   }
 
   setFilter(filter: FilterState) {
-    // Desactivar todos los filtros
     this.filters.forEach(f => f.active = false);
-
-    // Activar el filtro seleccionado
     filter.active = true;
     this.activeFilter = filter.state;
   }
@@ -117,14 +105,12 @@ export class HomePage {
   filteredZonas() {
     let filtered = this.zonas;
 
-    // Filtro por texto de búsqueda
     if (this.searchTerm) {
       filtered = filtered.filter(z =>
         z.name.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
 
-    // Filtro por estado
     if (this.activeFilter !== null) {
       filtered = filtered.filter(z => z.stateZone === this.activeFilter);
     }
@@ -134,9 +120,8 @@ export class HomePage {
 
   clearFilters() {
     this.searchTerm = '';
-    this.setFilter(this.filters[0]); // Volver a "Todos"
+    this.setFilter(this.filters[0]);
   }
-
 
   async cargarZonas() {
     this.cargando = true;
@@ -200,7 +185,6 @@ export class HomePage {
         return;
       }
 
-      // 🔹 Obtener zonas del usuario (cada una tiene su branchId)
       const zonas = await this.zonasService.getZonas(userId).toPromise();
       if (!zonas?.length) {
         const alert = await this.alertController.create({
@@ -212,10 +196,8 @@ export class HomePage {
         return;
       }
 
-      // 🔹 Tomar el branchId de la primera zona (ajusta si necesitas elegir)
       const branchId = zonas[0].branchId;
 
-      // 🔹 Navegar al escáner en modo descripción
       this.router.navigate(['/scanner', branchId], {
         state: { scanMode: 'description' },
       });
@@ -249,77 +231,50 @@ export class HomePage {
         {
           text: 'Cancelar',
           role: 'cancel',
-          handler: () => {
-            console.log('Prompt: Cancelado');
-          }
+          // handler: () => { console.log('Prompt: Cancelado'); } -> Eliminado
         },
         {
           text: 'Unirse',
           handler: (data) => {
-            // Validamos la entrada
             if (!data.inventaryId || Number(data.inventaryId) <= 0) {
               this.mostrarAlerta('Error', 'Debes ingresar un código válido.');
-              console.log('Prompt: Handler falló (código inválido)');
-              return false; // Evita que la alerta se cierre
+              return false;
             }
-            // Si es válido, el handler retorna los datos
-            console.log('Prompt: Handler exitoso. Datos:', data);
             return data;
           },
         },
       ],
     });
 
-    // Escuchamos el evento onDidDismiss (CUANDO la alerta se cierra)
     alert.onDidDismiss().then(async (result) => {
+      // Eliminado: console.log de depuración del onDidDismiss
 
-      // --- [INICIO DE LA DEPURACIÓN] ---
-      console.log('onDidDismiss: Evento disparado.');
-      console.log('onDidDismiss: Result Role:', result.role);
-      console.log('onDidDismiss: Result Data:', JSON.stringify(result.data));
-      // --- [FIN DE LA DEPURACIÓN] ---
-
-      // ESTA ES LA LÍNEA CORREGIDA:
       if (result.role !== 'cancel' && result.data && result.data.inventaryId) {
 
-        console.log('onDidDismiss: ¡Validación exitosa! Llamando a handleJoinInventory...');
         const inventaryId = Number(result.data.inventaryId);
-
-        // Llamamos a la lógica pesada (con el 'loading')
         await this.handleJoinInventory(inventaryId);
 
-      } else {
-        console.log('onDidDismiss: Validación fallida. No se hace nada.');
       }
+      // Eliminado: console.log('onDidDismiss: Validación fallida. No se hace nada.');
     });
 
     await alert.present();
   }
 
-  // La función handleJoinInventory (la que tiene el 'loading' y el try/catch)
-  // que te pasé en el mensaje anterior estaba perfecta. No la cambies.
+  /**
+   * Maneja la lógica de validación y navegación del invitado.
+   */
   private async handleJoinInventory(inventaryId: number): Promise<boolean> {
-
-    // NO MÁS 'loadingController' POR AHORA.
-
     try {
-      // 1. ESTE ES EL LOG QUE NECESITAMOS VER
-      console.log(`[handleJoinInventory] INTENTANDO: Llamar a inventoryService.joinInventory(${inventaryId})...`);
-
       const zoneId = await this.inventoryService.joinInventory(inventaryId);
-
-      // 2. SI VES ESTO, ¡GANAMOS!
-      console.log(`[handleJoinInventory] ÉXITO: Recibido zoneId ${zoneId}. Navegando...`);
 
       this.router.navigate(['/scanner', zoneId]);
       return true;
 
     } catch (err: any) {
 
-      // 3. SI VES ESTO, EL PROBLEMA ESTÁ EN EL SERVICIO O LA API
       console.error('[handleJoinInventory] ¡ERROR! La llamada al servicio falló:', err);
 
-      // Mostramos un alert simple, que no debería fallar
       const alert = await this.alertController.create({
         header: 'Error al unirse',
         message: err?.message || 'Error desconocido.',

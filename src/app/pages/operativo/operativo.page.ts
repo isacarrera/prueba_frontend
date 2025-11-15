@@ -74,7 +74,6 @@ export class OperativoPage {
 
     this.authService.loginOperativo(this.tipoDoc, this.numeroDoc).subscribe({
       next: async (res: any) => {
-        // 👇 ESTO SOLO SE EJECUTA SI EL LOGIN ES EXITOSO
         console.log('Login exitoso, iniciando SignalR...');
         this.signalrService.startConnection();
         this.router.navigate(['/home']);
@@ -82,7 +81,6 @@ export class OperativoPage {
       error: async (err: Error) => {
         console.error('Error en login:', err);
 
-        // 👇 TODOS LOS ERRORES (tanto HTTP como lógicos) vienen aquí
         this.showAlert('Acceso denegado', err.message);
       }
     });
