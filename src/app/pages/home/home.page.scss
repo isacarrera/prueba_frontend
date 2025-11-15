@@ -18,7 +18,6 @@
   top: max(28px, env(safe-area-inset-top));
   left: 16px;
   z-index: 10;
-  --background: rgba(10, 15, 44, 0.55);
   --color: #fff;
   border-radius: 50%;
   border: 1px solid rgba(59, 130, 246, 0.5);
@@ -37,7 +36,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: clamp(80px, 15vh, 120px);
+  margin-top: 40px;
 }
 
 .icon-circle {
@@ -70,22 +69,66 @@
   text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
-/* Barra de búsqueda */
-.custom-search {
+/* Contenedor del botón Unirse */
+.join-button-container {
   width: 90%;
-  margin: 28px auto;
-  --background: rgba(17, 23, 56, 0.55);
-  --color: #fff;
-  --icon-color: #60a5fa;
-  border: 2px solid rgba(59, 130, 246, 0.5);
-  border-radius: 18px;
-  backdrop-filter: blur(5px);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin: 12px auto;
+  display: flex;
+  justify-content: center;
 }
 
-.custom-search:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.5);
+/* Botón Unirse */
+.join-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 160px;
+  padding: 8px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  box-shadow:
+    0 4px 15px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.join-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(59, 130, 246, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.join-button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 10px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.join-icon {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.join-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Barra espaciadora */
+.separator {
+  width: 90%;
+  height: 3px;
+  background-color: rgba(59, 130, 246, 0.5);
+  margin: 20px auto;
 }
 
 .filters-container {
@@ -102,11 +145,13 @@
   overflow-x: auto;
   flex: 1;
   padding: 4px 0;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .filters-scroll::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
+  /* Chrome, Safari */
 }
 
 .filter-button {
@@ -182,7 +227,8 @@
 }
 
 /* Estados de carga y vacío */
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -241,7 +287,7 @@
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6),
-              0 0 18px rgba(59, 130, 246, 0.4);
+    0 0 18px rgba(59, 130, 246, 0.4);
   transition: all 0.25s ease;
   backdrop-filter: blur(4px);
   cursor: pointer;
@@ -250,7 +296,7 @@
 .card-zona:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 25px rgba(59, 130, 246, 0.7),
-              0 0 25px rgba(59, 130, 246, 0.6);
+    0 0 25px rgba(59, 130, 246, 0.6);
 }
 
 .card-zona:active {
@@ -269,6 +315,7 @@
   font-weight: 700;
   color: #ffffff;
 }
+
 ion-refresher {
   --color: #3b82f6;
 }
@@ -345,9 +392,12 @@ ion-refresher-content {
 
 /* Animaciones */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -382,8 +432,10 @@ ion-refresher-content {
 /* Estilo para el botón de escanear (nuevo) */
 .scan-button {
   position: absolute;
-  top: max(28px, env(safe-area-inset-top)); /* Misma altura que el .back-button */
-  right: 16px; /* <-- La clave: alineado a la derecha */
+  top: max(28px, env(safe-area-inset-top));
+  /* Misma altura que el .back-button */
+  right: 16px;
+  /* <-- La clave: alineado a la derecha */
   z-index: 10;
 
   /* Estilos copiados del .back-button para consistencia visual */

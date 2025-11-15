@@ -12,7 +12,8 @@ import {
   lockClosedOutline,
   lockOpenOutline,
   personAddOutline,
-  shieldCheckmarkOutline
+  shieldCheckmarkOutline,
+  addOutline
 } from 'ionicons/icons';
 import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
 import { AuthService } from 'src/app/services/auth.service';
@@ -56,7 +57,8 @@ export class HomePage {
       'lock-close-outline': lockClosedOutline,
       'shield-checkmark-outline': shieldCheckmarkOutline,
       'apps-outline': appsOutline,
-      'person-add-outline': personAddOutline
+      'person-add-outline': personAddOutline,
+      'add-outline': addOutline
     });
   }
 
@@ -76,7 +78,7 @@ export class HomePage {
   async goToOperativo(zonaId: number, zonaName: string) {
     const alert = await this.alertController.create({
       header: 'Confirmar Zona',
-      message: `¿Estás seguro que deseas ingresar a la zona <strong>${zonaName}</strong>?`,
+      message: `Ingreso a la zona ${zonaName}`,
       buttons: [
         {
           text: 'Cancelar',
@@ -84,7 +86,7 @@ export class HomePage {
           cssClass: 'secondary',
         },
         {
-          text: 'Confirmar',
+          text: 'Ingresar',
           cssClass: 'primary',
           handler: () => {
             this.router.navigate(['/inicio-operativo', zonaId]);

@@ -6,12 +6,6 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="presentJoinPrompt()">
-      <ion-icon name="person-add-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-
   <div class="wrap">
     <ion-button class="back-button" fill="clear" (click)="goBack()">
       <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
@@ -24,9 +18,16 @@
       <h1 class="title">Zonas Operativas</h1>
     </div>
 
-    <!-- Barra de búsqueda -->
-    <ion-searchbar placeholder="Buscar zona..." [(ngModel)]="searchTerm" debounce="300" class="custom-search">
-    </ion-searchbar>
+    <!-- Botón Unirse (reemplaza la barra de búsqueda) -->
+    <div class="join-button-container">
+      <button class="join-button" (click)="presentJoinPrompt()">
+        <ion-icon name="add-outline"  class="join-icon"></ion-icon>
+        <span class="join-text">Unirse</span>
+      </button>
+    </div>
+
+    <!-- Barra espaciadora -->
+    <div class="separator"></div>
 
     <div class="filters-container">
       <div class="filters-scroll">
