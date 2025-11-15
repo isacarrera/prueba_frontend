@@ -1,28 +1,24 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { ModalController, IonicModule, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { InventoryService } from 'src/app/services/inventary.service';
-import { StateSelectionModalComponent } from '../state-selection-modal/state-selection-modal.component';
+import { AlertController, IonicModule, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  closeOutline,
-  qrCodeOutline,
-  checkmarkOutline,
-  checkmarkDoneOutline,
-  warningOutline,
-  informationCircleOutline,
   checkmarkCircleOutline,
+  checkmarkDoneOutline,
+  checkmarkOutline,
   closeCircleOutline,
-  readerOutline,
-  arrowBackOutline,
+  closeOutline,
+  informationCircleOutline,
+  warningOutline
 } from 'ionicons/icons';
+import { AuthService } from 'src/app/services/auth.service';
+import { InventoryService } from 'src/app/services/inventary.service';
 import { Item, ItemService } from 'src/app/services/item.service';
 import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
-import { AuthService } from 'src/app/services/auth.service';
+import { StateSelectionModalComponent } from '../state-selection-modal/state-selection-modal.component';
 
 @Component({
   selector: 'app-scanner',
@@ -74,14 +70,17 @@ export class ScannerPage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    console.log('[ScannerPage] ngOnInit: Iniciando...');
     const paramId = Number(this.route.snapshot.paramMap.get('zonaId'));
 
     // 🔹 Inventario → usa zonaId
     if (this.scanMode === 'inventory') {
       this.zonaId = paramId;
       const inventaryId = this.inventoryService.getInventaryId();
+      console.log(`[ScannerPage] Modo inventario. ID: ${inventaryId}, ZonaID: ${this.zonaId}`);
 
       if (!inventaryId) {
+        console.error('[ScannerPage] ¡ERROR! inventaryId es nulo. Redirigiendo.');
         await this.showError('No hay un inventario activo.');
         this.router.navigate(['/inicio-operativo', this.zonaId]);
         return;
@@ -94,14 +93,18 @@ export class ScannerPage implements OnInit, OnDestroy {
     }
 
     // Permiso de cámara
+    console.log('[ScannerPage] Revisando permiso de cámara...');
     const permission = await BarcodeScanner.checkPermission({ force: true });
+    console.log('[ScannerPage] Resultado del permiso:', JSON.stringify(permission));
+
     if (!permission.granted) {
+      console.error('[ScannerPage] ¡ERROR! Permiso de cámara denegado. Redirigiendo.');
       await this.showError('Permiso de cámara requerido para escanear.');
       this.router.navigate(['/inicio-operativo', this.zonaId]);
       return;
     }
 
-    // Configurar interfaz de escaneo
+    console.log('[ScannerPage] Permiso concedido. Iniciando escáner...');
     document.body.classList.add('scanner-active');
     document.querySelector('html')?.classList.add('scanner-active');
     await BarcodeScanner.hideBackground();
@@ -130,6 +133,7 @@ export class ScannerPage implements OnInit, OnDestroy {
       }
     } catch (err) {
       console.error('Error en escaneo:', err);
+      console.error('⛔️ [ScannerPage] BarcodeScanner.startScan() falló:', err);
       this.stopScanner();
     }
   }

@@ -1,9 +1,16 @@
 <ion-content class="zones-content" [fullscreen]="true">
+
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content pullingIcon="chevron-down-circle-outline" pullingText="Arrastra para recargar"
       refreshingSpinner="circles" refreshingText="Recargando...">
     </ion-refresher-content>
   </ion-refresher>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="presentJoinPrompt()">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
   <div class="wrap">
     <ion-button class="back-button" fill="clear" (click)="goBack()">
@@ -18,19 +25,12 @@
     </div>
 
     <!-- Barra de búsqueda -->
-    <ion-searchbar
-      placeholder="Buscar zona..."
-      [(ngModel)]="searchTerm"
-      debounce="300"
-      class="custom-search">
+    <ion-searchbar placeholder="Buscar zona..." [(ngModel)]="searchTerm" debounce="300" class="custom-search">
     </ion-searchbar>
 
     <div class="filters-container">
       <div class="filters-scroll">
-        <button
-          *ngFor="let filter of filters"
-          class="filter-button"
-          [class.active]="filter.active"
+        <button *ngFor="let filter of filters" class="filter-button" [class.active]="filter.active"
           (click)="setFilter(filter)">
           <ion-icon [name]="filter.icon"></ion-icon>
           <span>{{ filter.name }}</span>
@@ -38,10 +38,7 @@
       </div>
 
       <!-- Botón para limpiar filtros (solo visible cuando hay filtros activos) -->
-      <button
-        *ngIf="activeFilter !== null || searchTerm"
-        class="clear-filters-btn"
-        (click)="clearFilters()">
+      <button *ngIf="activeFilter !== null || searchTerm" class="clear-filters-btn" (click)="clearFilters()">
         <ion-icon name="close-circle-outline"></ion-icon>
         Limpiar
       </button>
@@ -55,10 +52,8 @@
 
     <!-- Grid de zonas -->
     <div class="zones-grid" *ngIf="!cargando">
-      <div class="card-zona"
-           *ngFor="let zona of filteredZonas()"
-           [class.disabled]="!zona.isAvailable"
-           (click)="zona.isAvailable && goToOperativo(zona.id, zona.name)">
+      <div class="card-zona" *ngFor="let zona of filteredZonas()" [class.disabled]="!zona.isAvailable"
+        (click)="zona.isAvailable && goToOperativo(zona.id, zona.name)">
 
         <div class="card-info">
           <span class="label">{{ zona.name }}</span>
@@ -93,10 +88,7 @@
       <p *ngIf="!searchTerm && activeFilter === null">
         No hay zonas operativas disponibles.
       </p>
-      <button
-        *ngIf="searchTerm || activeFilter !== null"
-        class="clear-filters-empty-btn"
-        (click)="clearFilters()">
+      <button *ngIf="searchTerm || activeFilter !== null" class="clear-filters-empty-btn" (click)="clearFilters()">
         Limpiar filtros
       </button>
     </div>

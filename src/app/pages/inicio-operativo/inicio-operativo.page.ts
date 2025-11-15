@@ -36,6 +36,7 @@ import { InventoryService } from 'src/app/services/inventary.service';
 import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
 import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
 import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
+import { firstValueFrom } from 'rxjs';
 
 // Modelos
 
@@ -207,9 +208,9 @@ export class InicioOperativoPage implements OnInit {
   openObservacionesModal() {
     this.isObservacionesOpen = true;
     setTimeout(() => {
-    const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
-    textarea?.setFocus?.();
-  }, 300);
+      const textarea = document.querySelector('.sheet-textarea') as HTMLIonTextareaElement;
+      textarea?.setFocus?.();
+    }, 300);
   }
 
   closeObservacionesModal() {
@@ -384,27 +385,48 @@ export class InicioOperativoPage implements OnInit {
         },
         {
           text: 'Iniciar',
-          handler: () => {
+          handler: async () => {
             const request: StartInventoryRequestDto = {
               zoneId: zonaId,
               operatingGroupId: this.operatingGroupId!,
             };
 
-            this.inventaryService.start(request).subscribe({
-              next: (res) => {
-                this.inventaryService.setInventaryId(res.inventaryId);
-                console.log('Inventario iniciado con ID:', res.inventaryId);
-                this.router.navigate(['/scanner', zonaId]);
-              },
-              error: async (err) => {
-                const errorAlert = await this.alertController.create({
-                  header: 'Error',
-                  message: 'No se pudo iniciar el inventario.',
-                  buttons: ['OK'],
-                });
-                await errorAlert.present();
-              },
-            });
+            try {
+              // 2. Esperar (await) la respuesta HTTP
+              // Usamos firstValueFrom para convertir el Observable en Promesa
+              const res = await firstValueFrom(this.inventaryService.start(request));
+
+              if (!res || !res.inventaryId) {
+                // await loading.dismiss();
+                throw new Error('El backend no devolvió un ID de inventario.');
+              }
+
+              console.log('Inventario iniciado con ID:', res.inventaryId);
+
+              // 3. Sincronizar el estado
+              this.inventaryService.setInventaryId(res.inventaryId);
+
+              // 4. Esperar (await) la unión a SignalR
+              // (Necesitarás hacer público el SignalrService en InventoryService
+              // o inyectar SignalrService aquí también)
+              console.log('Uniéndose al grupo de SignalR...');
+              await this.inventaryService.signalrService.joinInventoryGroup(res.inventaryId);
+              console.log('Unido al grupo. Navegando al escáner...');
+
+              // await loading.dismiss();
+
+              // 5. Navegar SÓLO cuando todo esté listo
+              this.router.navigate(['/scanner', zonaId]);
+
+            } catch (err: any) {
+              // await loading.dismiss();
+              const errorAlert = await this.alertController.create({
+                header: 'Error',
+                message: err?.message || 'No se pudo iniciar el inventario.',
+                buttons: ['OK'],
+              });
+              await errorAlert.present();
+            }
           },
         },
       ],

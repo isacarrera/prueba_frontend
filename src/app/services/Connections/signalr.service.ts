@@ -25,7 +25,7 @@ export class SignalrService {
   public async startConnection(): Promise<void> {
     // Evitar múltiples conexiones
     if (this.hubConnection && this.hubConnection.state === 'Connected') {
-      console.log('⚠️ SignalR ya está conectado.');
+      console.log('SignalR ya está conectado.');
       return;
     }
 
@@ -45,13 +45,13 @@ export class SignalrService {
     // 1. Arrancar la conexión
     try {
       await this.hubConnection.start();
-      console.log('✅ Conexión SignalR establecida con éxito. ID:', this.hubConnection.connectionId);
+      console.log('Conexión SignalR establecida con éxito. ID:', this.hubConnection.connectionId);
 
       this.registerTestListener();
       this.registerInventoryListeners();
 
     } catch (err) {
-      console.error('❌ Error al conectar con SignalR:', err);
+      console.error('Error al conectar con SignalR:', err);
       // Opcional: Reintentar conexión después de unos segundos
       setTimeout(() => this.startConnection(), 5000);
     }
@@ -65,7 +65,7 @@ export class SignalrService {
 
     // "ReceiveTestAlert" debe coincidir con el string en el Controller .NET
     this.hubConnection.on('ReceiveTestAlert', async (mensaje: string) => {
-      console.log('🔔 Evento SignalR Recibido:', mensaje);
+      console.log('Evento SignalR Recibido:', mensaje);
       await this.mostrarAlertaPrueba(mensaje);
     });
   }
@@ -75,7 +75,7 @@ export class SignalrService {
    */
   private async mostrarAlertaPrueba(mensaje: string) {
     const alert = await this.alertController.create({
-      header: '🔔 Test SignalR',
+      header: 'Test SignalR',
       subHeader: 'Mensaje desde el Servidor',
       message: mensaje,
       buttons: ['Entendido'],
@@ -91,7 +91,7 @@ export class SignalrService {
     if (this.hubConnection) {
       await this.hubConnection.stop();
       this.hubConnection = null;
-      console.log('🛑 Conexión SignalR detenida.');
+      console.log('Conexión SignalR detenida.');
     }
   }
 
@@ -110,5 +110,28 @@ export class SignalrService {
         console.error('Payload de ReceiveItemUpdate inválido:', payload);
       }
     });
+  }
+
+  /**
+ * Invoca al Hub para unirse a un grupo de inventario específico.
+ * @param inventaryId El ID del inventario (código de invitación)
+ */
+  public async joinInventoryGroup(inventaryId: number | string): Promise<void> {
+    if (this.hubConnection?.state !== 'Connected') {
+      console.error('No se puede unir al grupo, SignalR no está conectado.');
+      // Opcional: intentar reconectar
+      await this.startConnection();
+      return Promise.reject('SignalR no está conectado.');
+    }
+
+    try {
+      // Invoca el método 'JoinInventoryGroup' en el AppHub.cs
+      // Asegúrate de que el nombre del método coincida 100%
+      await this.hubConnection.invoke('JoinInventoryGroup', inventaryId.toString());
+      console.log(`✅ [SignalR] Unido exitosamente al grupo: Inventary-${inventaryId}`);
+    } catch (err) {
+      console.error(`❌ [SignalR] Error al unirse al grupo Inventary-${inventaryId}:`, err);
+      return Promise.reject(err);
+    }
   }
 }

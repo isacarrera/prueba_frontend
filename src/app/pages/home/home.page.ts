@@ -2,20 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule, LoadingController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
+  appsOutline,
   arrowBackOutline,
   chevronDownCircleOutline,
+  closeCircleOutline,
   lockClosedOutline,
   lockOpenOutline,
-  shieldCheckmarkOutline,
-  appsOutline,
-  closeOutline,
-  closeCircleOutline
+  personAddOutline,
+  shieldCheckmarkOutline
 } from 'ionicons/icons';
 import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
 import { AuthService } from 'src/app/services/auth.service';
+import { InventoryService } from 'src/app/services/inventary.service';
 import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 
 @Component({
@@ -44,7 +45,9 @@ export class HomePage {
     private router: Router,
     private zonasService: ZonasInventarioService,
     private authService: AuthService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private inventoryService: InventoryService,
+    private loadingController: LoadingController
   ) {
     addIcons({
       arrowBackOutline,
@@ -53,7 +56,8 @@ export class HomePage {
       'lock-open-outline': lockOpenOutline,
       'lock-close-outline': lockClosedOutline,
       'shield-checkmark-outline': shieldCheckmarkOutline,
-      'apps-outline': appsOutline
+      'apps-outline': appsOutline,
+      'person-add-outline': personAddOutline
     });
   }
 
@@ -223,6 +227,107 @@ export class HomePage {
         buttons: ['OK'],
       });
       await alert.present();
+    }
+  }
+
+  /**
+   * Muestra un prompt para que el invitado ingrese el código de inventario.
+   */
+  async presentJoinPrompt() {
+    const alert = await this.alertController.create({
+      header: 'Unirse a Inventario',
+      message: 'Ingresa el código de inventario proporcionado por el anfitrión.',
+      inputs: [
+        {
+          name: 'inventaryId',
+          type: 'number',
+          placeholder: 'Código (ej: 101)',
+          min: 1,
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Prompt: Cancelado');
+          }
+        },
+        {
+          text: 'Unirse',
+          handler: (data) => {
+            // Validamos la entrada
+            if (!data.inventaryId || Number(data.inventaryId) <= 0) {
+              this.mostrarAlerta('Error', 'Debes ingresar un código válido.');
+              console.log('Prompt: Handler falló (código inválido)');
+              return false; // Evita que la alerta se cierre
+            }
+            // Si es válido, el handler retorna los datos
+            console.log('Prompt: Handler exitoso. Datos:', data);
+            return data;
+          },
+        },
+      ],
+    });
+
+    // Escuchamos el evento onDidDismiss (CUANDO la alerta se cierra)
+    alert.onDidDismiss().then(async (result) => {
+
+      // --- [INICIO DE LA DEPURACIÓN] ---
+      console.log('onDidDismiss: Evento disparado.');
+      console.log('onDidDismiss: Result Role:', result.role);
+      console.log('onDidDismiss: Result Data:', JSON.stringify(result.data));
+      // --- [FIN DE LA DEPURACIÓN] ---
+
+      // ESTA ES LA LÍNEA CORREGIDA:
+      if (result.role !== 'cancel' && result.data && result.data.inventaryId) {
+
+        console.log('onDidDismiss: ¡Validación exitosa! Llamando a handleJoinInventory...');
+        const inventaryId = Number(result.data.inventaryId);
+
+        // Llamamos a la lógica pesada (con el 'loading')
+        await this.handleJoinInventory(inventaryId);
+
+      } else {
+        console.log('onDidDismiss: Validación fallida. No se hace nada.');
+      }
+    });
+
+    await alert.present();
+  }
+
+  // La función handleJoinInventory (la que tiene el 'loading' y el try/catch)
+  // que te pasé en el mensaje anterior estaba perfecta. No la cambies.
+  private async handleJoinInventory(inventaryId: number): Promise<boolean> {
+
+    // NO MÁS 'loadingController' POR AHORA.
+
+    try {
+      // 1. ESTE ES EL LOG QUE NECESITAMOS VER
+      console.log(`[handleJoinInventory] INTENTANDO: Llamar a inventoryService.joinInventory(${inventaryId})...`);
+
+      const zoneId = await this.inventoryService.joinInventory(inventaryId);
+
+      // 2. SI VES ESTO, ¡GANAMOS!
+      console.log(`[handleJoinInventory] ÉXITO: Recibido zoneId ${zoneId}. Navegando...`);
+
+      this.router.navigate(['/scanner', zoneId]);
+      return true;
+
+    } catch (err: any) {
+
+      // 3. SI VES ESTO, EL PROBLEMA ESTÁ EN EL SERVICIO O LA API
+      console.error('[handleJoinInventory] ¡ERROR! La llamada al servicio falló:', err);
+
+      // Mostramos un alert simple, que no debería fallar
+      const alert = await this.alertController.create({
+        header: 'Error al unirse',
+        message: err?.message || 'Error desconocido.',
+        buttons: ['OK']
+      });
+      await alert.present();
+
+      return false;
     }
   }
 }
