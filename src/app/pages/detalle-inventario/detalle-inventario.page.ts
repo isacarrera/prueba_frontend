@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { Router, ActivatedRoute } from '@angular/router'; // Necesitas ActivatedRoute para el 'back' si usas goBack()
+import { Router, ActivatedRoute } from '@angular/router'; 
 
 @Component({
   selector: 'app-detalle-inventario',

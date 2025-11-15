@@ -36,9 +36,7 @@ export class ScannerPage implements OnInit, OnDestroy {
   showInstructions = true;
   scanMode: 'inventory' | 'description' = 'inventory';
   zonaId: number = 0;      // Se usa para inventario
-  branchId: number = 0;    // Se usa para descripción
-
-  // Modal de descripción
+  branchId: number = 0;    
   isDescriptionModalOpen = false;
   descriptionItem: Item | null = null;
   descriptionError: string | null = null;
@@ -120,8 +118,7 @@ export class ScannerPage implements OnInit, OnDestroy {
       const result = await BarcodeScanner.startScan();
 
       if (result.hasContent) {
-        const cleanCode = result.content.replace(/^Code:/, '');
-        await this.handleScanResult(cleanCode);
+        await this.handleScanResult(result.content);
 
         if (this.scanMode === 'inventory') {
           // vuelve a escanear automáticamente
@@ -135,36 +132,50 @@ export class ScannerPage implements OnInit, OnDestroy {
   }
 
   // 🔹 Maneja el resultado del escaneo
-  private async handleScanResult(cleanCode: string) {
-    if (this.scanMode === 'description') {
-      await BarcodeScanner.stopScan();
+  private async handleScanResult(rawCode: string) {
+  // LIMPIEZA
+  const cleanRaw = rawCode.trim().replace(/\s+/g, '');
 
-      try {
-        const item = await this.itemService
-          .getByCodeAndBranch(this.branchId, cleanCode)
-          .toPromise();
+  // VALIDAR ESTÁNDAR
+  const QR_REGEX = /^Code:[A-Za-z0-9]{1,12}$/;
 
-        if (item) {
-          this.descriptionItem = item;
-          this.descriptionError = null;
-        } else {
-          this.descriptionItem = null;
-          this.descriptionError = `No se encontró ningún ítem con código ${cleanCode}.`;
-        }
-      } catch (error) {
-        console.error('Error al obtener el ítem:', error);
-        this.descriptionItem = null;
-        this.descriptionError = 'Error al obtener la descripción del ítem.';
-      }
+  if (!QR_REGEX.test(cleanRaw)) {
+    await this.showError('Código QR inválido. Solo se aceptan QRs del sistema.');
 
-      this.isDescriptionModalOpen = true;
-    } else {
-      this.scannedCode = cleanCode;
-      await new Promise((r) => setTimeout(r, 800));
-      this.scannedCode = null;
-      await this.openStateSelectionModal(cleanCode);
-    }
+    if (this.scanMode === 'inventory') this.startScanning();
+    return;
   }
+
+  // EXTRAER EL CÓDIGO REAL PARA ENVIAR AL BACKEND
+  const code = cleanRaw.replace('Code:', '');
+  console.log('Código válido procesado:', code);
+
+  // ⬇ Aquí continúa tu código normal
+  if (this.scanMode === 'description') {
+    await BarcodeScanner.stopScan();
+    try {
+      const item = await this.itemService
+        .getByCodeAndBranch(this.branchId, code)
+        .toPromise();
+
+      this.descriptionItem = item ?? null;
+      this.descriptionError = item
+        ? null
+        : `No se encontró ningún ítem con código ${code}.`;
+    } catch {
+      this.descriptionItem = null;
+      this.descriptionError = 'Error al obtener la descripción del ítem.';
+    }
+    this.isDescriptionModalOpen = true;
+  } else {
+    this.scannedCode = code;
+    await new Promise((r) => setTimeout(r, 800));
+    this.scannedCode = null;
+    await this.openStateSelectionModal(code);
+  }
+}
+
+
 
   /** 🔹 Cierra el modal de descripción:
    * - Si es inventario → vuelve a inicio-operativo/:zonaId
