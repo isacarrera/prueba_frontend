@@ -25,7 +25,8 @@
     <div class="input-container">
       <ion-item class="custom-input" lines="none">
         <ion-icon name="keypad-outline" slot="start" class="input-icon"></ion-icon>
-        <ion-input [(ngModel)]="numeroDoc" type="text" inputmode="numeric" placeholder="Número de Documento"></ion-input>
+        <ion-input [(ngModel)]="numeroDoc" type="text" inputmode="numeric" placeholder="Número de Documento"
+          maxlength="10" (ionInput)="onDocumentNumberInput($event)"></ion-input>
       </ion-item>
     </div>
 

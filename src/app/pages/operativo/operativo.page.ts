@@ -66,9 +66,37 @@ export class OperativoPage {
     this.router.navigate(['/login']);
   }
 
+  // Metodo para validar y limitar el input del numero de documento
+  onDocumentNumberInput(event: any) {
+    let value = event.detail.value;
+
+    // Solo permitir numeros
+    value = value.replace(/[^0-9]/g, '');
+
+    // Limitar a 10 caracteres maximo
+    if (value.length > 10) {
+      value = value.substring(0, 10);
+    }
+
+    // Actualizar el modelo y el input
+    this.numeroDoc = value;
+    event.target.value = value;
+
+    // Prevenir que se escriba más de 10 caracteres
+    if (value.length >= 10) {
+      event.target.setAttribute('maxlength', '10');
+    }
+  }
+
   acceder() {
     if (!this.tipoDoc || !this.numeroDoc) {
       this.showAlert('Error', 'Debes completar los datos.');
+      return;
+    }
+
+    // Validación adicional de longitud
+    if (this.numeroDoc.length > 10) {
+      this.showAlert('Error', 'El número de documento no puede tener más de 10 dígitos.');
       return;
     }
 
@@ -80,12 +108,10 @@ export class OperativoPage {
       },
       error: async (err: Error) => {
         console.error('Error en login:', err);
-
         this.showAlert('Acceso denegado', err.message);
       }
     });
   }
-
 
   private async showAlert(header: string, message: string) {
     const alert = await this.alertCtrl.create({
