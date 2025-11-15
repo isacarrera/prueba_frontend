@@ -144,7 +144,7 @@ export class InicioOperativoPage implements OnInit {
         return;
       }
 
-      // 🔹 Obtener zonas del usuario (cada una tiene su branchId)
+      // Obtener zonas del usuario (cada una tiene su branchId)
       const zonas = await this.zonasService.getZonas(userId).toPromise();
       if (!zonas?.length) {
         const alert = await this.alertController.create({
@@ -156,12 +156,15 @@ export class InicioOperativoPage implements OnInit {
         return;
       }
 
-      // 🔹 Tomar el branchId de la primera zona (ajusta si necesitas elegir)
+      // Tomar el branchId de la primera zona (ajusta si necesitas elegir)
       const branchId = zonas[0].branchId;
 
-      // 🔹 Navegar al escáner en modo descripción
+      // Navegar al escáner en modo descripción
       this.router.navigate(['/scanner', branchId], {
-        state: { scanMode: 'description' },
+        state: {
+          scanMode: 'description',
+          isGuest: false
+        },
       });
     } catch (error) {
       console.error('Error al iniciar escaneo de descripción:', error);
@@ -371,7 +374,9 @@ export class InicioOperativoPage implements OnInit {
 
     const currentInventaryId = this.inventaryService.getInventaryId();
     if (currentInventaryId) {
-      this.router.navigate(['/scanner/', zonaId]);
+      this.router.navigate(['/scanner', zonaId], {
+        state: { isGuest: false }
+      });
       return;
     }
 

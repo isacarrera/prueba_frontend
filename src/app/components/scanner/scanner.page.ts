@@ -40,6 +40,9 @@ export class ScannerPage implements OnInit, OnDestroy {
   descriptionItem: Item | null = null;
   descriptionError: string | null = null;
 
+  /** Almacena si el usuario entró como Invitado (true) o Anfitrión (false) */
+  private isGuestFlow: boolean = false;
+
   constructor(
     private router: Router,
     private inventoryService: InventoryService,
@@ -64,9 +67,12 @@ export class ScannerPage implements OnInit, OnDestroy {
       const navigation = this.router.getCurrentNavigation();
       if (navigation?.extras?.state) {
         this.scanMode = navigation.extras.state['scanMode'] || 'inventory';
+        // Leer el nuevo flag. Si no viene, se asume que es Anfitrion (false).
+        this.isGuestFlow = navigation.extras.state['isGuest'] || false;
       }
     } catch {
       this.scanMode = 'inventory';
+      this.isGuestFlow = false;
     }
   }
 
@@ -79,7 +85,7 @@ export class ScannerPage implements OnInit, OnDestroy {
 
       if (!inventaryId) {
         await this.showError('No hay un inventario activo.');
-        this.router.navigate(['/inicio-operativo', this.zonaId]);
+        this.navigateOnExit();
         return;
       }
     }
@@ -93,7 +99,7 @@ export class ScannerPage implements OnInit, OnDestroy {
 
     if (!permission.granted) {
       await this.showError('Permiso de cámara requerido para escanear.');
-      this.router.navigate(['/inicio-operativo', this.zonaId]);
+      this.navigateOnExit();
       return;
     }
 
@@ -103,6 +109,18 @@ export class ScannerPage implements OnInit, OnDestroy {
 
     this.startScanning();
     setTimeout(() => (this.showInstructions = false), 2000);
+  }
+
+  private navigateOnExit() {
+    if (this.isGuestFlow) {
+      // Los invitados siempre vuelven a /home
+      this.router.navigate(['/home']);
+    } else {
+      // Los anfitriones siempre vuelven a la zona específica
+      // Leemos el ID de la ruta actual para asegurar que siempre lo tenemos
+      const currentZoneId = this.route.snapshot.paramMap.get('zonaId');
+      this.router.navigate(['/inicio-operativo', currentZoneId]);
+    }
   }
 
   ngOnDestroy() {
@@ -162,12 +180,7 @@ export class ScannerPage implements OnInit, OnDestroy {
 
   closeDescriptionModal() {
     this.isDescriptionModalOpen = false;
-
-    if (this.scanMode === 'description') {
-      this.router.navigate(['/inicio-operativo']);
-    } else {
-      this.router.navigate(['/inicio-operativo', this.zonaId]);
-    }
+    this.navigateOnExit();
   }
 
   // Modal de seleccion de estado (modo inventario)
@@ -197,10 +210,7 @@ export class ScannerPage implements OnInit, OnDestroy {
   // Cancela el escaneo y vuelve a inicio-operativo (solo inventario)
   async cancelScan() {
     await this.stopScanner();
-    this.router.navigate([
-      '/inicio-operativo/',
-      this.route.snapshot.paramMap.get('zonaId'),
-    ]);
+    this.navigateOnExit();
   }
 
   // Detiene y limpia el estado del escáner

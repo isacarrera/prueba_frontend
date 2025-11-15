@@ -199,7 +199,10 @@ export class HomePage {
       const branchId = zonas[0].branchId;
 
       this.router.navigate(['/scanner', branchId], {
-        state: { scanMode: 'description' },
+        state: {
+          scanMode: 'description',
+          isGuest: true
+        },
       });
     } catch (error) {
       console.error('Error al iniciar escaneo de descripción:', error);
@@ -231,7 +234,6 @@ export class HomePage {
         {
           text: 'Cancelar',
           role: 'cancel',
-          // handler: () => { console.log('Prompt: Cancelado'); } -> Eliminado
         },
         {
           text: 'Unirse',
@@ -247,15 +249,12 @@ export class HomePage {
     });
 
     alert.onDidDismiss().then(async (result) => {
-      // Eliminado: console.log de depuración del onDidDismiss
-
       if (result.role !== 'cancel' && result.data && result.data.inventaryId) {
 
         const inventaryId = Number(result.data.inventaryId);
         await this.handleJoinInventory(inventaryId);
 
       }
-      // Eliminado: console.log('onDidDismiss: Validación fallida. No se hace nada.');
     });
 
     await alert.present();
@@ -268,7 +267,9 @@ export class HomePage {
     try {
       const zoneId = await this.inventoryService.joinInventory(inventaryId);
 
-      this.router.navigate(['/scanner', zoneId]);
+      this.router.navigate(['/scanner', zoneId], {
+        state: { isGuest: true }
+      });
       return true;
 
     } catch (err: any) {
