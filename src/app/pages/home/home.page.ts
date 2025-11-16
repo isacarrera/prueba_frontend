@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -19,6 +19,7 @@ import { NavigationService } from 'src/app/services/Common/navigation.service';
 import { InventoryGuestService } from 'src/app/services/Home/inventory-guest.service';
 import { ZoneFacadeService } from 'src/app/services/Home/zone-facade.service';
 import { AlertHelperService } from 'src/app/services/Common/alert-helper.service';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -27,12 +28,13 @@ import { AlertHelperService } from 'src/app/services/Common/alert-helper.service
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
   private readonly zoneFacade = inject(ZoneFacadeService);
   private readonly guestService = inject(InventoryGuestService);
   private readonly navigationService = inject(NavigationService);
   private readonly alertHelper = inject(AlertHelperService);
+  private readonly platform = inject(Platform);
 
   // Estado del componente
   searchTerm: string = '';
@@ -41,12 +43,16 @@ export class HomePage implements OnInit {
   filters: FilterState[] = [];
   activeFilter: StateZone | null = null;
 
+  // Subscription del hardware back button
+  private backButtonSubscription: any;
+
   constructor() {
     this.registerIcons();
     this.initializeFilters();
   }
 
   ngOnInit() {
+    this.setupBackButtonHandler();
   }
 
   // ========================================
@@ -60,6 +66,13 @@ export class HomePage implements OnInit {
   async handleRefresh(event: any) {
     await this.loadZones();
     event.target.complete();
+  }
+
+  ngOnDestroy() {
+    // Limpiar subscription del hardware back button
+    if (this.backButtonSubscription) {
+      this.backButtonSubscription.unsubscribe();
+    }
   }
 
   // ========================================
@@ -126,8 +139,12 @@ export class HomePage implements OnInit {
   // NAVEGACIÓN
   // ========================================
 
-  goBack(): void {
-    this.navigationService.navigateToLogin();
+  async goBack(): Promise<void> {
+    const shouldExit = await this.alertHelper.showExitConfirmation();
+
+    if (shouldExit) {
+      this.navigationService.navigateToLogin();
+    }
   }
 
   async goToOperativo(zonaId: number, zonaName: string): Promise<void> {
@@ -155,6 +172,19 @@ export class HomePage implements OnInit {
   // ========================================
   // HELPERS PRIVADOS
   // ========================================
+
+  private setupBackButtonHandler(): void {
+    this.backButtonSubscription = this.platform.backButton.subscribeWithPriority(15, async () => {
+      // Solo ejecutar si estamos en la ruta /home
+      if (window.location.pathname === '/home') {
+        const shouldExit = await this.alertHelper.showExitConfirmation();
+
+        if (shouldExit) {
+          this.navigationService.navigateToLogin();
+        }
+      }
+    });
+  }
 
   private registerIcons(): void {
     addIcons({

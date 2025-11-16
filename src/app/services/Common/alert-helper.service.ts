@@ -87,4 +87,29 @@ export class AlertHelperService {
     await alert.present();
     alert.onDidDismiss().then(() => onDismiss());
   }
+
+  /**
+   * Muestra alerta de confirmación para salir de la aplicación
+   * @returns Promise<boolean> - true si confirma salir, false si cancela
+   */
+  async showExitConfirmation(): Promise<boolean> {
+    return new Promise(async (resolve) => {
+      const alert = await this.alertController.create({
+        header: 'Salir',
+        message: '¿Estás seguro de que deseas salir de la aplicación?',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            handler: () => resolve(false)
+          },
+          {
+            text: 'Salir',
+            handler: () => resolve(true)
+          }
+        ]
+      });
+      await alert.present();
+    });
+  }
 }
