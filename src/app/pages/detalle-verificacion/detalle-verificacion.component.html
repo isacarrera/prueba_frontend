@@ -1,135 +1,86 @@
 <ion-content class="verification-page">
 
-    <div class="header">
-        <ion-button fill="clear" (click)="volver()" class="back-btn">
-            <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        <div class="header-content">
-            <h2>Verificación</h2>
-            <p class="subtitle">Detalle del inventario</p>
-          </div>
-      </div>
+    <div class="header">
+        <ion-button fill="clear" (click)="volver()" class="back-btn">
+            <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <div class="header-content">
+            <h2>Verificación</h2>
+            <p class="subtitle">Detalle del inventario</p>
+        </div>
+    </div>
 
-    <div class="icon-section" *ngIf="showIcon">
-        <div class="icon-circle">
-            <div class="icon-inner">
-                <ion-icon name="document-text-outline"></ion-icon>
-              </div>
-           
-          </div>
-      </div>
+    <div class="icon-section" *ngIf="showIcon">
+        <div class="icon-circle">
+            <div class="icon-inner">
+                <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+        </div>
+    </div>
 
-    <div class="title-section">
-        <h1 class="main-title">Verificar Inventario</h1>
-        <div class="status-badge" [class]="getOverallStatus()">
-            {{ getStatusText() }}
-          </div>
-      </div>
+    <div class="title-section">
+        <h1 class="main-title">Verificar Inventario</h1>
+        <div class="status-badge" [class]="getOverallStatus()">
+            {{ getStatusText() }}
+        </div>
+    </div>
 
-    <section class="section" *ngIf="comparacion">
-        <div class="summary-card">
-            <div class="summary-header">
-                <ion-icon name="information-circle-outline"></ion-icon>
-                <h3>Resumen de Verificación</h3>
-              </div>
-            <div class="summary-content">
-                <p>{{ comparacion.shortSummary || 'Resumen de la verificación del inventario' }}</p>
-                <div class="stats-grid">
-                    <div class="stat-item missing">
-                        <div class="stat-number">{{ comparacion.missingItems?.length || 0 }}</div>
-                        <div class="stat-label">Faltantes</div>
-                      </div>
-                    <div class="stat-item unexpected">
-                        <div class="stat-number">{{ comparacion.unexpectedItems?.length || 0 }}</div>
-                        <div class="stat-label">Inesperados</div>
-                      </div>
-                    <div class="stat-item mismatch">
-                        <div class="stat-number">{{ comparacion.stateMismatches?.length || 0 }}</div>
-                        <div class="stat-label">Discrepancias</div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
+    <section class="section" *ngIf="comparacion">
+        <div class="summary-card">
+            <div class="summary-header">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <h3>Resumen de Verificación</h3>
+            </div>
+            <div class="summary-content">
+                <p>{{ comparacion.shortSummary || 'Resumen de la verificación del inventario' }}</p>
+                
+                <!-- ### INICIO DE LOS CAMBIOS (Añadimos (click)) ### -->
+                <div class="stats-grid">
+                    
+                    <div class="stat-item missing" (click)="handleStatClick('missing')">
+                        <div class="stat-number">{{ comparacion.missingItems?.length || 0 }}</div>
+                        <div class="stat-label">Faltantes</div>
+                    </div>
+                    
+                    <div class="stat-item unexpected" (click)="handleStatClick('unexpected')">
+                        <div class="stat-number">{{ comparacion.unexpectedItems?.length || 0 }}</div>
+                        <div class="stat-label">Inesperados</div>
+                    </div>
+                    
+                    <div class="stat-item mismatch" (click)="handleStatClick('mismatch')">
+                        <div class="stat-number">{{ comparacion.stateMismatches?.length || 0 }}</div>
+                        <div class="stat-label">Discrepancias</div>
+                    </div>
 
-    <ion-accordion-group class="results-accordion" *ngIf="comparacion">
+                </div>
+                <!-- ### FIN DE LOS CAMBIOS ### -->
+            </div>
+        </div>
+    </section>
 
-            <ion-accordion value="missing" class="issue-accordion missing" *ngIf="comparacion.missingItems?.length">
-            <div slot="header" class="accordion-header">
-                <div class="header-left">
-                    <ion-icon name="warning-outline"></ion-icon>
-                    <h3>Ítems Faltantes</h3>
-                  </div>
-                <span class="count-badge">{{ comparacion.missingItems.length }}</span>
-              </div>
-           
-            <div class="items-list" slot="content">
-                <ion-button           expand="block"           fill="outline"           color="warning"          
-          (click)="verDetalle('Ítems Faltantes', comparacion.missingItems)">
-                    Ver Lista Completa ({{ comparacion.missingItems.length }})
-                  </ion-button>
-              </div>
+    <!-- ### ELIMINACIÓN ### 
+        El <ion-accordion-group> que estaba aquí SE ELIMINA POR COMPLETO.
+    -->
 
-          </ion-accordion>
+    <div class="actions-section" *ngIf="!cargando">
+        <ion-button color="danger" expand="block" (click)="negarVerificacion()" [disabled]="cargando"
+            class="action-btn deny">
+            <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+            Negar Verificación
+        </ion-button>
 
-            <ion-accordion value="unexpected" class="issue-accordion unexpected"
-      *ngIf="comparacion.unexpectedItems?.length">
-            <div slot="header" class="accordion-header">
-                <div class="header-left">
-                    <ion-icon name="help-circle-outline"></ion-icon>
-                    <h3>Ítems Inesperados</h3>
-                  </div>
-                <span class="count-badge">{{ comparacion.unexpectedItems.length }}</span>
-              </div>
-           
-            <div class="items-list" slot="content">
-                <ion-button           expand="block"           fill="outline"           color="secondary"          
-          (click)="verDetalle('Ítems Inesperados', comparacion.unexpectedItems)">
-                    Ver Lista Completa ({{ comparacion.unexpectedItems.length }})
-                  </ion-button>
-              </div>
+        <ion-button color="success" expand="block" (click)="confirmarCierre()" [disabled]="cargando"
+            class="action-btn confirm">
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Confirmar Verificación
+        </ion-button>
+    </div>
 
-          </ion-accordion>
-
-            <ion-accordion value="mismatch" class="issue-accordion mismatch"
-      *ngIf="comparacion.stateMismatches?.length">
-            <div slot="header" class="accordion-header">
-                <div class="header-left">
-                    <ion-icon name="swap-horizontal-outline"></ion-icon>
-                    <h3>Discrepancias de Estado</h3>
-                  </div>
-                <span class="count-badge">{{ comparacion.stateMismatches.length }}</span>
-              </div>
-           
-            <div class="items-list" slot="content">
-                <ion-button           expand="block"           fill="outline"           color="tertiary"          
-          (click)="verDetalle('Discrepancias de Estado', comparacion.stateMismatches)">
-                    Ver Lista Completa ({{ comparacion.stateMismatches.length }})
-                  </ion-button>
-              </div>
-
-          </ion-accordion>
-      </ion-accordion-group>
-
-    <div class="actions-section" *ngIf="!cargando">
-        <ion-button color="danger" expand="block" (click)="negarVerificacion()" [disabled]="cargando"      
-      class="action-btn deny">
-            <ion-icon name="close-circle-outline" slot="start"></ion-icon>
-            Negar Verificación
-          </ion-button>
-
-        <ion-button color="success" expand="block" (click)="confirmarCierre()" [disabled]="cargando"      
-      class="action-btn confirm">
-            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-            Confirmar Verificación
-          </ion-button>
-      </div>
-
-    <div class="loading-state" *ngIf="cargando">
-        <div class="spinner-container">
-            <ion-spinner name="crescent"></ion-spinner>
-            <p>Cargando verificación...</p>
-          </div>
-      </div>
+    <div class="loading-state" *ngIf="cargando">
+        <div class="spinner-container">
+            <ion-spinner name="crescent"></ion-spinner>
+            <p>Cargando verificación...</p>
+        </div>
+    </div>
 
 </ion-content>

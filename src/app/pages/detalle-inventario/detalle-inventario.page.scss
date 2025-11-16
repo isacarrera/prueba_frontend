@@ -1,0 +1,173 @@
+ion-content {
+  // Un fondo oscuro base, similar al de tu app
+  --background: #0D0F1B; 
+}
+
+// 2. Estilo de la Tarjeta de Ítem
+.item-card-detail {
+  background: #1A1C30; // Un color de tarjeta más claro que el fondo
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  // Borde de color dinámico (ver abajo)
+  border-left: 4px solid var(--ion-color-medium); 
+}
+
+// 3. Contenido de la Tarjeta
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.item-name {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #ffffff; // Texto principal blanco
+}
+
+.item-code {
+  font-size: 0.85em;
+  color: #9a9a9a; // Texto secundario gris
+  background-color: #333;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.item-reason {
+  font-size: 0.9em;
+  color: #dcdcdc; // Texto de razón más suave
+  margin-top: 8px;
+}
+
+// 4. Estilo de Discrepancias
+.state-comparison {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0D0F1B; // Fondo interior más oscuro
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 12px;
+}
+
+.state-block {
+  text-align: center;
+}
+
+.state-label {
+  font-size: 0.75em;
+  color: #9a9a9a;
+  display: block;
+}
+
+.state-value {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #fff;
+}
+
+.arrow-icon {
+  color: var(--ion-color-primary); // Flecha de color primario
+  font-size: 1.2em;
+}
+
+// 5. Estilo de Botón "Cargar Más"
+.load-more-container {
+  margin-top: 16px;
+  margin-bottom: 16px;
+
+  ion-button {
+    // Color por defecto (ver temas dinámicos)
+    --color: var(--ion-color-primary);
+    --border-color: var(--ion-color-primary);
+  }
+}
+
+// 6. Estilo del contador total
+.summary-count {
+  text-align: center;
+  color: var(--ion-color-medium);
+  font-size: 0.9em;
+  
+  strong {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1em;
+  }
+}
+
+
+// --- 7. TEMA DE COLOR DINÁMICO ---
+// Esto usa las clases que pusimos en ion-content
+
+ion-content.theme-missing {
+  .item-card-detail {
+    border-left-color: var(--ion-color-warning); // Borde amarillo
+  }
+  .load-more-container ion-button {
+    --color: var(--ion-color-warning);
+    --border-color: var(--ion-color-warning);
+  }
+}
+
+ion-content.theme-unexpected {
+  .item-card-detail {
+    border-left-color: var(--ion-color-secondary); // Borde azul/púrpura
+  }
+  .load-more-container ion-button {
+    --color: var(--ion-color-secondary);
+    --border-color: var(--ion-color-secondary);
+  }
+}
+
+ion-content.theme-mismatch {
+  .item-card-detail {
+    border-left-color: var(--ion-color-tertiary); // Borde de otro color
+  }
+  .load-more-container ion-button {
+    --color: var(--ion-color-tertiary);
+    --border-color: var(--ion-color-tertiary);
+  }
+}
+
+ion-header ion-toolbar {
+  /* Usamos el mismo color exacto que definimos 
+    para el fondo del ion-content.
+  */
+  --background: #0D0F1B; 
+
+  // Asegura que el título y el botón de atrás sean blancos
+  --color: #ffffff; 
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 0;
+  .back-btn {
+    --color: #fff;
+    --background: transparent;
+    --border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+  }
+  .header-content {
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 4px 0 0 0;
+    }
+  }
+}

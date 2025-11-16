@@ -6,7 +6,7 @@ export interface InventoryDifference {
   name: string;
   category: string;
   baseState: string;
-  inventoryState: string;
+  inventaryState: string;
 }
 
 export interface InventoryNotificationContent {

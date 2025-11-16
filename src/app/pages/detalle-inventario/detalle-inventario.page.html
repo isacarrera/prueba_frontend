@@ -1,42 +1,50 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/verification"></ion-back-button>
-    </ion-buttons>
+<div class="header">
+  <ion-button fill="clear" (click)="goBack()" class="back-btn">
+    <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+  </ion-button>
+  <div class="header-content">
+    <h2>Verificación</h2>
     <ion-title>{{ title }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+  </div>
+</div>
 
-<ion-content>
+<ion-content [class]="getPageClass()">
 
-  <ion-list lines="none" class="ion-padding-vertical">
-    <div *ngFor="let item of displayedItems" class="item-card item-detail">
+  <div class="list-container ion-padding">
+
+    <div *ngFor="let item of displayedItems" class="item-card-detail">
+
       <div class="item-header">
         <h4 class="item-name">{{ item.name }}</h4>
         <span class="item-code">{{ item.code }}</span>
       </div>
+
       <p class="item-reason">Razón: {{ item.reason || 'Sin razón registrada' }}</p>
 
       <div *ngIf="item.expectedState" class="state-comparison">
-        <span class="state-label">Base: {{ item.expectedState }}</span>
-        <span class="state-label">Escaneado: {{ item.scannedState }}</span>
+        <div class="state-block expected">
+          <span class="state-label">Base</span>
+          <span class="state-value">{{ item.expectedState }}</span>
+        </div>
+        <ion-icon name="arrow-forward-outline" class="arrow-icon"></ion-icon>
+        <div class="state-block scanned">
+          <span class="state-label">Escaneado</span>
+          <span class="state-value">{{ item.scannedStateName }}</span>
+        </div>
       </div>
+
     </div>
-  </ion-list>
 
-  <div *ngIf="!allItems?.length" class="empty-state ion-padding">
-    <p>No hay ítems en esta categoría para mostrar.</p>
+    <div class="load-more-container" *ngIf="displayedItems.length < allItems.length">
+      <ion-button expand="block" fill="outline" (click)="loadMore()">
+        Cargar Más ({{ displayedItems.length }} de {{ allItems.length }})
+      </ion-button>
+    </div>
+
+    <p *ngIf="allItems!.length > 0" class="summary-count">
+      Total de ítems: <strong>{{ allItems!.length }}</strong>
+    </p>
+
   </div>
 
-  <div class="load-more-container ion-padding" *ngIf="displayedItems.length < allItems.length">
-    <ion-button expand="block" fill="outline" (click)="loadMore()">
-      Cargar Más ({{ displayedItems.length }} de {{ allItems.length }})
-    </ion-button>
-  </div>
-
-  <p *ngIf="allItems.length > 0" 
-    class="summary-count" 
-    [class.ion-padding]="displayedItems.length >= allItems!.length" 
-    style="text-align: center; color: var(--ion-color-medium); padding-bottom: 20px;">
-    Total de ítems: **{{ allItems!.length }}** </p>
 </ion-content>
