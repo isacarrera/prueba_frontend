@@ -8,6 +8,7 @@ export interface InventoryCompareItem {
   suggestedAction?: string;
   expectedState?: string;
   scannedState?: string;
+  scannedStateName: string;
 }
 
 export interface InventoryCompareResponse {

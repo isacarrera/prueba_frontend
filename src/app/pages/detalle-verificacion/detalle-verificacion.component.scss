@@ -111,6 +111,7 @@
     font-weight: 700;
     margin-bottom: 16px;
     background: linear-gradient(to right, #60a5fa, #93c5fd);
+    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
@@ -575,4 +576,21 @@ ion-accordion.issue-accordion {
 .custom-textarea:focus {
   outline: 2px solid var(--primary-blue);
   outline-offset: 2px;
+}
+
+/* Añade esto a tu .scss para que parezcan clickables */
+.accordion-header {
+  cursor: pointer;
+}
+
+/* Añade esto a tu .scss */
+.stats-grid .stat-item {
+  cursor: pointer; // Muestra una "manito" al pasar el mouse
+  transition: transform 0.2s ease, background-color 0.2s ease;
+
+  // Efecto visual al pasar el mouse o presionar
+  &:hover {
+    transform: translateY(-3px); // Se levanta ligeramente
+    background-color: rgba(255, 255, 255, 0.05); // Un leve brillo
+  }
 }
