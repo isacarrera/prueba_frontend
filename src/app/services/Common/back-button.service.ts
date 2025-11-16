@@ -4,7 +4,7 @@ import { App } from '@capacitor/app';
 import { NavController, Platform } from '@ionic/angular';
 
 /**
- * Servicio centralizado para manejar el botón físico de retroceso
+ * 🎯 Servicio centralizado para manejar el botón físico de retroceso
  * Permite configurar comportamientos específicos por ruta
  */
 @Injectable({
@@ -20,7 +20,7 @@ export class BackButtonService {
 
   // Rutas donde el componente maneja su propio back button
   // (tienen prioridad 15, este servicio usa prioridad 10)
-  private readonly CUSTOM_HANDLER_ROUTES = ['/home'];
+  private readonly CUSTOM_HANDLER_ROUTES = ['/home', '/inicio-operativo'];
 
   /**
    * Inicializa el manejador global del hardware back button
@@ -32,7 +32,7 @@ export class BackButtonService {
 
       // Si la ruta tiene un handler personalizado (prioridad 15),
       // este código no se ejecutará gracias a la prioridad
-      if (this.CUSTOM_HANDLER_ROUTES.includes(currentUrl)) {
+      if (this.isCustomHandlerRoute(currentUrl)) {
         return; // El componente maneja su propio comportamiento
       }
 
@@ -45,6 +45,13 @@ export class BackButtonService {
       // Para cualquier otra ruta, navegar hacia atrás
       this.navController.back();
     });
+  }
+
+  /**
+   * Verifica si la URL contiene una ruta con handler personalizado
+   */
+  private isCustomHandlerRoute(url: string): boolean {
+    return this.CUSTOM_HANDLER_ROUTES.some(route => url.includes(route));
   }
 
   /**

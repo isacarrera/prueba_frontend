@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -25,6 +25,8 @@ import { AlertHelperService } from 'src/app/services/Common/alert-helper.service
 import { CategoryFacadeService } from 'src/app/services/Inicio-Operativo/category-facade.service';
 import { InventoryFacadeService } from 'src/app/services/Inicio-Operativo/inventory-facade.service';
 import { NavigationService } from 'src/app/services/Common/navigation.service';
+import { Platform } from '@ionic/angular';
+import { InventoryExitService } from 'src/app/services/Inicio-Operativo/inventory-exit.service';
 
 @Component({
   selector: 'app-inicio-operativo',
@@ -33,13 +35,15 @@ import { NavigationService } from 'src/app/services/Common/navigation.service';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class InicioOperativoPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
+export class InicioOperativoPage implements OnInit, OnDestroy {
 
+  private readonly route = inject(ActivatedRoute);
   private readonly inventoryFacade = inject(InventoryFacadeService);
   private readonly categoryFacade = inject(CategoryFacadeService);
   private readonly navigationService = inject(NavigationService);
   private readonly alertHelper = inject(AlertHelperService);
+  private readonly inventoryExitService = inject(InventoryExitService);
+  private readonly platform = inject(Platform);
 
   // Estado del componente
   categorias: any[] = [];
@@ -51,10 +55,12 @@ export class InicioOperativoPage implements OnInit {
   // Estados de modales
   isInviteOpen = false;
   isObservacionesOpen = false;
-  isExitOpen = false;
   isConfirmOpen = false;
   isExportOpen = false;
   isInstructionsOpen = false;
+
+  // Subscription del hardware back button
+  private backButtonSubscription: any;
 
   // Getter para código de invitación
   get codeArray(): string[] {
@@ -67,6 +73,37 @@ export class InicioOperativoPage implements OnInit {
 
   async ngOnInit() {
     await this.loadInitialData();
+    this.setupBackButtonHandler();
+  }
+
+  ngOnDestroy() {
+    // Limpiar subscription del hardware back button
+    if (this.backButtonSubscription) {
+      this.backButtonSubscription.unsubscribe();
+    }
+  }
+
+  /**
+ * Hook de Ionic que se dispara ANTES de que la vista se navegue
+ * por gestos (swipe) o botones de back en el header.
+ */
+  async ionViewCanLeave(): Promise<boolean> {
+    // Llama al servicio central
+    const shouldExit = await this.inventoryExitService.handleExitAttempt();
+
+    if (shouldExit) {
+      // 2. Si se debe salir, navegamos manualmente a 'login'
+      this.navigationService.navigateToLogin();
+
+      // 3. IMPORTANTE: Retornamos 'false' para PREVENIR
+      // la navegación "hacia atrás" por defecto de Ionic.
+      // Nosotros ya hemos tomado el control de la navegación.
+      return false;
+    }
+
+    // 4. Si 'shouldExit' es 'false' (usuario canceló),
+    // retornamos 'false' para PREVENIR la navegación.
+    return false;
   }
 
   // ========================================
@@ -188,6 +225,21 @@ export class InicioOperativoPage implements OnInit {
   }
 
   // ========================================
+  // MANEJO DE SALIDA
+  // ========================================
+
+  async onExitButtonPress(): Promise<void> {
+    // Llama al servicio central
+    const shouldExit = await this.inventoryExitService.handleExitAttempt();
+
+    // Si el servicio confirma (usuario presionó "Salir" o "Salir y Cancelar")
+    if (shouldExit) {
+      // Navega a login (consistente con tu back button handler)
+      this.navigationService.navigateToLogin();
+    }
+  }
+
+  // ========================================
   // OBSERVACIONES
   // ========================================
 
@@ -230,14 +282,6 @@ export class InicioOperativoPage implements OnInit {
     this.isObservacionesOpen = false;
   }
 
-  openExitModal(): void {
-    this.isExitOpen = true;
-  }
-
-  closeExitModal(): void {
-    this.isExitOpen = false;
-  }
-
   openConfirmModal(): void {
     this.isConfirmOpen = true;
   }
@@ -260,6 +304,22 @@ export class InicioOperativoPage implements OnInit {
 
   private getZonaIdFromRoute(): number {
     return Number(this.route.snapshot.paramMap.get('zonaId'));
+  }
+
+  private setupBackButtonHandler(): void {
+    this.backButtonSubscription = this.platform.backButton.subscribeWithPriority(15, async () => {
+      // Verificar que estamos en la ruta de inicio-operativo
+      const currentPath = window.location.pathname;
+      const isInicioOperativo = currentPath.includes('/inicio-operativo/');
+
+      if (isInicioOperativo) {
+        const shouldExit = await this.inventoryExitService.handleExitAttempt();
+
+        if (shouldExit) {
+          this.navigationService.navigateToLogin();
+        }
+      }
+    });
   }
 
   private registerIcons(): void {

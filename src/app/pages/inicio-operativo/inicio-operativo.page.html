@@ -3,7 +3,7 @@
 
     <!-- Header -->
     <div class="header">
-      <ion-icon name="log-out-outline" class="icon-left" (click)="openExitModal()"></ion-icon>
+      <ion-icon name="log-out-outline" class="icon-left" (click)="onExitButtonPress()"></ion-icon>
       <h1 class="title">Inicio</h1>
       <div class="circle-btn" (click)="openInviteModal()"><ion-icon name="person-circle-outline"></ion-icon>
       </div>
@@ -49,25 +49,6 @@
       </div>
     </div>
     <!-- 🔹 Modales -->
-
-
-    <!-- Modal Salir -->
-    <ion-modal [isOpen]="isExitOpen" (didDismiss)="closeExitModal()" class="custom-modal">
-      <ng-template>
-        <div class="modal-card">
-          <div class="modal-icon">
-            <ion-icon name="log-out-outline"></ion-icon>
-          </div>
-          <h1 class="modal-title">No puedes salir</h1>
-          <p class="modal-subtitle">El inventario aún no ha finalizado</p>
-          <div class="modal-actions">
-            <ion-button fill="clear" (click)="closeExitModal()" class="back-btn">
-              <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
-            </ion-button>
-          </div>
-        </div>
-      </ng-template>
-    </ion-modal>
 
     <!-- Modal Confirmar Inventario -->
     <ion-modal [isOpen]="isConfirmOpen" (didDismiss)="closeConfirmModal()" class="custom-modal">
