@@ -4,8 +4,9 @@ import { AlertController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
 import { ZonasInventarioService } from '../zonas-inventario.service';
 
+
 /**
- * Servicio centralizado para navegacion
+ * Servicio centralizado para navegación
  * Maneja rutas y estados de navegación con validaciones
  */
 @Injectable({
@@ -76,6 +77,32 @@ export class NavigationService {
    */
   navigateToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  /**
+   * Navega a inicio operativo con confirmación
+   */
+  async navigateToOperativo(zoneId: number, zoneName: string): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Zona',
+      message: `Ingreso a la zona ${zoneName}`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: 'Ingresar',
+          cssClass: 'primary',
+          handler: () => {
+            this.router.navigate(['/inicio-operativo', zoneId]);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   /**

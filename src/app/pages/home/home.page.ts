@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   appsOutline,
@@ -16,9 +15,10 @@ import {
   addOutline
 } from 'ionicons/icons';
 import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
-import { AuthService } from 'src/app/services/auth.service';
-import { InventoryService } from 'src/app/services/inventary.service';
-import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
+import { NavigationService } from 'src/app/services/Common/navigation.service';
+import { InventoryGuestService } from 'src/app/services/Home/inventory-guest.service';
+import { ZoneFacadeService } from 'src/app/services/Home/zone-facade.service';
+import { AlertHelperService } from 'src/app/services/Common/alert-helper.service';
 
 @Component({
   selector: 'app-home',
@@ -27,28 +27,136 @@ import { ZonasInventarioService } from 'src/app/services/zonas-inventario.servic
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
+  private readonly zoneFacade = inject(ZoneFacadeService);
+  private readonly guestService = inject(InventoryGuestService);
+  private readonly navigationService = inject(NavigationService);
+  private readonly alertHelper = inject(AlertHelperService);
+
+  // Estado del componente
   searchTerm: string = '';
   zonas: ZonaInventarioBranch[] = [];
   cargando = true;
-
-  filters: FilterState[] = [
-    { id: 1, name: 'Todos', state: null, icon: 'apps-outline', active: true },
-    { id: 2, name: 'Disponible', state: StateZone.Available, icon: 'lock-open-outline', active: false },
-    { id: 3, name: 'En Inventario', state: StateZone.InInventory, icon: 'lock-close-outline', active: false },
-    { id: 4, name: 'En Verificación', state: StateZone.InVerification, icon: 'shield-checkmark-outline', active: false }
-  ];
-
+  filters: FilterState[] = [];
   activeFilter: StateZone | null = null;
 
-  constructor(
-    private router: Router,
-    private zonasService: ZonasInventarioService,
-    private authService: AuthService,
-    private alertController: AlertController,
-    private inventoryService: InventoryService,
-  ) {
+  constructor() {
+    this.registerIcons();
+    this.initializeFilters();
+  }
+
+  ngOnInit() {
+  }
+
+  // ========================================
+  // LIFECYCLE HOOKS
+  // ========================================
+
+  async ionViewWillEnter() {
+    await this.loadZones();
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadZones();
+    event.target.complete();
+  }
+
+  // ========================================
+  // INICIALIZACIÓN
+  // ========================================
+
+  private initializeFilters(): void {
+    this.filters = this.zoneFacade.getDefaultFilters();
+    this.activeFilter = this.zoneFacade.getActiveFilterState(this.filters);
+  }
+
+  // ========================================
+  // CARGA DE DATOS
+  // ========================================
+
+  private async loadZones(): Promise<void> {
+    this.cargando = true;
+
+    const result = await this.zoneFacade.loadUserZones();
+
+    this.zonas = result.zones;
+    this.cargando = false;
+
+    // Mostrar alerta solo si hay error
+    if (result.error) {
+      const header = result.zones.length === 0 ? 'Aviso' : 'Error';
+      await this.alertHelper.showInfo(header, result.error);
+    }
+  }
+
+  // ========================================
+  // FILTRADO Y BÚSQUEDA
+  // ========================================
+
+  /**
+   * Obtiene zonas filtradas según búsqueda y filtro activo
+   */
+  filteredZonas(): ZonaInventarioBranch[] {
+    return this.zoneFacade.filterZones(
+      this.zonas,
+      this.searchTerm,
+      this.activeFilter
+    );
+  }
+
+  /**
+   * Establece un filtro como activo
+   */
+  setFilter(filter: FilterState): void {
+    this.filters = this.zoneFacade.activateFilter(this.filters, filter.id);
+    this.activeFilter = filter.state;
+  }
+
+  /**
+   * Limpia todos los filtros y búsqueda
+   */
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.filters = this.zoneFacade.resetFilters();
+    this.activeFilter = null;
+  }
+
+  // ========================================
+  // NAVEGACIÓN
+  // ========================================
+
+  goBack(): void {
+    this.navigationService.navigateToLogin();
+  }
+
+  async goToOperativo(zonaId: number, zonaName: string): Promise<void> {
+    await this.navigationService.navigateToOperativo(zonaId, zonaName);
+  }
+
+  // ========================================
+  // FUNCIONES DE INVITADO
+  // ========================================
+
+  /**
+   * Muestra prompt para unirse como invitado
+   */
+  async presentJoinPrompt(): Promise<void> {
+    await this.guestService.showJoinPrompt();
+  }
+
+  /**
+   * Navega a scanner en modo descripción (invitado)
+   */
+  async scanItemDescription(): Promise<void> {
+    await this.guestService.navigateToDescriptionScanner();
+  }
+
+  // ========================================
+  // HELPERS PRIVADOS
+  // ========================================
+
+  private registerIcons(): void {
     addIcons({
       arrowBackOutline,
       chevronDownCircleOutline,
@@ -60,225 +168,5 @@ export class HomePage {
       'person-add-outline': personAddOutline,
       'add-outline': addOutline
     });
-  }
-
-  async ionViewWillEnter() {
-    await this.cargarZonas();
-  }
-
-  async handleRefresh(event: any) {
-    await this.cargarZonas();
-    event.target.complete();
-  }
-
-  goBack() {
-    this.router.navigate(['/login']);
-  }
-
-  async goToOperativo(zonaId: number, zonaName: string) {
-    const alert = await this.alertController.create({
-      header: 'Confirmar Zona',
-      message: `Ingreso a la zona ${zonaName}`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Ingresar',
-          cssClass: 'primary',
-          handler: () => {
-            this.router.navigate(['/inicio-operativo', zonaId]);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  setFilter(filter: FilterState) {
-    this.filters.forEach(f => f.active = false);
-    filter.active = true;
-    this.activeFilter = filter.state;
-  }
-
-  filteredZonas() {
-    let filtered = this.zonas;
-
-    if (this.searchTerm) {
-      filtered = filtered.filter(z =>
-        z.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
-
-    if (this.activeFilter !== null) {
-      filtered = filtered.filter(z => z.stateZone === this.activeFilter);
-    }
-
-    return filtered;
-  }
-
-  clearFilters() {
-    this.searchTerm = '';
-    this.setFilter(this.filters[0]);
-  }
-
-  async cargarZonas() {
-    this.cargando = true;
-
-    try {
-      const user = await this.authService.getUserFromToken();
-      if (user?.userId) {
-        this.zonasService.getZonas(user.userId).subscribe({
-          next: (data: ZonaInventarioBranch[]) => {
-            this.zonas = data;
-            this.cargando = false;
-
-            if (this.zonas.length === 0) {
-              this.mostrarAlerta('Aviso', 'No tienes inventarios asignados en este momento.');
-            }
-          },
-          error: async (err) => {
-            console.error('Error al cargar zonas', err);
-            this.cargando = false;
-
-            if (err.status === 404) {
-              this.mostrarAlerta('Aviso', 'No tienes inventarios asignados en este momento.');
-            } else {
-              this.mostrarAlerta('Error', 'Ocurrió un problema al cargar las zonas.');
-            }
-          }
-        });
-      } else {
-        this.cargando = false;
-        console.error('Usuario no autenticado');
-        this.mostrarAlerta('Error', 'Usuario no autenticado.');
-      }
-    } catch (error) {
-      this.cargando = false;
-      console.error('Error al obtener usuario:', error);
-      this.mostrarAlerta('Error', 'Error al cargar las zonas.');
-    }
-  }
-
-  private async mostrarAlerta(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['OK']
-    });
-    await alert.present();
-  }
-
-  async scanItemDescription() {
-    try {
-      const user = await this.authService.getUserFromToken();
-      const userId = user?.userId ?? 0;
-
-      if (!userId) {
-        const alert = await this.alertController.create({
-          header: 'Error',
-          message: 'No se pudo identificar el usuario actual.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-        return;
-      }
-
-      const zonas = await this.zonasService.getZonas(userId).toPromise();
-      if (!zonas?.length) {
-        const alert = await this.alertController.create({
-          header: 'Sin zonas',
-          message: 'No se encontraron zonas asociadas a tu usuario.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-        return;
-      }
-
-      const branchId = zonas[0].branchId;
-
-      this.router.navigate(['/scanner', branchId], {
-        state: {
-          scanMode: 'description',
-          isGuest: true
-        },
-      });
-    } catch (error) {
-      console.error('Error al iniciar escaneo de descripción:', error);
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No se pudo preparar el escáner para descripción.',
-        buttons: ['OK'],
-      });
-      await alert.present();
-    }
-  }
-
-  /**
-   * Muestra un prompt para que el invitado ingrese el código de inventario.
-   */
-  async presentJoinPrompt() {
-    const alert = await this.alertController.create({
-      header: 'Unirse a Inventario',
-      message: 'Ingresa el código de invitación (ej: D8K4) proporcionado por el anfitrión.',
-      inputs: [
-        {
-          name: 'invitationCode',
-          type: 'text',
-          placeholder: 'Código (ej: D8K4)',
-          attributes: {
-            autocapitalize: 'off',
-            autocorrect: 'off'
-          }
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Unirse',
-          // Usamos el handler ASYNC robusto
-          handler: async (data) => {
-            // 1. Limpiar y validar el CÓDIGO
-            const code = data.invitationCode?.trim().toUpperCase();
-            if (!code) {
-              this.mostrarAlerta('Error', 'Debes ingresar un código.');
-              return false; // Evita que se cierre
-            }
-
-            // 2. Llamar a la lógica de unión (que ahora es bool)
-            return await this.handleJoinInventory(code);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  /**
-   * Maneja la lógica de validación y navegación del invitado.
-   */
-  private async handleJoinInventory(invitationCode: string): Promise<boolean> {
-    try {
-      // Llama al servicio actualizado
-      const { zoneId } = await this.inventoryService.joinInventory(invitationCode);
-
-      // Navegar al invitado al Scanner.
-      this.router.navigate(['/scanner', zoneId], {
-        state: { isGuest: true }
-      });
-      return true; // Cierra la alerta
-
-    } catch (err: any) {
-      console.error('[handleJoinInventory] ¡ERROR! La llamada al servicio falló:', err);
-      this.mostrarAlerta('Error al unirse', err?.message || 'Error desconocido.');
-      return false; // Mantiene la alerta abierta
-    }
   }
 }

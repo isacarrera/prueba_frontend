@@ -21,10 +21,10 @@ import {
   qrCodeOutline,
   readerOutline,
 } from 'ionicons/icons';
-import { AlertHelperService } from 'src/app/services/Inicio-Operativo/alert-helper.service';
+import { AlertHelperService } from 'src/app/services/Common/alert-helper.service';
 import { CategoryFacadeService } from 'src/app/services/Inicio-Operativo/category-facade.service';
 import { InventoryFacadeService } from 'src/app/services/Inicio-Operativo/inventory-facade.service';
-import { NavigationService } from 'src/app/services/Inicio-Operativo/navigation.service';
+import { NavigationService } from 'src/app/services/Common/navigation.service';
 
 @Component({
   selector: 'app-inicio-operativo',
