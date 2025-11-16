@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
   chatbubbleEllipsesOutline,
+  checkmarkCircleOutline,
   checkmarkDoneOutline,
   checkmarkOutline,
   closeOutline,
@@ -54,7 +55,6 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
 
   // Estados de modales
   isInviteOpen = false;
-  isObservacionesOpen = false;
   isConfirmOpen = false;
   isExportOpen = false;
   isInstructionsOpen = false;
@@ -240,21 +240,6 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
   }
 
   // ========================================
-  // OBSERVACIONES
-  // ========================================
-
-  async guardarObservacion(): Promise<void> {
-    console.log('Observación guardada:', this.observacionTexto || '(sin texto)');
-    this.closeObservacionesModal();
-
-    const mensaje = this.observacionTexto.trim()
-      ? 'Tu observación ha sido guardada correctamente.'
-      : 'No escribiste ninguna observación, pero fue guardada como vacía.';
-
-    await this.alertHelper.showSuccess(mensaje);
-  }
-
-  // ========================================
   // GESTIÓN DE MODALES (UI PURA)
   // ========================================
 
@@ -272,14 +257,6 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
 
   closeInstructionsModal(): void {
     this.isInstructionsOpen = false;
-  }
-
-  openObservacionesModal(): void {
-    this.isObservacionesOpen = true;
-  }
-
-  closeObservacionesModal(): void {
-    this.isObservacionesOpen = false;
   }
 
   openConfirmModal(): void {
@@ -325,19 +302,16 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
   private registerIcons(): void {
     addIcons({
       cloudUploadOutline,
-      personCircleOutline,
-      chatbubbleEllipsesOutline,
+      checkmarkDoneOutline,
       documentTextOutline,
       homeOutline,
       qrCodeOutline,
       informationCircleOutline,
-      ellipsisHorizontalCircleOutline,
       personAddOutline,
       arrowBackOutline,
       checkmarkOutline,
       readerOutline,
       logOutOutline,
-      checkmarkDoneOutline,
       closeOutline,
     });
   }

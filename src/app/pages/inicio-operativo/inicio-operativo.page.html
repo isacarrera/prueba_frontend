@@ -3,25 +3,23 @@
 
     <!-- Header -->
     <div class="header">
-      <ion-icon name="log-out-outline" class="icon-left" (click)="onExitButtonPress()"></ion-icon>
+      <div class="circle-btn" (click)="onExitButtonPress()"><ion-icon name="log-out-outline"></ion-icon>
+      </div>
       <h1 class="title">Inicio</h1>
-      <div class="circle-btn" (click)="openInviteModal()"><ion-icon name="person-circle-outline"></ion-icon>
+      <div class="circle-btn" (click)="openInviteModal()"><ion-icon name="person-add-outline"></ion-icon>
       </div>
     </div>
 
     <!-- Top Actions -->
+
     <div class="top-actions">
-
-      <div class="circle-btn" (click)="openInstructionsModal()">
-        <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
-      </div>
-
-      <ion-button class="confirm-btn" (click)="openConfirmModal()">Confirmar</ion-button>
-
-      <div class="circle-btn" (click)="openObservacionesModal()">
-        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      <h2 class="subtitle">Listado Categorias</h2>
+      <div class="confirm-btn" (click)="openConfirmModal()">
+        <img src="assets/icons/Icono-Inventario.png" alt="Confirmar" class="confirm-icon-inven">
       </div>
     </div>
+
+
 
     <!-- Card List -->
     <div class="card-list">
@@ -42,10 +40,12 @@
       </div>
       <div class="nav-item" (click)="iniciarInventario()">
         <ion-icon name="qr-code-outline"></ion-icon>
+        <span>Escaner</span>
       </div>
 
-      <div class="nav-item" (click)="scanItemDescription()">
-        <ion-icon name="reader-outline"></ion-icon>
+      <div class="nav-item" (click)="openInstructionsModal()">
+        <ion-icon class="nav-item-info" name="information-circle-outline"></ion-icon>
+        <span>Info</span>
       </div>
     </div>
     <!-- 🔹 Modales -->
@@ -58,7 +58,6 @@
             <ion-icon name="checkmark-done-outline"></ion-icon>
           </div>
           <h1 class="confirm-title">Inventario</h1>
-          <p class="confirm-subtitle">Entrada</p>
           <h2 class="confirm-text">Confirmar Inventario</h2>
           <p class="confirm-note">Se Notificará al Encargado de Zona</p>
           <div class="confirm-actions">
@@ -101,8 +100,6 @@
           <div class="modal-icon">
             <ion-icon name="person-add-outline"></ion-icon>
           </div>
-          <span class="modal-subtitle">ADSO</span>
-          <h1></h1>
           <p>Código de Invitación</p>
           <div class="code-box">
             <span *ngFor="let char of codeArray">{{ char }}</span>
@@ -113,39 +110,5 @@
         </div>
       </ng-template>
     </ion-modal>
-    <ion-modal [isOpen]="isObservacionesOpen" (didDismiss)="closeObservacionesModal()" class="modal-sheet"
-      [initialBreakpoint]="1" [breakpoints]="[0, 1]" backdropDismiss="false" [canDismiss]="true"
-      [backdropBreakpoint]="0.5">
-
-      <ng-template>
-        <div class="sheet-container">
-
-          <div class="sheet-header">
-            <div class="sheet-handle"></div>
-            <h1 class="sheet-title">Observaciones</h1>
-            <ion-button fill="clear" (click)="closeObservacionesModal()">
-              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-            </ion-button>
-          </div>
-
-          <div class="sheet-content">
-            <p>Añade cualquier detalle o incidencia sobre el inventario.</p>
-
-            <ion-item lines="none" class="textarea-item">
-              <ion-textarea [(ngModel)]="observacionTexto" placeholder="Escribe tus observaciones..." autoGrow="true"
-                autofocus="true" rows="4" class="sheet-textarea">
-              </ion-textarea>
-            </ion-item>
-
-            <ion-button expand="block" class="save-btn" (click)="guardarObservacion()">
-              Guardar Observación
-              <ion-icon slot="end" name="checkmark-outline"></ion-icon>
-            </ion-button>
-          </div>
-
-        </div>
-      </ng-template>
-    </ion-modal>
-
   </div>
 </ion-content>

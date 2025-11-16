@@ -2,15 +2,16 @@
   --background: radial-gradient(circle at top, #0f172a, #0b0f2c 70%);
   color: white;
 }
+
 /* 🔹 Modal de Confirmación de Inventario */
 .confirm-card {
- background: rgba(11, 15, 44, 0.95);
+  background: rgba(11, 15, 44, 0.95);
   border-radius: 18px;
   padding: 32px 24px;
   text-align: center;
   color: white;
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
   max-width: 320px;
   margin: 0 auto;
   margin-top: 40px;
@@ -26,8 +27,9 @@
   align-items: center;
   margin: -70px auto 20px;
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
 }
+
 .confirm-icon ion-icon {
   font-size: 38px;
   color: #3b82f6;
@@ -38,16 +40,14 @@
   font-size: 24px;
   font-weight: 800;
 }
-.confirm-subtitle {
-  font-size: 16px;
-  color: #aaa;
-  margin-bottom: 20px;
-}
+
+
 .confirm-text {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 8px;
 }
+
 .confirm-note {
   font-size: 14px;
   color: #ddd;
@@ -71,6 +71,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .ok-btn ion-icon {
   font-size: 28px;
   color: #22c55e;
@@ -86,6 +87,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .cancel-btn ion-icon {
   font-size: 28px;
   color: #ef4444;
@@ -97,21 +99,23 @@
   padding: 20px;
   height: 100%;
 }
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 10px 0 25px;
 }
+
 .header .title {
   font-size: 24px;
   font-weight: 800;
-  margin-left: 40px;
   color: white;
   text-transform: uppercase;
   letter-spacing: 2px;
   text-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
 }
+
 .header ion-icon {
   font-size: 26px;
   color: white;
@@ -121,19 +125,18 @@
   box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
   transition: transform 0.2s ease;
 }
+
 .header ion-icon:hover {
   transform: scale(1.1);
 }
-.upload-icon {
-  color: #22c55e; /* Verde */
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+
+.subtitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
 }
-.top-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0 35px;
-}
+
 .circle-btn {
   width: 52px;
   height: 52px;
@@ -144,51 +147,111 @@
   justify-content: center;
   align-items: center;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6),
-              inset 0 0 10px rgba(59, 130, 246, 0.5);
+    inset 0 0 10px rgba(59, 130, 246, 0.5);
   transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
+
 .circle-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
 }
+
 .circle-btn ion-icon {
   font-size: 28px;
   color: white;
 }
-.confirm-btn {
-  --background: linear-gradient(135deg, #2563eb, #1e40af);
-  --border-radius: 14px;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: white;
-  padding: 10px 28px;
-  margin-left: 0;
-  letter-spacing: 1px;
-  transition: transform 0.2s ease;
-}
-.confirm-btn:hover {
-  transform: scale(1.05);
 
+// .top-actions {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin: 10px 0 35px;
+// }
+
+// .confirm-btn {
+//   width: 54px;
+//   height: 54px;
+//   margin-left: 0;
+//   border-radius: 50%;
+//   background: linear-gradient(135deg, #2563eb, #1e40af);
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   transition: transform 0.2s ease, box-shadow 0.3s ease;
+// }
+
+// .confirm-btn:hover {
+//   transform: scale(1.1);
+//   box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+// }
+
+// .confirm-btn ion-icon {
+//   font-size: 32px;
+//   color: white;
+// }
+
+.top-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0 35px;
 }
+
+.confirm-btn {
+  width: 55px;
+  height: 55px;
+  margin-left: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  animation: bounce 2s infinite;
+}
+
+.confirm-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  /* Pausar animación al hacer hover */
+  animation-play-state: paused;
+}
+
+.confirm-icon-inven {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+/* Definición de la animación bounce */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
 .card-list {
   flex: 1;
   margin-top: 10px;
 }
+
 .card-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  /* 🎨 Degradado vibrante */
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(147, 51, 234, 0.15));
   backdrop-filter: blur(10px);
-
   border: 1px solid rgba(59, 130, 246, 0.4);
   border-radius: 18px;
   padding: 18px;
   margin-bottom: 16px;
-
-  /* 🌟 Glow más vivo */
   box-shadow: 0 0 18px rgba(59, 130, 246, 0.3), inset 0 0 12px rgba(147, 51, 234, 0.25);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -198,55 +261,44 @@
   box-shadow: 0 0 25px rgba(59, 130, 246, 0.6), inset 0 0 18px rgba(147, 51, 234, 0.4);
 }
 
-.background-card {
-  background: rgba(255, 255, 255, 0.05); /* translúcido */
-  backdrop-filter: blur(12px);           /* efecto blur tipo glass */
-  border-radius: 20px;
-  padding: 16px;
-  margin: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6); /* sombra para resaltar */
-  border: 1px solid rgba(255,255,255,0.15);
-  flex: 1; /* ocupa el espacio disponible */
-  display: flex;
-  flex-direction: column;
-}
-
 .card-left {
   display: flex;
   flex-direction: column;
 }
+
 .card-left .label {
   font-weight: bold;
   font-size: 16px;
   color: #fff;
   text-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
 }
+
 .card-left .count {
   font-size: 13px;
   color: #aaa;
 }
+
 .card-icon {
   font-size: 26px;
   color: #fff;
-  background: rgba(59,130,246,0.2);
+  background: rgba(59, 130, 246, 0.2);
   border-radius: 14px;
   padding: 12px;
-  animation: neonPulse 2s infinite;
 }
-
 
 .bottom-bar {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(147,51,234,0.2));
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(147, 51, 234, 0.2));
   backdrop-filter: blur(12px);
   border-radius: 20px;
   padding: 12px 0;
   margin-bottom: 12px;
-  box-shadow: 0 -6px 18px rgba(0,0,0,0.7),
-              0 0 16px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.7),
+    0 0 16px rgba(59, 130, 246, 0.4);
 }
+
 .nav-item {
   display: flex;
   flex-direction: column;
@@ -255,13 +307,20 @@
   font-size: 13px;
   transition: all 0.3s ease;
 }
+
 .nav-item.active {
   color: #3b82f6;
   text-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
 }
+
 .nav-item ion-icon {
   font-size: 24px;
 }
+
+.nav-item-info {
+  font-size: 30px !important;
+}
+
 .nav-item:hover {
   color: white;
   transform: scale(1.1);
@@ -269,13 +328,13 @@
 
 ion-modal.custom-modal::part(content) {
   --width: 90%;
-   justify-content: center;
-   align-items: center; 
+  justify-content: center;
+  align-items: center;
   --height: auto;
   --border-radius: 20px;
   background: transparent;
   display: flex;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .modal-card {
@@ -284,11 +343,11 @@ ion-modal.custom-modal::part(content) {
   padding: 32px 24px;
   text-align: center;
   color: white;
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
   max-width: 320px;
-  max-height: 80vh; /* 🔹 evita que el modal sea demasiado grande */
-  overflow-y: auto;  /* 🔹 permite scroll interno */
+  max-height: 80vh;
+  overflow-y: auto;
   margin: 0 auto;
   margin-top: 40px;
   display: flex;
@@ -297,7 +356,7 @@ ion-modal.custom-modal::part(content) {
 }
 
 .modal-icon {
-width: 80px;
+  width: 80px;
   height: 80px;
   border-radius: 50%;
   background: #0f172a;
@@ -306,33 +365,35 @@ width: 80px;
   align-items: center;
   margin: 0px auto 20px;
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
 }
+
 .modal-icon ion-icon {
   font-size: 40px;
   color: white;
 }
-.modal-subtitle {
-  font-size: 16px;
-  color: #aaa;
-}
+
+
 .modal-card h1 {
   font-size: 28px;
   font-weight: bold;
 }
+
 .modal-card p {
   margin: 10px 0;
   font-size: 16px;
   color: #ddd;
 }
+
 .code-box {
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin: 0; 
+  margin: 0;
 }
+
 .code-box span {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border: 2px solid #2563eb;
   border-radius: 12px;
   padding: 10px 18px;
@@ -345,10 +406,10 @@ width: 80px;
 .back-btn {
   margin-top: 10px;
   --color: white;
-  margin: 10px auto 0 auto; 
+  margin: 10px auto 0 auto;
   display: block;
-  
 }
+
 /* 🔹 Observaciones Modal */
 .modal-title {
   font-size: 24px;
@@ -356,11 +417,6 @@ width: 80px;
   margin-top: 10px;
 }
 
-.modal-subtitle {
-  font-size: 16px;
-  color: #aaa;
-  margin-bottom: 20px;
-}
 .instructions-list {
   text-align: left;
   padding-left: 16px;
@@ -368,168 +424,7 @@ width: 80px;
   font-size: 14px;
   margin: 10px 0;
 }
+
 .instructions-list li {
   margin-bottom: 8px;
-}
-ion-item[lines="none"] {
-  --background: transparent;
-  --inner-border-width: 0;
-  --inner-padding-end: 0;
-}
-
-
-
-/* Botón atrás */
-.back-button {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  --background: rgba(10, 15, 44, 0);
-  --color: #fff;
-  border: 2px solid #3b82f6;
-  border-radius: 999px;
-  backdrop-filter: blur(4px);
-}
-.modal-card.exit {
-  background: rgba(30, 41, 59, 0.95);
-  border: 2px solid #f87171; /* rojo */
-}
-
-.ok-btn ion-icon {
-  color: #ef4444; /* rojo salir */
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.ok-btn ion-icon {
-  color: #22c55e; /* verde */
-  font-size: 26px;
-}
-
-.back-btn ion-icon {
-  color: #fff;
-  font-size: 26px;
-}
-/* 🔹🔹 NUEVOS Estilos Modal Observaciones (Bottom Sheet) 🔹🔹 */
-
-/* 1. Define el modal como una "hoja" que sube */
-ion-modal.modal-sheet {
-  --height: auto;
-  --border-radius: 24px 24px 0 0; /* Esquinas superiores redondeadas */
-  
-  /* Ancla el modal abajo */
-  align-items: flex-end; 
-}
-
-/* 2. Contenedor principal dentro del modal */
-.sheet-container {
-  width: 100%;
-  background: #0f172a; /* Color base oscuro */
-  border-top: 1px solid rgba(59, 130, 246, 0.4); /* Borde neón */
-  box-shadow: 0 -8px 25px rgba(0,0,0,0.5); /* Sombra superior */
-  padding: 16px 20px 30px 20px; /* Espaciado interno */
-  display: flex;
-  flex-direction: column;
-}
-
-/* 3. Encabezado (Título y botón de cerrar) */
-.sheet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  position: relative; /* Necesario para el "handle" */
-}
-
-/* 4. "Handle" (la barra gris para arrastrar) */
-.sheet-handle {
-  position: absolute;
-  top: -8px; /* Un poco por fuera del contenedor */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-}
-
-.sheet-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-}
-
-.sheet-header ion-button {
-  --color: white;
-  font-size: 24px;
-  margin: 0;
-}
-
-/* 5. Contenido (párrafo, textarea, botón) */
-.sheet-content {
-  text-align: left; /* Alinea el texto de ayuda */
-}
-
-.sheet-content p {
-  font-size: 14px;
-  color: #aaa;
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
-/* 6. Textarea (casi igual al anterior, pero renombrado) */
-.textarea-item {
-  --background: transparent;
-  --inner-border-width: 0;
-  --inner-padding-end: 0;
-  --padding-start: 0;
-}
-
-.sheet-textarea {
-  width: 100%;
-  min-height: 120px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 12px;
-  color: white;
-  font-size: 14px;
-  box-shadow: inset 0 0 8px rgba(37, 99, 235, 0.3);
-  --background: transparent;
-  --color: white;
-  --placeholder-color: #aaa;
-  --placeholder-opacity: 1;
-}
-
-.sheet-textarea:focus-within {
-  border-color: #3b82f6; /* Resaltar al enfocar */
-}
-
-/* 7. Nuevo botón de guardar (más grande y claro) */
-.save-btn {
-  --background: linear-gradient(135deg, #2563eb, #1e40af);
-  --border-radius: 12px;
-  font-weight: bold;
-  text-transform: none; /* Texto normal, no mayúsculas */
-  color: white;
-  margin-top: 20px;
-  height: 48px;
-}
-:global(ion-alert.custom-alert) {
-  
-  /* Botón de peligro (rojo) */
-  .alert-button-danger {
-    color: var(--ion-color-danger, #ef4444) !important;
-    font-weight: 600;
-  }
-  
-  /* Botón de cancelar (color secundario) */
-  .alert-button-cancel {
-    color: var(--ion-color-medium, #92949c) !important;
-  }
 }
