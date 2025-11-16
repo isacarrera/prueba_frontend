@@ -135,8 +135,8 @@ export class ScannerPage implements OnInit, OnDestroy {
       if (result.hasContent) {
         await this.handleScanResult(result.content);
 
-        if (this.scanMode === 'inventory') {
-          this.startScanning(); // vuelve a escanear automáticamente
+        if (this.scanMode === 'inventory' || this.scanMode === 'description') {
+          this.startScanning();
         }
       }
     } catch (err) {
@@ -159,7 +159,6 @@ export class ScannerPage implements OnInit, OnDestroy {
     }
 
     const code = cleanRaw.replace('Code:', '');
-    console.log('Código válido procesado:', code);
 
     if (this.scanMode === 'description') {
       await BarcodeScanner.stopScan();
@@ -173,13 +172,14 @@ export class ScannerPage implements OnInit, OnDestroy {
           await this.presentItemInfoModal(item as ItemData);
         } else {
           await this.showError(`No se encontró ningún ítem con código ${code}.`);
+          await new Promise(r => setTimeout(r, 1500));
         }
 
       } catch (error) {
         console.error('Error al obtener el ítem:', error);
         await this.showError('Error al obtener la descripción del ítem.');
+        await new Promise(r => setTimeout(r, 1500));
       }
-      this.navigateOnExit();
 
     } else {
       this.scannedCode = code;
