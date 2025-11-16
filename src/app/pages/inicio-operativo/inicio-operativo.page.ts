@@ -2,32 +2,27 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, Platform } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
-  chatbubbleEllipsesOutline,
-  checkmarkCircleOutline,
   checkmarkDoneOutline,
   checkmarkOutline,
   closeOutline,
   cloudUploadOutline,
   documentTextOutline,
-  ellipsisHorizontalCircleOutline,
   homeOutline,
   informationCircleOutline,
   logOutOutline,
   personAddOutline,
-  personCircleOutline,
   qrCodeOutline,
-  readerOutline,
+  readerOutline
 } from 'ionicons/icons';
 import { AlertHelperService } from 'src/app/services/Common/alert-helper.service';
-import { CategoryFacadeService } from 'src/app/services/Inicio-Operativo/category-facade.service';
-import { InventoryFacadeService } from 'src/app/services/Inicio-Operativo/inventory-facade.service';
 import { NavigationService } from 'src/app/services/Common/navigation.service';
-import { Platform } from '@ionic/angular';
+import { CategoryFacadeService } from 'src/app/services/Inicio-Operativo/category-facade.service';
 import { InventoryExitService } from 'src/app/services/Inicio-Operativo/inventory-exit.service';
+import { InventoryFacadeService } from 'src/app/services/Inicio-Operativo/inventory-facade.service';
 
 @Component({
   selector: 'app-inicio-operativo',
@@ -55,9 +50,9 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
 
   // Estados de modales
   isInviteOpen = false;
-  isConfirmOpen = false;
   isExportOpen = false;
   isInstructionsOpen = false;
+  isConfirmOpen = false;
 
   // Subscription del hardware back button
   private backButtonSubscription: any;
@@ -192,17 +187,38 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
   // ========================================
 
   async finalizarInventario(): Promise<void> {
+
+    this.closeConfirmModal();
+
+    const scannedCount = this.inventoryFacade.getScannedItemCount();
+
+    if (scannedCount === 0) {
+      await this.alertHelper.showError(
+        'No se puede finalizar un inventario sin ítems escaneados.'
+      );
+      return;
+    }
+
     const validation = this.inventoryFacade.validateInventoryCompletion(this.categorias);
 
-    // Si está incompleto, pedir confirmación
     if (!validation.isComplete) {
       const shouldProceed = await this.inventoryFacade.showIncompleteInventoryAlert(validation);
 
       if (!shouldProceed) {
-        this.closeConfirmModal();
-        return;
+        return; // El usuario canceló en la alerta de incompletos
       }
     }
+
+    const observationResult = await this.alertHelper.showObservationPrompt(
+      'Finalizar inventario',
+      'Agrega observaciones si lo deseas (opcional):'
+    );
+
+    if (observationResult === null) {
+      return;
+    }
+
+    this.observacionTexto = observationResult;
 
     await this.executeFinishInventory();
   }
@@ -212,7 +228,6 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
 
     if (result.success) {
       this.observacionTexto = '';
-      this.closeConfirmModal();
 
       await this.alertHelper.showInfoWithCallback(
         '✅ Éxito',
@@ -259,20 +274,20 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
     this.isInstructionsOpen = false;
   }
 
-  openConfirmModal(): void {
-    this.isConfirmOpen = true;
-  }
-
-  closeConfirmModal(): void {
-    this.isConfirmOpen = false;
-  }
-
   openExportModal(): void {
     this.isExportOpen = true;
   }
 
   closeExportModal(): void {
     this.isExportOpen = false;
+  }
+
+  openConfirmModal(): void {
+    this.isConfirmOpen = true;
+  }
+
+  closeConfirmModal(): void {
+    this.isConfirmOpen = false;
   }
 
   // ========================================

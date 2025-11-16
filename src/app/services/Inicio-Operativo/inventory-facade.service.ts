@@ -162,6 +162,14 @@ export class InventoryFacadeService {
   }
 
   /**
+   * Obtiene el total de items escaneados actualmente
+   */
+  getScannedItemCount(): number {
+    // Reutilizamos el 'inventoryService' que ya está inyectado
+    return this.inventoryService.getScannedItems().length;
+  }
+
+  /**
    * Verifica si hay un inventario activo
    */
   hasActiveInventory(): boolean {

@@ -112,4 +112,47 @@ export class AlertHelperService {
       await alert.present();
     });
   }
+
+  // En: AlertHelperService.ts
+
+  /**
+   * Muestra alerta de confirmación con un input de textarea
+   * @returns Promise<string | null> - El texto escrito, o null si cancela
+   */
+  async showObservationPrompt(
+    header: string,
+    message: string
+  ): Promise<string | null> {
+    return new Promise(async (resolve) => {
+      const alert = await this.alertController.create({
+        header,
+        message,
+        cssClass: 'custom-alert', // Opcional, si tienes estilos
+        inputs: [
+          {
+            name: 'observations',
+            type: 'textarea',
+            placeholder: 'Observaciones (opcional)'
+          }
+        ],
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            cssClass: 'alert-button-cancel',
+            handler: () => resolve(null) // Resuelve null si cancela
+          },
+          {
+            text: 'Finalizar',
+            cssClass: 'alert-button-confirm', // Opcional
+            handler: (data) => {
+              const obs = (data?.observations ?? '').trim();
+              resolve(obs); // Resuelve el texto (vacío o escrito)
+            }
+          }
+        ]
+      });
+      await alert.present();
+    });
+  }
 }

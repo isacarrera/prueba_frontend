@@ -29,9 +29,9 @@ export class StateSelectionModalComponent implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private inventoryService : InventoryService,
-    private stateItemService : StateItemService
-  ) {}
+    private inventoryService: InventoryService,
+    private stateItemService: StateItemService
+  ) { }
 
   async ngOnInit() {
     await this.loadStateItems();
@@ -95,8 +95,22 @@ export class StateSelectionModalComponent implements OnInit {
 
       this.showFeedbackView = true;
     } catch (err: any) {
-      this.lastResponse = { error: err.message };
-      this.feedbackMessage = 'No se pudo enviar el escaneo. Verifica tu conexión.';
+      let backendMessage = 'No se pudo enviar el escaneo. Verifica tu conexión.';
+
+      if (err?.error?.message) {
+        backendMessage = err.error.message;
+      }
+
+      else if (err?.error?.error) {
+        backendMessage = err.error.error;
+      }
+
+      else if (typeof err === 'string') {
+        backendMessage = err;
+      }
+
+      this.lastResponse = { error: backendMessage };
+      this.feedbackMessage = backendMessage;
       this.feedbackStatus = 'error';
       this.showFeedbackView = true;
     } finally {
