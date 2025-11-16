@@ -135,8 +135,7 @@ export class ScannerPage implements OnInit, OnDestroy {
       const result = await BarcodeScanner.startScan();
 
       if (result.hasContent) {
-        const cleanCode = result.content.replace(/^Code:/, '');
-        await this.handleScanResult(cleanCode);
+        await this.handleScanResult(result.content);
 
         if (this.scanMode === 'inventory') {
           this.startScanning(); // vuelve a escanear automáticamente
@@ -149,34 +148,42 @@ export class ScannerPage implements OnInit, OnDestroy {
   }
 
   // Maneja el resultado del escaneo
-  private async handleScanResult(cleanCode: string) {
+  private async handleScanResult(rawCode: string) {
+
+    const cleanRaw = rawCode.trim().replace(/\s+/g, '');
+    const QR_REGEX = /^Code:[A-Za-z0-9]{1,12}$/
+
+    if (!QR_REGEX.test(cleanRaw)) {
+      await this.showError('Código QR inválido. Solo se aceptan QRs del sistema.');
+
+      if (this.scanMode === 'inventory') this.startScanning();
+      return;
+    }
+
+    const code = cleanRaw.replace('Code:', '');
+    console.log('Código válido procesado:', code);
+
     if (this.scanMode === 'description') {
       await BarcodeScanner.stopScan();
-
       try {
         const item = await this.itemService
-          .getByCodeAndBranch(this.branchId, cleanCode)
+          .getByCodeAndBranch(this.branchId, code)
           .toPromise();
 
-        if (item) {
-          this.descriptionItem = item;
-          this.descriptionError = null;
-        } else {
-          this.descriptionItem = null;
-          this.descriptionError = `No se encontró ningún ítem con código ${cleanCode}.`;
-        }
-      } catch (error) {
-        console.error('Error al obtener el ítem:', error);
+        this.descriptionItem = item ?? null;
+        this.descriptionError = item
+          ? null
+          : `No se encontró ningún ítem con código ${code}.`;
+      } catch {
         this.descriptionItem = null;
         this.descriptionError = 'Error al obtener la descripción del ítem.';
       }
-
       this.isDescriptionModalOpen = true;
     } else {
-      this.scannedCode = cleanCode;
+      this.scannedCode = code;
       await new Promise((r) => setTimeout(r, 800));
       this.scannedCode = null;
-      await this.openStateSelectionModal(cleanCode);
+      await this.openStateSelectionModal(code);
     }
   }
 
