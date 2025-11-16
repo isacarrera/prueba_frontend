@@ -12,7 +12,8 @@ import {
   lockOpenOutline,
   personAddOutline,
   shieldCheckmarkOutline,
-  addOutline
+  addOutline,
+  qrCodeOutline
 } from 'ionicons/icons';
 import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
 import { NavigationService } from 'src/app/services/Common/navigation.service';
@@ -196,7 +197,8 @@ export class HomePage implements OnInit, OnDestroy {
       'shield-checkmark-outline': shieldCheckmarkOutline,
       'apps-outline': appsOutline,
       'person-add-outline': personAddOutline,
-      'add-outline': addOutline
+      'add-outline': addOutline,
+      qrCodeOutline
     });
   }
 }

@@ -15,11 +15,11 @@ import {
   qrCodeOutline,
   warningOutline
 } from 'ionicons/icons';
-import { AuthService } from 'src/app/services/auth.service';
 import { InventoryService } from 'src/app/services/inventary.service';
 import { Item, ItemService } from 'src/app/services/item.service';
-import { ZonasInventarioService } from 'src/app/services/zonas-inventario.service';
 import { StateSelectionModalComponent } from '../state-selection-modal/state-selection-modal.component';
+import { ItemInfoModalComponent } from '../item-info-modal/item-info-modal.component';
+import { ItemData } from 'src/app/Interfaces/item-info.model';
 
 @Component({
   selector: 'app-scanner',
@@ -51,8 +51,6 @@ export class ScannerPage implements OnInit, OnDestroy {
     private modalController: ModalController,
     private route: ActivatedRoute,
     private itemService: ItemService,
-    private zonasService: ZonasInventarioService,
-    private authService: AuthService
   ) {
     addIcons({
       closeOutline,
@@ -165,20 +163,24 @@ export class ScannerPage implements OnInit, OnDestroy {
 
     if (this.scanMode === 'description') {
       await BarcodeScanner.stopScan();
+
       try {
         const item = await this.itemService
           .getByCodeAndBranch(this.branchId, code)
           .toPromise();
 
-        this.descriptionItem = item ?? null;
-        this.descriptionError = item
-          ? null
-          : `No se encontró ningún ítem con código ${code}.`;
-      } catch {
-        this.descriptionItem = null;
-        this.descriptionError = 'Error al obtener la descripción del ítem.';
+        if (item) {
+          await this.presentItemInfoModal(item as ItemData);
+        } else {
+          await this.showError(`No se encontró ningún ítem con código ${code}.`);
+        }
+
+      } catch (error) {
+        console.error('Error al obtener el ítem:', error);
+        await this.showError('Error al obtener la descripción del ítem.');
       }
-      this.isDescriptionModalOpen = true;
+      this.navigateOnExit();
+
     } else {
       this.scannedCode = code;
       await new Promise((r) => setTimeout(r, 800));
@@ -188,7 +190,6 @@ export class ScannerPage implements OnInit, OnDestroy {
   }
 
   closeDescriptionModal() {
-    this.isDescriptionModalOpen = false;
     this.navigateOnExit();
   }
 
@@ -203,6 +204,20 @@ export class ScannerPage implements OnInit, OnDestroy {
     });
 
     await modal.present();
+    await modal.onDidDismiss();
+  }
+
+  private async presentItemInfoModal(itemData: ItemData) {
+    const modal = await this.modalController.create({
+      component: ItemInfoModalComponent,
+      componentProps: {
+        itemData: itemData
+      },
+      cssClass: 'item-info-modal'
+    });
+
+    await modal.present();
+
     await modal.onDidDismiss();
   }
 

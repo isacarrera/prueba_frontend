@@ -1,0 +1,53 @@
+<ion-content class="ion-padding">
+  <div class="center-wrapper">
+    <div class="modal-wrapper">
+      <header class="modal-header">
+        <h2>Información del Ítem</h2>
+        <span class="item-code">{{ itemData.code }}</span>
+        <button class="close-button" (click)="dismiss()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </header>
+
+      <div class="info-content">
+        <!-- Información Principal -->
+        <div class="info-section">
+          <div class="info-row">
+            <div class="info-label">Nombre</div>
+            <div class="info-value">{{ itemData.name || 'No disponible' }}</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">Descripción</div>
+            <div class="info-value description">{{ itemData.description || 'Sin descripción' }}</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">Categoría</div>
+            <div class="info-value">{{ itemData.categoryName || 'No asignada' }}</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">Estado</div>
+            <div class="info-value status-badge" [ngClass]="getStatusClass(itemData.stateItemName)">
+              {{ itemData.stateItemName || 'Desconocido' }}
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">Zona</div>
+            <div class="info-value">{{ itemData.zoneName || 'No asignada' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="action-buttons">
+        <ion-button fill="outline" color="medium" class="action-button" (click)="dismiss()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Cerrar
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

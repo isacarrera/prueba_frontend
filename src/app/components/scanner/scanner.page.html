@@ -34,46 +34,4 @@
       <p class="code-text">{{ scannedCode }}</p>
     </div>
   </div>
-
-  <ion-modal [isOpen]="isDescriptionModalOpen" (willDismiss)="closeDescriptionModal()" class="description-modal-full">
-    <ng-template>
-      <ion-content class="modal-content-wrapper ion-padding">
-        <div class="description-card">
-          <div class="card-header">
-            <h1 class="card-title">Descripción del Ítem</h1>
-            <ion-button fill="clear" color="light" (click)="closeDescriptionModal()">
-              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-            </ion-button>
-          </div>
-
-          <ng-container *ngIf="descriptionItem; else errorTpl">
-            <h2 class="item-name">{{ descriptionItem.name }}</h2>
-
-            <div class="data-grid">
-              <p><strong>Código:</strong> <span>{{ descriptionItem.code }}</span></p>
-              <p><strong>Categoría:</strong> <span>{{ descriptionItem.categoryName }}</span></p>
-              <p><strong>Estado:</strong> <span [class.available]="descriptionItem.stateItemName === 'Disponible'">{{
-                  descriptionItem.stateItemName }}</span></p>
-              <p><strong>Zona:</strong> <span>{{ descriptionItem.zoneName }}</span></p>
-            </div>
-
-            <div class="description-box">
-              <p class="description-label">Descripción:</p>
-              <p class="description-text-content">{{ descriptionItem.description }}</p>
-            </div>
-
-
-          </ng-container>
-
-          <ng-template #errorTpl>
-            <ion-text color="danger">
-              <p class="error-message">{{ descriptionError || 'No se pudo obtener la descripción del ítem.' }}</p>
-            </ion-text>
-          </ng-template>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
-
-
 </ion-content>
