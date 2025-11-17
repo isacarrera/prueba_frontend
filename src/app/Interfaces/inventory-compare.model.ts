@@ -10,6 +10,7 @@ export interface InventoryCompareItem {
   scannedState?: string;
   scannedStateName: string;
   categoryName: string;
+  zoneOrigen?: string;
 }
 
 export interface InventoryCompareResponse {

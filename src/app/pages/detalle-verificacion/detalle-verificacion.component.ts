@@ -109,7 +109,7 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
 
     const totalIssues =
       (this.comparacion.missingItems?.length || 0) +
-      // (this.comparacion.unexpectedItems?.length || 0) +
+      (this.comparacion.unexpectedItems?.length || 0) +
       (this.comparacion.stateMismatches?.length || 0);
 
     if (totalIssues === 0) return 'clean';
@@ -379,13 +379,13 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
         }
         break;
 
-      // case 'unexpected':
-      //   if (this.comparacion.unexpectedItems?.length > 0) {
-      //     this.verDetalle('Ítems Inesperados', this.comparacion.unexpectedItems);
-      //   } else {
-      //     this.mostrarAlerta('Sin cambios', 'No hay ítems inesperados para mostrar.');
-      //   }
-      //   break;
+      case 'unexpected':
+        if (this.comparacion.unexpectedItems?.length > 0) {
+          this.verDetalle('Ítems Inesperados', this.comparacion.unexpectedItems);
+        } else {
+          this.mostrarAlerta('Sin cambios', 'No hay ítems inesperados para mostrar.');
+        }
+        break;
 
       case 'mismatch':
         if (this.comparacion.stateMismatches?.length > 0) {

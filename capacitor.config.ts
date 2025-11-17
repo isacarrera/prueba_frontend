@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
   server: {
     cleartext: true, // permite http://
     androidScheme: 'http',
-    hostname: '10.240.214.185',
+    hostname: '10.222.252.185',
   }
 };
 
