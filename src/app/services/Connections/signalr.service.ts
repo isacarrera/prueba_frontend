@@ -4,6 +4,8 @@ import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signal
 import { environment } from 'src/environments/environment.prod';
 import { AuthService } from '../auth.service';
 import { InventoryService } from '../inventary.service';
+import { ZoneFacadeService } from '../Home/zone-facade.service';
+import { ZoneStateUpdate } from 'src/app/Interfaces/zone.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,8 @@ export class SignalrService {
   constructor(
     private authService: AuthService,
     private alertController: AlertController,
-    private inventoryService: InventoryService
+    private inventoryService: InventoryService,
+    private zoneFacade: ZoneFacadeService
   ) { }
 
   public async startConnection(): Promise<void> {
@@ -41,6 +44,7 @@ export class SignalrService {
       await this.hubConnection.start();
       console.log('Conexión SignalR establecida con éxito. ID:', this.hubConnection.connectionId);
       this.registerInventoryListeners();
+      this.registerZoneStateListener();
 
     } catch (err) {
       console.error('Error al conectar con SignalR:', err);
@@ -91,5 +95,18 @@ export class SignalrService {
       console.error(`[SignalR] Error al invocar 'JoinInventoryGroup':`, err);
       throw err;
     }
+  }
+
+  /**
+   * Escucha cambios de estado de Zonas y los pasa al ZoneFacade.
+   */
+  private registerZoneStateListener(): void {
+    if (!this.hubConnection) return;
+
+    // "ReceiveZoneStateUpdate" debe coincidir con el string en el backend
+    this.hubConnection.on('ReceiveZoneStateUpdate', (payload: ZoneStateUpdate) => {
+      console.log('🔔 Evento [ReceiveZoneStateUpdate] Recibido:', payload);
+      this.zoneFacade.handleZoneStateUpdate(payload);
+    });
   }
 }

@@ -15,12 +15,13 @@ import {
   addOutline,
   qrCodeOutline
 } from 'ionicons/icons';
-import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
+import { FilterState, StateZone, ZonaInventarioBranch, ZoneStateUpdate } from 'src/app/Interfaces/zone.model';
 import { NavigationService } from 'src/app/services/Common/navigation.service';
 import { InventoryGuestService } from 'src/app/services/Home/inventory-guest.service';
 import { ZoneFacadeService } from 'src/app/services/Home/zone-facade.service';
 import { AlertHelperService } from 'src/app/services/Common/alert-helper.service';
 import { Platform } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -47,6 +48,9 @@ export class HomePage implements OnInit, OnDestroy {
   // Subscription del hardware back button
   private backButtonSubscription: any;
 
+  // Signal
+  private zoneUpdateSubscription: Subscription | null = null;
+
   constructor() {
     this.registerIcons();
     this.initializeFilters();
@@ -62,6 +66,14 @@ export class HomePage implements OnInit, OnDestroy {
 
   async ionViewWillEnter() {
     await this.loadZones();
+
+    if (this.zoneUpdateSubscription) {
+      this.zoneUpdateSubscription.unsubscribe();
+    }
+
+    this.zoneUpdateSubscription = this.zoneFacade.zoneStateUpdates$.subscribe(payload => {
+      this.updateLocalZoneState(payload);
+    });
   }
 
   async handleRefresh(event: any) {
@@ -73,6 +85,10 @@ export class HomePage implements OnInit, OnDestroy {
     // Limpiar subscription del hardware back button
     if (this.backButtonSubscription) {
       this.backButtonSubscription.unsubscribe();
+    }
+
+    if (this.zoneUpdateSubscription) {
+      this.zoneUpdateSubscription.unsubscribe();
     }
   }
 
@@ -101,6 +117,31 @@ export class HomePage implements OnInit, OnDestroy {
     if (result.error) {
       const header = result.zones.length === 0 ? 'Aviso' : 'Error';
       await this.alertHelper.showInfo(header, result.error);
+    }
+  }
+
+  /**
+   * Busca la zona en el array 'this.zonas' y actualiza sus propiedades.
+   */
+  private updateLocalZoneState(payload: ZoneStateUpdate): void {
+    if (!this.zonas || this.zonas.length === 0) return;
+
+    const zoneIndex = this.zonas.findIndex(z => z.id === payload.zoneId);
+
+    if (zoneIndex > -1) {
+      console.log(`Actualizando UI para Zona ${payload.zoneId}`);
+
+      // Actualizamos las propiedades de la zona en el array
+      this.zonas[zoneIndex] = {
+        ...this.zonas[zoneIndex], // Conservar datos existentes (id, name, branchId)
+        stateZone: this.parseStateZoneFromString(payload.newState), // Necesitarás un helper
+        stateLabel: payload.newStateLabel,
+        iconName: payload.newIconName,
+        isAvailable: payload.isAvailable
+      };
+
+      // Forzar la re-renderización si Angular no lo detecta (a veces necesario)
+      // this.zonas = [...this.zonas];
     }
   }
 
@@ -185,6 +226,19 @@ export class HomePage implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  /**
+   * (Este helper ya lo tenías en tu 'ZonasInventarioService',
+   * lo copiamos aquí o lo movemos a un helper global)
+   */
+  private parseStateZoneFromString(stateString: string): StateZone {
+    switch (stateString.toLowerCase()) {
+      case 'available': return StateZone.Available;
+      case 'ininventory': return StateZone.InInventory;
+      case 'inverification': return StateZone.InVerification;
+      default: return StateZone.InVerification;
+    }
   }
 
   private registerIcons(): void {

@@ -43,3 +43,11 @@ export interface FilterState {
   icon: string;
   active: boolean;
 }
+
+export interface ZoneStateUpdate {
+  zoneId: number;
+  newState: string;
+  newStateLabel: string;
+  newIconName: string;
+  isAvailable: boolean;
+}

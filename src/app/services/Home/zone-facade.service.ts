@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, Subject, catchError, map, of } from 'rxjs';
 import { ZonasInventarioService } from '../zonas-inventario.service';
 import { AuthService } from '../auth.service';
-import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces/zone.model';
+import { FilterState, StateZone, ZonaInventarioBranch, ZoneStateUpdate } from 'src/app/Interfaces/zone.model';
 
 /**
  * Facade para gestión completa de zonas operativas
@@ -12,16 +12,21 @@ import { FilterState, StateZone, ZonaInventarioBranch } from 'src/app/Interfaces
   providedIn: 'root'
 })
 export class ZoneFacadeService {
+
   private readonly zonasService = inject(ZonasInventarioService);
   private readonly authService = inject(AuthService);
 
-  // 🔹 Filtros predefinidos del sistema
+  // Filtros predefinidos del sistema
   private readonly DEFAULT_FILTERS: FilterState[] = [
     { id: 1, name: 'Todos', state: null, icon: 'apps-outline', active: true },
     { id: 2, name: 'Disponible', state: StateZone.Available, icon: 'lock-open-outline', active: false },
     { id: 3, name: 'En Inventario', state: StateZone.InInventory, icon: 'lock-close-outline', active: false },
     { id: 4, name: 'En Verificación', state: StateZone.InVerification, icon: 'shield-checkmark-outline', active: false }
   ];
+
+  // Signal
+  private zoneUpdateSubject = new Subject<ZoneStateUpdate>();
+  public zoneStateUpdates$ = this.zoneUpdateSubject.asObservable();
 
   /**
    * Obtiene los filtros por defecto
@@ -139,5 +144,13 @@ export class ZoneFacadeService {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Llamado por SignalrService para empujar una actualización de estado.
+   */
+  public handleZoneStateUpdate(payload: ZoneStateUpdate): void {
+    console.log(`[ZoneFacade] Recibida actualización por Socket para Zona ${payload.zoneId}`);
+    this.zoneUpdateSubject.next(payload);
   }
 }
