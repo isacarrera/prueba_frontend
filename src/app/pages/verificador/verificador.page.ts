@@ -84,6 +84,59 @@ export class VerificadorPage {
     });
   }
 
+  async recuperar() {
+    const alert = await this.alertCtrl.create({
+      header: 'Recuperar contraseña',
+      message: 'Ingresa tu correo electrónico registrado',
+      inputs: [
+        {
+          name: 'email',
+          type: 'email',
+          placeholder: 'tu_correo@email.com'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Enviar',
+          handler: (data) => {
+            const email = data.email?.trim();
+            if (!email) {
+              this.showAlert('Error', 'Debes ingresar un correo válido');
+              return false;
+            }
+
+            this.enviarSolicitudRecuperacion(email);
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private enviarSolicitudRecuperacion(email: string) {
+    this.authService.forgotPassword(email).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.showAlert('Correo enviado', res.message || 'Revisa tu bandeja de entrada');
+        } else {
+          this.showAlert('Aviso', res.message || 'Si el correo está registrado, recibirás instrucciones');
+        }
+      },
+      error: (err) => {
+        console.error('Error al solicitar recuperación:', err);
+
+        if (err.status === 0) {
+          this.showAlert('Error', 'No hay conexión con el servidor.');
+        } else {
+          this.showAlert('Error', err.error?.message || 'No fue posible procesar la solicitud.');
+        }
+      }
+    });
+  }
+
   private async showAlert(header: string, message: string) {
     const alert = await this.alertCtrl.create({
       header,
@@ -92,4 +145,6 @@ export class VerificadorPage {
     });
     await alert.present();
   }
+
+
 }

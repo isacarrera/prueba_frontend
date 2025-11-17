@@ -42,45 +42,49 @@ export class AuthService {
   }
 
   loginOperativo(documentType: string, documentNumber: string) {
-  return this.http.post<any>(`${this.apiUrl}/LoginOperativo`, {
-    documentType,
-    documentNumber
-  }).pipe(
-    // 👇 MOVEMOS toda la lógica al switchMap para manejar tanto success como errors
-    switchMap(async (res) => {
-      await this.init();
+    return this.http.post<any>(`${this.apiUrl}/LoginOperativo`, {
+      documentType,
+      documentNumber
+    }).pipe(
+      // 👇 MOVEMOS toda la lógica al switchMap para manejar tanto success como errors
+      switchMap(async (res) => {
+        await this.init();
 
-      // Si el backend responde con success: false pero código HTTP 200
-      if (res.success === false) {
-        throw new Error(res.message || 'Acceso denegado');
-      }
+        // Si el backend responde con success: false pero código HTTP 200
+        if (res.success === false) {
+          throw new Error(res.message || 'Acceso denegado');
+        }
 
-      // Si no trae tokens, también es error
-      if (!res.token || !res.refreshToken) {
-        throw new Error('El servidor no envió los tokens');
-      }
+        // Si no trae tokens, también es error
+        if (!res.token || !res.refreshToken) {
+          throw new Error('El servidor no envió los tokens');
+        }
 
-      // 👇 GUARDAR TOKENS solo si es exitoso
-      await this.storage.set('access_token', res.token);
-      await this.storage.set('refresh_token', res.refreshToken);
-      this.idleService.startWatching();
+        // 👇 GUARDAR TOKENS solo si es exitoso
+        await this.storage.set('access_token', res.token);
+        await this.storage.set('refresh_token', res.refreshToken);
+        this.idleService.startWatching();
 
-      // Devolvemos la respuesta para el next()
-      return res;
-    }),
-    catchError((error: HttpErrorResponse) => {
-      // 👇 MANEJAMOS ERRORES HTTP (401, 403, 500, etc.)
-      if (error.status === 401 || error.status === 403) {
-        // Para 401/403, el backend envía el mensaje en error.error
-        const message = error.error?.message || error.message;
-        throw new Error(message);
-      } else {
-        // Otros errores (conexión, servidor, etc.)
-        throw new Error('Problema de conexión. Intenta nuevamente.');
-      }
-    })
-  );
-}
+        // Devolvemos la respuesta para el next()
+        return res;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        // 👇 MANEJAMOS ERRORES HTTP (401, 403, 500, etc.)
+        if (error.status === 401 || error.status === 403) {
+          // Para 401/403, el backend envía el mensaje en error.error
+          const message = error.error?.message || error.message;
+          throw new Error(message);
+        } else {
+          // Otros errores (conexión, servidor, etc.)
+          throw new Error('Problema de conexión. Intenta nuevamente.');
+        }
+      })
+    );
+  }
+
+  forgotPassword(email: string) {
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email });
+  }
 
 
   async getAccessToken() {
