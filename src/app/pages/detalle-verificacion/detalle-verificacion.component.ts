@@ -109,7 +109,7 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
 
     const totalIssues =
       (this.comparacion.missingItems?.length || 0) +
-      (this.comparacion.unexpectedItems?.length || 0) +
+      // (this.comparacion.unexpectedItems?.length || 0) +
       (this.comparacion.stateMismatches?.length || 0);
 
     if (totalIssues === 0) return 'clean';
@@ -312,20 +312,9 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
           itemId: i.itemId,
           code: i.code,
           name: i.name,
-          // TODO: cuando el backend exponga categoría real del ítem, usar ese campo.
-          category: (i as any).category ?? i.reason ?? 'Sin categoría',
+          category: i.categoryName,
           baseState: i.expectedState || 'DESCONOCIDO',   // Inventario base
-          inventaryState: 'FALTANTE'                     // Estado en inventario actual
-        })),
-
-        // ÍTEMS INESPERADOS
-        ...(cmp.unexpectedItems || []).map<InventoryDifference>((i: InventoryCompareItem) => ({
-          itemId: i.itemId,
-          code: i.code,
-          name: i.name,
-          category: (i as any).category ?? i.reason ?? 'Sin categoría',
-          baseState: i.expectedState || 'DESCONOCIDO',
-          inventaryState: 'EXTRA'
+          inventaryState: i.scannedStateName || 'Perdido'                     // Estado en inventario actual
         })),
 
         // DISCREPANCIAS DE ESTADO
@@ -333,7 +322,7 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
           itemId: i.itemId,
           code: i.code,
           name: i.name,
-          category: (i as any).category ?? i.reason ?? 'Sin categoría',
+          category: i.categoryName,
           baseState: i.expectedState || 'DESCONOCIDO',
           inventaryState: i.scannedStateName || 'DESCONOCIDO'
         }))
@@ -390,13 +379,13 @@ export class DetalleVerificacionPage implements OnInit, OnDestroy {
         }
         break;
 
-      case 'unexpected':
-        if (this.comparacion.unexpectedItems?.length > 0) {
-          this.verDetalle('Ítems Inesperados', this.comparacion.unexpectedItems);
-        } else {
-          this.mostrarAlerta('Sin cambios', 'No hay ítems inesperados para mostrar.');
-        }
-        break;
+      // case 'unexpected':
+      //   if (this.comparacion.unexpectedItems?.length > 0) {
+      //     this.verDetalle('Ítems Inesperados', this.comparacion.unexpectedItems);
+      //   } else {
+      //     this.mostrarAlerta('Sin cambios', 'No hay ítems inesperados para mostrar.');
+      //   }
+      //   break;
 
       case 'mismatch':
         if (this.comparacion.stateMismatches?.length > 0) {
