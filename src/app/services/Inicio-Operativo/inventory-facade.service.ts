@@ -1,11 +1,14 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import { firstValueFrom, Observable } from 'rxjs';
+import { ModalController } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
+import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
+import { ManualScanEntry } from 'src/app/Interfaces/missing.model copy';
+import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
+import { UnscannedItemsModalComponent } from 'src/app/components/unscanned-items-modal/unscanned-items-modal.component';
+import { AuthService } from '../auth.service';
 import { InventoryService } from '../inventary.service';
 import { OperatingService } from '../operating.service';
-import { AuthService } from '../auth.service';
-import { StartInventoryRequestDto } from 'src/app/Interfaces/start-inventory-request.model';
-import { FinishRequestDto } from 'src/app/Interfaces/finish-request.model';
 
 
 /**
@@ -20,6 +23,7 @@ export class InventoryFacadeService {
   private readonly operatingService = inject(OperatingService);
   private readonly authService = inject(AuthService);
   private readonly alertController = inject(AlertController);
+  private readonly modalController = inject(ModalController);
 
   /**
    * Obtiene el Operating Group ID del usuario actual
@@ -130,34 +134,83 @@ export class InventoryFacadeService {
     const inventaryId = this.inventoryService.getInventaryId();
 
     if (!inventaryId) {
-      return {
-        success: false,
-        error: 'No hay un inventario activo para finalizar.'
-      };
+      return { success: false, error: 'No hay un inventario activo.' };
     }
 
-    const request: FinishRequestDto = {
-      inventaryId,
-      observations: observations.trim() || ''
-    };
-
     try {
+      // Consultar Faltantes al Backend
+      const missingItems = await firstValueFrom(
+        this.inventoryService.getMissingItems(inventaryId)
+      );
+
+      // PASO 2: Si hay faltantes, abrir Modal
+      if (missingItems && missingItems.length > 0) {
+
+        // MapeaR el DTO del back al formato que espera el Modal
+        const modalItems = missingItems.map(item => ({
+          id: item.itemId,
+          code: item.code,
+          name: item.name,
+          description: item.description,
+          currentState: item.currentState
+        }));
+
+        const modal = await this.modalController.create({
+          component: UnscannedItemsModalComponent,
+          componentProps: {
+            unscannedItems: modalItems
+          },
+          backdropDismiss: false // Obliga a interactuar
+        });
+
+        await modal.present();
+        const { data } = await modal.onWillDismiss();
+
+        // Si el usuario cancela el modal, abortar la finalización
+        if (!data || data.action !== 'apply') {
+          return { success: false, error: 'Finalización cancelada: Ítems pendientes.' };
+        }
+
+        // PASO 3: Registrar Correcciones
+        // El modal devuelve texto ('en orden'), el back necesita IDs (1)
+        const itemsToSend: ManualScanEntry[] = data.updatedItems.map((uItem: any) => ({
+          itemId: uItem.id,
+          stateItemId: this.mapStateToId(uItem.finalState)
+        }));
+
+        await firstValueFrom(
+          this.inventoryService.registerManualScans(inventaryId, itemsToSend)
+        );
+      }
+
+      const request: FinishRequestDto = {
+        inventaryId,
+        observations: observations.trim() || ''
+      };
+
       await this.inventoryService.finish(request).toPromise();
       this.inventoryService.setInventaryId(0);
 
       return { success: true };
+
     } catch (error: any) {
-      console.error('Error al finalizar inventario:', error);
+      console.error('Error en proceso de finalización:', error);
+      const msg = error?.error?.Message || error?.message || 'Error desconocido.';
+      return { success: false, error: msg };
+    }
+  }
 
-      let errorMessage = 'No se pudo finalizar el inventario.';
-      if (error?.error?.message) errorMessage = error.error.message;
-      else if (error?.status === 400) errorMessage = 'Datos inválidos. Verifica la información.';
-      else if (error?.status === 404) errorMessage = 'Inventario no encontrado.';
-
-      return {
-        success: false,
-        error: errorMessage
-      };
+  /**
+   * Helper para convertir el texto del Modal a IDs de base de datos
+   */
+  private mapStateToId(stateText: string): number {
+    const normalized = stateText?.toLowerCase().trim() || '';
+    switch (normalized) {
+      case 'en orden': return 1;
+      case 'reparación': return 2;
+      case 'dañado': return 3;
+      case 'perdido': return 4;
+      default: return 4; // Default a Perdido si falla
     }
   }
 

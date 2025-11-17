@@ -9,6 +9,7 @@ import { ScanResponseDto } from '../Interfaces/scan-response.model';
 import { StartInventoryRequestDto } from '../Interfaces/start-inventory-request.model';
 import { StartInventoryResponseDto } from '../Interfaces/start-inventory-response.model';
 import { SignalrService } from './Connections/signalr.service';
+import { ManualScanEntry, MissingItem } from '../Interfaces/missing.model copy';
 
 @Injectable({
   providedIn: 'root',
@@ -152,6 +153,18 @@ export class InventoryService {
 
   clearScannedItems(): void {
     this.scannedItemsSubject.next(new Set());
+  }
+
+  getMissingItems(inventaryId: number): Observable<MissingItem[]> {
+    return this.http.get<MissingItem[]>(`${this.baseUrl}/${inventaryId}/missing`);
+  }
+
+  registerManualScans(inventaryId: number, items: ManualScanEntry[]): Observable<any> {
+    const body = {
+      inventaryId,
+      items
+    };
+    return this.http.post(`${this.baseUrl}/manual-scan`, body);
   }
 
   finish(finishRequest: FinishRequestDto): Observable<any> {

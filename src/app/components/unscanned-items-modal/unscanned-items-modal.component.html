@@ -1,0 +1,64 @@
+<ion-content class="ion-padding">
+  <div class="center-wrapper">
+    <div class="modal-wrapper unscanned-modal">
+      <header class="modal-header">
+        <h2>Ítems No Escaneados</h2>
+        <span class="items-count">{{ unscannedItems.length }} ítems</span>
+        <button class="close-button" (click)="dismiss()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </header>
+
+      <div class="modal-subtitle">
+        <p>Confirma el estado de los ítems que no fueron escaneados durante el inventario.</p>
+      </div>
+
+      <div class="items-list-container">
+        <div class="items-list">
+          <div *ngFor="let item of displayedItems; let i = index" class="unscanned-item">
+            <div class="item-header">
+              <div class="item-code-badge">{{ item.code }}</div>
+              <div class="item-index">#{{ i + 1 }}</div>
+            </div>
+
+            <div class="item-info">
+              <h3 class="item-name">{{ item.name }}</h3>
+              <p class="item-description">{{ item.description }}</p>
+            </div>
+
+            <div class="state-selection">
+              <label class="state-label">Estado confirmado:</label>
+              <select class="state-select" [ngModel]="item.selectedState || 'perdido'"
+                (ngModelChange)="onStateChange(item, $event)">
+                <option value="en orden">En Orden</option>
+                <option value="reparación">Reparación</option>
+                <option value="dañado">Dañado</option>
+                <option value="perdido">Perdido</option>
+              </select>
+
+              <div class="state-badge" [ngClass]="getStateBadgeClass(item.selectedState || 'perdido')">
+                {{ getStateDisplayName(item.selectedState || 'perdido') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="load-more-section" *ngIf="hasMoreItems">
+          <button class="load-more-btn" (click)="loadMore()">
+            <ion-icon name="chevron-down-outline"></ion-icon>
+            Cargar Más ({{ displayedItems.length }} / {{ unscannedItems.length }})
+          </button>
+        </div>
+      </div>
+
+      <div class="actions-section">
+        <div class="action-buttons">
+          <button class="btn-primary" (click)="applyChanges()">
+            <ion-icon name="checkmark-done-outline"></ion-icon>
+            Aplicar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -72,32 +72,19 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Limpiar subscription del hardware back button
     if (this.backButtonSubscription) {
       this.backButtonSubscription.unsubscribe();
     }
   }
 
-  /**
- * Hook de Ionic que se dispara ANTES de que la vista se navegue
- * por gestos (swipe) o botones de back en el header.
- */
   async ionViewCanLeave(): Promise<boolean> {
-    // Llama al servicio central
     const shouldExit = await this.inventoryExitService.handleExitAttempt();
 
     if (shouldExit) {
-      // 2. Si se debe salir, navegamos manualmente a 'login'
       this.navigationService.navigateToLogin();
-
-      // 3. IMPORTANTE: Retornamos 'false' para PREVENIR
-      // la navegación "hacia atrás" por defecto de Ionic.
-      // Nosotros ya hemos tomado el control de la navegación.
       return false;
     }
 
-    // 4. Si 'shouldExit' es 'false' (usuario canceló),
-    // retornamos 'false' para PREVENIR la navegación.
     return false;
   }
 
@@ -191,22 +178,11 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
     this.closeConfirmModal();
 
     const scannedCount = this.inventoryFacade.getScannedItemCount();
-
     if (scannedCount === 0) {
       await this.alertHelper.showError(
         'No se puede finalizar un inventario sin ítems escaneados.'
       );
       return;
-    }
-
-    const validation = this.inventoryFacade.validateInventoryCompletion(this.categorias);
-
-    if (!validation.isComplete) {
-      const shouldProceed = await this.inventoryFacade.showIncompleteInventoryAlert(validation);
-
-      if (!shouldProceed) {
-        return; // El usuario canceló en la alerta de incompletos
-      }
     }
 
     const observationResult = await this.alertHelper.showObservationPrompt(
