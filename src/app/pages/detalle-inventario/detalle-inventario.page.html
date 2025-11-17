@@ -20,6 +20,9 @@
       </div>
 
       <p class="item-reason">Razón: {{ item.reason || 'Sin razón registrada' }}</p>
+      <p *ngIf="item.zoneOrigen" class="item-zone-origin">
+        Zona origen: <strong>{{ item.zoneOrigen }}</strong>
+      </p>
 
       <div *ngIf="item.expectedState" class="state-comparison">
         <div class="state-block expected">
