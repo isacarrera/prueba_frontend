@@ -6,6 +6,8 @@ import { AuthService } from '../auth.service';
 import { InventoryService } from '../inventary.service';
 import { ZoneFacadeService } from '../Home/zone-facade.service';
 import { ZoneStateUpdate } from 'src/app/Interfaces/zone.model';
+import { VerificationListUpdate } from 'src/app/Interfaces/verification.model';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +23,9 @@ export class SignalrService {
     private inventoryService: InventoryService,
     private zoneFacade: ZoneFacadeService
   ) { }
+
+  private verificationListUpdateSubject = new Subject<VerificationListUpdate>();
+  public verificationListUpdates$ = this.verificationListUpdateSubject.asObservable();
 
   public async startConnection(): Promise<void> {
     if (this.hubConnection && this.hubConnection.state === 'Connected') {
@@ -45,6 +50,7 @@ export class SignalrService {
       console.log('Conexión SignalR establecida con éxito. ID:', this.hubConnection.connectionId);
       this.registerInventoryListeners();
       this.registerZoneStateListener();
+      this.registerVerificationListListener();
 
     } catch (err) {
       console.error('Error al conectar con SignalR:', err);
@@ -105,8 +111,21 @@ export class SignalrService {
 
     // "ReceiveZoneStateUpdate" debe coincidir con el string en el backend
     this.hubConnection.on('ReceiveZoneStateUpdate', (payload: ZoneStateUpdate) => {
-      console.log('🔔 Evento [ReceiveZoneStateUpdate] Recibido:', payload);
+      console.log('Evento [ReceiveZoneStateUpdate] Recibido:', payload);
       this.zoneFacade.handleZoneStateUpdate(payload);
+    });
+  }
+
+  /**
+   * Escucha cambios en la lista de verificación (Añadir/Quitar).
+   */
+  private registerVerificationListListener(): void {
+    if (!this.hubConnection) return;
+
+    // "ReceiveVerificationListUpdate" debe coincidir con el backend
+    this.hubConnection.on('ReceiveVerificationListUpdate', (payload: VerificationListUpdate) => {
+      console.log('Evento [ReceiveVerificationListUpdate] Recibido:', payload);
+      this.verificationListUpdateSubject.next(payload);
     });
   }
 }

@@ -12,6 +12,7 @@ import {
   personOutline,
 } from 'ionicons/icons';
 import { AuthService } from 'src/app/services/auth.service';
+import { SignalrService } from 'src/app/services/Connections/signalr.service';
 
 @Component({
   selector: 'app-verificador',
@@ -21,16 +22,15 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class VerificadorPage {
-  recuperar() {
-    throw new Error('Method not implemented.');
-  }
+
   usuario = '';
   contrasena = '';
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private signalrService: SignalrService
   ) {
     addIcons({
       personOutline,
@@ -51,8 +51,19 @@ export class VerificadorPage {
     }
 
     this.authService.login(this.usuario, this.contrasena).subscribe({
+
+      // --- [ 3. MARCAR EL 'next' COMO ASYNC ] ---
       next: async (res) => {
         if (res?.token) {
+          try {
+            console.log('Login de Verificador exitoso, iniciando SignalR...');
+            await this.signalrService.startConnection();
+            console.log('SignalR conectado.');
+          } catch (signalErr) {
+            console.error('Error al conectar con SignalR', signalErr);
+          }
+          // ------------------------------------
+
           this.showAlert('Acceso correcto', 'Bienvenido al sistema');
           this.router.navigate(['/revision-inventario']);
         } else {

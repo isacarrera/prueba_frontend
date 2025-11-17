@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,8 +17,10 @@ import {
   fileTrayOutline
 } from 'ionicons/icons';
 import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { InventoryService } from 'src/app/services/inventary.service';
+import { SignalrService } from 'src/app/services/Connections/signalr.service';
+import { VerificationListUpdate } from 'src/app/Interfaces/verification.model';
 
 @Component({
   selector: 'app-revision-inventario',
@@ -27,17 +29,22 @@ import { InventoryService } from 'src/app/services/inventary.service';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class RevisionInventarioPage implements OnInit {
+export class RevisionInventarioPage implements OnInit, OnDestroy {
   inventariosEnVerificacion: any[] = [];
   branchId: number | null = null;
   cargando = true;
+
+  private verificationListSub: Subscription | null = null;
+  private signalrService: SignalrService;
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private checkerService: CheckerService,
-    private inventoryService: InventoryService
+    private inventoryService: InventoryService,
+    private injector: Injector
   ) {
+    this.signalrService = this.injector.get(SignalrService);
     addIcons({
       arrowBackOutline,
       documentTextOutline,
@@ -51,12 +58,27 @@ export class RevisionInventarioPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loadInventories();
+
   }
 
   async ionViewWillEnter() {
     await this.loadInventories();
+    this.subscribeToUpdates();
   }
+
+  ionViewDidLeave() {
+    if (this.verificationListSub) {
+      this.verificationListSub.unsubscribe();
+      this.verificationListSub = null;
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.verificationListSub) {
+      this.verificationListSub.unsubscribe();
+    }
+  }
+
   async loadInventories() {
     const user = await this.authService.getUserFromToken();
     const userId = user?.userId;
@@ -91,6 +113,56 @@ export class RevisionInventarioPage implements OnInit {
     });
   }
 
+  /**
+   * Se suscribe al Observable de SignalR.
+   */
+  private subscribeToUpdates(): void {
+    if (this.verificationListSub) return; // Ya suscrito
+
+    this.verificationListSub = this.signalrService.verificationListUpdates$.subscribe(payload => {
+      this.handleVerificationUpdate(payload);
+    });
+  }
+
+  /*
+   * Actualiza la lista local 'inventariosEnVerificacion' basado en el payload.
+   */
+  private handleVerificationUpdate(payload: VerificationListUpdate): void {
+    // Solo reaccionar si la actualización pertenece a nuestra sucursal
+    if (payload.branchId !== this.branchId) {
+      console.log(`Actualización ignorada (BranchId ${payload.branchId} != ${this.branchId})`);
+      return;
+    }
+
+    // Si se añade un inventario
+    if (payload.updateType === 'Added') {
+      // Evitar duplicados (por si acaso)
+      const exists = this.inventariosEnVerificacion.some(inv => inv.inventaryId === payload.inventaryId);
+      if (!exists) {
+        console.log(`Añadiendo inventario ${payload.inventaryId} a la lista...`);
+        // Creamos el objeto que coincide con lo que espera el HTML
+        const newItem = {
+          inventaryId: payload.inventaryId,
+          date: payload.date,
+          zoneId: payload.zoneId,
+          zoneName: payload.zoneName,
+          // (añade cualquier otra propiedad que tu DTO 'InventarySummaryDto' tenga)
+        };
+        // Añadir al principio de la lista y forzar re-renderización
+        this.inventariosEnVerificacion = [newItem, ...this.inventariosEnVerificacion];
+      }
+    }
+
+    // Si se quita un inventario
+    if (payload.updateType === 'Removed') {
+      console.log(`Quitando inventario ${payload.inventaryId} de la lista...`);
+      // Filtrar el inventario fuera de la lista y forzar re-renderización
+      this.inventariosEnVerificacion = this.inventariosEnVerificacion.filter(
+        inv => inv.inventaryId !== payload.inventaryId
+      );
+    }
+  }
+
   getFormattedDate(dateString: string): string {
     if (!dateString) return 'Fecha no disponible';
 
@@ -118,51 +190,6 @@ export class RevisionInventarioPage implements OnInit {
     } catch {
       return 'Hora inválida';
     }
-  }
-
-  getFormattedDateTime(dateString: string): string {
-    if (!dateString) return 'Fecha/hora no disponible';
-
-    try {
-      const date = this.getFormattedDate(dateString);
-      const time = this.getFormattedTime(dateString);
-
-      return `${date} ${time}`;
-    } catch {
-      return 'Fecha/hora inválida';
-    }
-  }
-
-  // Métodos auxiliares para la vista
-  getCardStatusClass(inventario: any): string {
-    return inventario?.stateZone?.toLowerCase() || 'pending';
-  }
-
-  getStatusIcon(inventario: any): string {
-    const status = inventario?.stateZone?.toLowerCase();
-    switch(status) {
-      case 'completed': return 'checkmark-done-outline';
-      case 'in-progress': return 'sync-outline';
-      default: return 'time-outline';
-    }
-  }
-
-  getStatusText(inventario: any): string {
-    const status = inventario?.stateZone?.toLowerCase();
-    switch(status) {
-      case 'completed': return 'Completado';
-      case 'in-progress': return 'En Progreso';
-      default: return 'Pendiente';
-    }
-  }
-
-  calculateProgress(inventario: any): number {
-    // Implementa tu lógica de cálculo de progreso aquí
-    // Por ejemplo, basado en items verificados vs totales
-    if (inventario?.verifiedItems && inventario?.totalItems) {
-      return Math.round((inventario.verifiedItems / inventario.totalItems) * 100);
-    }
-    return inventario?.progress || 0;
   }
 
   goBack() {
