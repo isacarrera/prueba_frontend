@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package io.codexy.app;
 
 import com.getcapacitor.BridgeActivity;
 

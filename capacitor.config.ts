@@ -5,10 +5,10 @@ const config: CapacitorConfig = {
   appName: 'Codexy',
   webDir: 'www',
   bundledWebRuntime: false,
-  server: {
-    cleartext: true,
-    androidScheme: 'http'
-  }
+  // server: {
+  //   cleartext: true,
+  //   androidScheme: 'http'
+  // }
 };
 
 export default config;
