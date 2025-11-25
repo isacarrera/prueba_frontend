@@ -20,6 +20,7 @@ import { Item, ItemService } from 'src/app/services/item.service';
 import { StateSelectionModalComponent } from '../state-selection-modal/state-selection-modal.component';
 import { ItemInfoModalComponent } from '../item-info-modal/item-info-modal.component';
 import { ItemData } from 'src/app/Interfaces/item-info.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-scanner',
@@ -33,15 +34,13 @@ export class ScannerPage implements OnInit, OnDestroy {
   scannedCode: string | null = null;
   showInstructions = true;
   scanMode: 'inventory' | 'description' = 'inventory';
-  zonaId: number = 0;      // Se usa para inventario
-  branchId: number = 0;    // Se usa para descripción
+  zonaId: number = 0;
+  branchId: number = 0;
 
-  // Modal de descripción
   isDescriptionModalOpen = false;
   descriptionItem: Item | null = null;
   descriptionError: string | null = null;
 
-  /** Almacena si el usuario entró como Invitado (true) o Anfitrión (false) */
   private isGuestFlow: boolean = false;
 
   constructor(
@@ -67,7 +66,6 @@ export class ScannerPage implements OnInit, OnDestroy {
       const navigation = this.router.getCurrentNavigation();
       if (navigation?.extras?.state) {
         this.scanMode = navigation.extras.state['scanMode'] || 'inventory';
-        // Leer el nuevo flag. Si no viene, se asume que es Anfitrion (false).
         this.isGuestFlow = navigation.extras.state['isGuest'] || false;
       }
     } catch {
@@ -94,7 +92,6 @@ export class ScannerPage implements OnInit, OnDestroy {
       this.branchId = paramId;
     }
 
-    // Permiso de camara
     const permission = await BarcodeScanner.checkPermission({ force: true });
 
     if (!permission.granted) {
@@ -113,11 +110,8 @@ export class ScannerPage implements OnInit, OnDestroy {
 
   private navigateOnExit() {
     if (this.isGuestFlow) {
-      // Los invitados siempre vuelven a /home
       this.router.navigate(['/home']);
     } else {
-      // Los anfitriones siempre vuelven a la zona específica
-      // Leemos el ID de la ruta actual para asegurar que siempre lo tenemos
       const currentZoneId = this.route.snapshot.paramMap.get('zonaId');
       this.router.navigate(['/inicio-operativo', currentZoneId]);
     }
@@ -127,7 +121,6 @@ export class ScannerPage implements OnInit, OnDestroy {
     this.stopScanner();
   }
 
-  // Inicia el escaneo
   private async startScanning() {
     try {
       const result = await BarcodeScanner.startScan();
@@ -140,16 +133,15 @@ export class ScannerPage implements OnInit, OnDestroy {
         }
       }
     } catch (err) {
-      console.error('[ScannerPage] Error en startScan() / Plugin falló:', err);
+      console.error('[ScannerPage] Error en startScan():', err);
       this.stopScanner();
     }
   }
 
-  // Maneja el resultado del escaneo
   private async handleScanResult(rawCode: string) {
 
     const cleanRaw = rawCode.trim().replace(/\s+/g, '');
-    const QR_REGEX = /^Code:[A-Za-z0-9]{1,12}$/
+    const QR_REGEX = /^Code:[A-Za-z0-9]{1,12}$/;
 
     if (!QR_REGEX.test(cleanRaw)) {
       await this.showError('Código QR inválido. Solo se aceptan QRs del sistema.');
@@ -160,6 +152,9 @@ export class ScannerPage implements OnInit, OnDestroy {
 
     const code = cleanRaw.replace('Code:', '');
 
+    // -----------------------------------------
+    // DESCRIPCIÓN
+    // -----------------------------------------
     if (this.scanMode === 'description') {
       await BarcodeScanner.stopScan();
 
@@ -181,25 +176,50 @@ export class ScannerPage implements OnInit, OnDestroy {
         await new Promise(r => setTimeout(r, 1500));
       }
 
-    } else {
-      this.scannedCode = code;
-      await new Promise((r) => setTimeout(r, 800));
-      this.scannedCode = null;
-      await this.openStateSelectionModal(code);
+      return;
     }
+
+    // -----------------------------------------
+    // INVENTARIO
+    // -----------------------------------------
+    this.scannedCode = code;
+    await new Promise((r) => setTimeout(r, 800));
+    this.scannedCode = null;
+
+    const inventaryId = this.inventoryService.getInventaryId()!;
+
+    try {
+      const res = await firstValueFrom(
+        this.inventoryService.isItemScannedByCode(inventaryId, code)
+      );
+
+      if (res.isScanned) {
+        // Abrir modal en modo duplicado
+        await this.openStateSelectionModal(code, true);
+        return;
+      }
+    } catch (err: any) {
+      if (err.status === 404) {
+        await this.showError(err.error?.message || "Item no encontrado.");
+        return;
+      }
+    }
+
+    // Si NO es duplicado → abrir modal normal
+    await this.openStateSelectionModal(code);
   }
 
   closeDescriptionModal() {
     this.navigateOnExit();
   }
 
-  // Modal de seleccion de estado (modo inventario)
-  private async openStateSelectionModal(code: string) {
+  private async openStateSelectionModal(code: string, alreadyScanned = false) {
     const modal = await this.modalController.create({
       component: StateSelectionModalComponent,
       componentProps: {
         code,
         inventaryId: this.inventoryService.getInventaryId()!,
+        alreadyScanned
       },
     });
 
@@ -217,11 +237,9 @@ export class ScannerPage implements OnInit, OnDestroy {
     });
 
     await modal.present();
-
     await modal.onDidDismiss();
   }
 
-  // Mensaje de error reutilizable
   private async showError(message: string) {
     const alert = await this.alertController.create({
       header: 'Error',
@@ -231,13 +249,11 @@ export class ScannerPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  // Cancela el escaneo y vuelve a inicio-operativo (solo inventario)
   async cancelScan() {
     await this.stopScanner();
     this.navigateOnExit();
   }
 
-  // Detiene y limpia el estado del escáner
   private async stopScanner() {
     try {
       await BarcodeScanner.stopScan();
@@ -250,7 +266,6 @@ export class ScannerPage implements OnInit, OnDestroy {
     document.querySelector('html')?.classList.remove('scanner-active');
   }
 
-  // Control del flash
   async toggleFlash() {
     const alert = await this.alertController.create({
       header: 'Flash',
@@ -259,4 +274,5 @@ export class ScannerPage implements OnInit, OnDestroy {
     });
     await alert.present();
   }
+
 }

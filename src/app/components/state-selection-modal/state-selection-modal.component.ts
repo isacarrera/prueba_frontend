@@ -15,8 +15,11 @@ import { StateItemService } from 'src/app/services/stateItem.service';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class StateSelectionModalComponent implements OnInit {
+  
   @Input() code!: string;
   @Input() inventaryId!: number;
+
+  @Input() alreadyScanned: boolean = false;
 
   selectedStateId: number | null = null;
   stateItems: StateItem[] = [];
@@ -31,19 +34,27 @@ export class StateSelectionModalComponent implements OnInit {
     private modalCtrl: ModalController,
     private inventoryService: InventoryService,
     private stateItemService: StateItemService
-  ) { }
+  ) {}
 
   async ngOnInit() {
     await this.loadStateItems();
+
+    // Si ya estaba escaneado, mostrar feedback de inmediato
+    if (this.alreadyScanned) {
+      this.showFeedbackView = true;
+      this.feedbackMessage = 'Este ítem ya fue escaneado anteriormente.';
+      this.feedbackStatus = 'warning';
+    }
   }
 
-  /** 🔹 Carga los estados reales desde la API */
   private async loadStateItems() {
     try {
       this.stateItems = await firstValueFrom(this.stateItemService.getStateItems());
+      
       if (!this.stateItems.length) {
         console.warn('⚠️ No se encontraron estados en el backend.');
       }
+
     } catch (err) {
       console.error('❌ Error al cargar estados de ítem:', err);
       this.stateItems = [];
@@ -51,6 +62,11 @@ export class StateSelectionModalComponent implements OnInit {
   }
 
   async confirm() {
+
+    if (this.alreadyScanned) {
+      return;
+    }
+
     if (this.isProcessing || !this.selectedStateId) return;
 
     this.isProcessing = true;
@@ -67,25 +83,27 @@ export class StateSelectionModalComponent implements OnInit {
 
       if (!response) throw new Error('No se recibió respuesta del servidor.');
 
-      // if (response.isValid && response.itemId && response.status === 'Correct') {
-      //   this.inventoryService.addScannedItem(response.itemId);
-      // }
+      // Registrar como escaneado (solo si NO es duplicado)
+      if (response.itemId) {
+        this.inventoryService.addScannedItem(response.itemId);  
+      }
 
+      // UI feedback por estado devuelto
       switch (response.status) {
         case 'Correct':
-          this.feedbackMessage = 'Item escaneado correctamente.';
+          this.feedbackMessage = 'Ítem escaneado correctamente.';
           this.feedbackStatus = 'success';
           break;
         case 'WrongZone':
-          this.feedbackMessage = 'Item no pertenece a esta zona.';
+          this.feedbackMessage = 'Ítem no pertenece a esta zona.';
           this.feedbackStatus = 'error';
           break;
         case 'NotFound':
-          this.feedbackMessage = 'Item no encontrado en el sistema.';
+          this.feedbackMessage = 'Ítem no encontrado en el sistema.';
           this.feedbackStatus = 'error';
           break;
         case 'Duplicate':
-          this.feedbackMessage = 'Item ya escaneado anteriormente.';
+          this.feedbackMessage = 'Ítem ya escaneado anteriormente.';
           this.feedbackStatus = 'warning';
           break;
         default:
@@ -94,25 +112,20 @@ export class StateSelectionModalComponent implements OnInit {
       }
 
       this.showFeedbackView = true;
+
     } catch (err: any) {
+
       let backendMessage = 'No se pudo enviar el escaneo. Verifica tu conexión.';
 
-      if (err?.error?.message) {
-        backendMessage = err.error.message;
-      }
-
-      else if (err?.error?.error) {
-        backendMessage = err.error.error;
-      }
-
-      else if (typeof err === 'string') {
-        backendMessage = err;
-      }
+      if (err?.error?.message) backendMessage = err.error.message;
+      else if (err?.error?.error) backendMessage = err.error.error;
+      else if (typeof err === 'string') backendMessage = err;
 
       this.lastResponse = { error: backendMessage };
       this.feedbackMessage = backendMessage;
       this.feedbackStatus = 'error';
       this.showFeedbackView = true;
+
     } finally {
       this.isProcessing = false;
     }
@@ -120,8 +133,7 @@ export class StateSelectionModalComponent implements OnInit {
 
   closeModalAndContinue() {
     const success = this.lastResponse && !this.lastResponse.error;
-    const itemScanned =
-      success && this.lastResponse.isValid && this.lastResponse.itemId;
+    const itemScanned = !!(this.lastResponse && this.lastResponse.itemId);
 
     this.modalCtrl.dismiss({
       success,

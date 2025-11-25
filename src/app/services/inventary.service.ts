@@ -189,7 +189,10 @@ export class InventoryService {
     return this.http.post(`${this.baseUrl}/verify`, body);
   }
 
-  getItemDescription(code: string): Observable<any> {
-    return this.http.get(`${this.itemApiUrl}/by-code/${code}`);
+  isItemScannedByCode(inventaryId: number, code: string): Observable<any> {
+    return this.http.get<any>(
+      `${this.baseUrl}/${inventaryId}/is-scanned/${code}`
+    );
   }
+
 }

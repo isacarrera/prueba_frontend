@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonicModule, Platform } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -62,7 +62,9 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
     return this.invitationCode ? this.invitationCode.split('') : ['-', '-', '-', '-'];
   }
 
-  constructor() {
+  constructor(
+    private router: Router,
+  ) {
     this.registerIcons();
   }
 
@@ -208,7 +210,7 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
       await this.alertHelper.showInfoWithCallback(
         '✅ Éxito',
         'Inventario finalizado correctamente.',
-        () => this.navigationService.navigateToLogin()
+        () => this.navigateToHome()
       );
     } else {
       await this.alertHelper.showError(result.error || 'No se pudo finalizar el inventario.');
@@ -265,6 +267,10 @@ export class InicioOperativoPage implements OnInit, OnDestroy {
   closeConfirmModal(): void {
     this.isConfirmOpen = false;
   }
+  navigateToHome() {
+  this.router.navigate(['/home']);
+}
+
 
   // ========================================
   // HELPERS PRIVADOS
