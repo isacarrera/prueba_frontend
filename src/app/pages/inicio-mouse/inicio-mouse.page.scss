@@ -13,25 +13,30 @@
 
 /* ✅ Estados de escaneado */
 .status.escaneado {
-  background: #16a34a; /* verde */
+  background: #16a34a;
+  /* verde */
   color: white;
 }
 
 .status.pendiente {
-  background: #f87171; /* rojo */
+  background: #f87171;
+  /* rojo */
   color: white;
 }
 
 /* ✅ Clases para las cards escaneadas */
 .device-card.scanned {
-  box-shadow: inset 4px 0 #16a34a, /* franja lateral verde escaneado */
-              0 6px 20px rgba(0, 0, 0, 0.4);
-  background: #15253d; /* fondo ligeramente diferente para escaneados */
+  box-shadow: inset 4px 0 #16a34a,
+    /* franja lateral verde escaneado */
+    0 6px 20px rgba(0, 0, 0, 0.4);
+  background: #15253d;
+  /* fondo ligeramente diferente para escaneados */
 }
 
 .device-card:not(.scanned) {
-  box-shadow: inset 4px 0 #f87171, /* franja lateral roja pendiente */
-              0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 4px 0 #f87171,
+    /* franja lateral roja pendiente */
+    0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Botón atrás */
@@ -52,7 +57,7 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   background: #0f1535;
   display: flex;
   justify-content: center;
@@ -60,6 +65,7 @@
   margin: 70px auto 20px;
   box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
 }
+
 .icon-circle img {
   width: 60px;
   height: 60px;
@@ -81,6 +87,151 @@
   margin-bottom: 30px;
 }
 
+/* Contenedor de filtros */
+.filters-container {
+  width: 90%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filters-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  padding: 4px 0;
+  scrollbar-width: none;
+}
+
+.filters-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(17, 23, 56, 0.4);
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #e2e8f0;
+}
+
+.filter-button.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
+  color: white;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.filter-button ion-icon {
+  font-size: 16px;
+}
+
+.clear-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.clear-filters-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.clear-filters-empty-btn {
+  margin-top: 16px;
+  padding: 10px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.clear-filters-empty-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+/* Información de resultados */
+.results-info {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.results-info p {
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Estados de carga y vacío */
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.loading-state ion-spinner {
+  --color: #3b82f6;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state .empty-icon {
+  font-size: 64px;
+  color: #94a3b8;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.empty-state p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 14px;
+}
+
+
 /* Card estilo Figma */
 .device-card {
   width: 100%;
@@ -93,17 +244,19 @@
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s ease;
-   cursor: default;
+  cursor: default;
 }
 
 .device-left {
   display: flex;
   flex-direction: column;
 }
+
 .device-id {
   font-weight: bold;
   font-size: 16px;
 }
+
 .device-serial {
   font-size: 13px;
   color: #aaa;
@@ -130,6 +283,7 @@
   font-size: 18px;
   color: white;
 }
+
 .load-more-container {
   margin-top: 20px;
   margin-bottom: 20px;
